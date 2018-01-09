@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MapQuad : MonoBehaviour {
 
-    // Todo, wall rotation needs to be set up
     // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
 
     // Material resource locations will have to be manually added and adjusted in the start function as tile improvements change
@@ -189,6 +187,23 @@ public class MapQuad : MonoBehaviour {
             for (int i = 0; i < mapWidth; ++i)
             {
                 mapTiles[j, i] = new Tile(i, j);
+
+                if (j == 0)
+                {
+                    mapTiles[j, i].walls.south = true;
+                }
+                if (i == 0)
+                {
+                    mapTiles[j, i].walls.west = true;
+                }
+                if (j == mapHeight - 1)
+                {
+                    mapTiles[j, i].walls.north = true;
+                }
+                if (i == mapWidth - 1)
+                {
+                    mapTiles[j, i].walls.east = true;
+                }
             }
         }
 	}
