@@ -17,5 +17,28 @@ public class GameController : MonoBehaviour {
         {
             Application.Quit();
         }
+        // Toggle framerate display between Basic, Advanced, and Off
+        // This should be a user configurable key binding, so move this to player controlls once player controls are implemented
+        if (Input.GetKeyDown(KeyCode.F5)) // Is F5 generally reserved for something else?
+        {
+            FramerateDisplay fpsScript = GameObject.Find("GameController").GetComponent<FramerateDisplay>();
+            Canvas fpsDisplay = GameObject.Find("FPSDisplay").GetComponent<Canvas>();
+
+            if (!fpsScript.enabled)
+            {
+                fpsDisplay.enabled = true;
+                fpsScript.enabled = true;
+                fpsScript.isAdvanced = false;
+            }
+            else if (!fpsScript.isAdvanced)
+            {
+                fpsScript.isAdvanced = true;
+            }
+            else
+            {
+                fpsScript.enabled = false;
+                fpsDisplay.enabled = false;
+            }
+        }
 	}
 }
