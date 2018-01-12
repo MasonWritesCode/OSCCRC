@@ -62,7 +62,7 @@ public class FramerateDisplay : MonoBehaviour {
             }
             // We will use current FPS for entire text color for now.
             // We will target 60 fps as green, 30 fps as yellow, and 0 as red, and try to set the color to have a smooth gradient between them
-            textDisplay.color = new Color(Mathf.Max((60.0f-currentFramerate) / 60.0f, 0.0f), Mathf.Max(currentFramerate / 60.0f, 1.0f), 0.0f);
+            textDisplay.color = new Color(Mathf.Max((60.0f-currentFramerate) / 60.0f, 0.0f), Mathf.Min(currentFramerate / 60.0f, 1.0f), 0.0f);
 
             m_frameAccum = 0;
             m_timeAccum = 0;
