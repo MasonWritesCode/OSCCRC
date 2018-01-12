@@ -4,8 +4,16 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement)
+    {
+        // This checks if a player is allowed to place the desired improvement, and does so if they can
+        // This is different between game modes, so will have to account for that when other modes are implemented
+        // Since we haven't implemented any game modes yet, always allow the placement
+        tile.improvement = improvement;
+    }
+
+    // Use this for initialization
+    void Start () {
 
 	}
 	
@@ -18,7 +26,7 @@ public class GameController : MonoBehaviour {
             Application.Quit();
         }
         // Toggle framerate display between Basic, Advanced, and Off
-        // This should be a user configurable key binding, so move this to player controlls once player controls are implemented
+        // This should be a user configurable key binding probably, so probably move this to player controlls once player controls are implemented
         if (Input.GetKeyDown(KeyCode.F5)) // Is F5 generally reserved for something else?
         {
             FramerateDisplay fpsScript = GameObject.Find("GameController").GetComponent<FramerateDisplay>();
