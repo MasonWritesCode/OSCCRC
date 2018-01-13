@@ -44,7 +44,7 @@ public class FramerateDisplay : MonoBehaviour {
             m_timeRemaining += 1.0f / updateInterval;
 
             float currentFramerate = m_frameAccum / m_timeAccum;
-            m_averageFramerate = ((m_averageFramerate * (m_updateNumber - 1)) + currentFramerate) / m_updateNumber;
+            m_averageFramerate = (m_averageFramerate * ((m_updateNumber - 1) / (float)m_updateNumber)) + (currentFramerate / m_updateNumber);
             if (currentFramerate < m_minFramerate || m_minFramerate < 0)
             {
                 m_minFramerate = currentFramerate;
