@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour {
     // I heard Unity is going to be overhauling its input system soon. It would be nice to subscribe to event callbacks rather than poll every frame.
 
     public int playerID;
+    public Transform highlighter;
 
     private MapTile currentTile = null;
     private GameController gameController;
@@ -28,7 +29,8 @@ public class PlayerController : MonoBehaviour {
             MapTile newTile = hitObject.transform.GetComponent<MapTile>();
             if (newTile != null && newTile != currentTile)
             {
-                // Some form of highlighting should be applied to the current tile here to verify which tile is selected while the cursor is between tiles.
+                // Currently using a spotlight to highlight the currently slected tile
+                highlighter.position = newTile.transform.position + Vector3.up * 2;
                 currentTile = newTile;
             }
         }
