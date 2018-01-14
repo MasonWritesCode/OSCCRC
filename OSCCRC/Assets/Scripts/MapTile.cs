@@ -80,11 +80,11 @@ public class MapTile : MonoBehaviour {
             // The companion wall always has the same existance state
             if (isCreating)
             {
-                map.mapTiles[otherTileX, otherTileZ].walls.m_walls[(wallID + 2) % 4] = m_walls[wallID];
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = m_walls[wallID];
             }
             else if (!isCreating)
             {
-                map.mapTiles[otherTileX, otherTileZ].walls.m_walls[(wallID + 2) % 4] = null;
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = null;
             }
         }
     }
@@ -92,8 +92,6 @@ public class MapTile : MonoBehaviour {
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileMaterial(value); } }
     public Walls walls;
-
-    public static float tileSize;
 
     private TileImprovement m_improvement;
 

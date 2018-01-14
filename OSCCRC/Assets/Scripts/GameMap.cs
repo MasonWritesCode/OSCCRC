@@ -5,20 +5,21 @@ public class GameMap : MonoBehaviour {
 
     public int mapHeight = 9;
     public int mapWidth = 12;
-    public MapTile[,] mapTiles;
+    public float tileSize;
 
     // These must be considered static for now, because I am treating the size of tiles as pulled from the prefab as static in Tile class
     public Transform TilePrefab;
     public Transform WallPrefab;
 
     private Transform mapTransform;
+    private MapTile[,] mapTiles;
 
     // create tile and create wall functions?
 
     void Start () {
         mapTiles = new MapTile[mapHeight, mapWidth];
 
-        MapTile.tileSize = TilePrefab.localScale.x;
+        tileSize = TilePrefab.localScale.x;
         MapTile.Walls.map = this;
 
         mapTransform = GetComponent<Transform>();
@@ -48,9 +49,14 @@ public class GameMap : MonoBehaviour {
         }
 	}
 
+    public MapTile tileAt(Vector3 point)
+    {
+        return mapTiles[(int)(point.z), (int)(point.x)];
+    }
+
     public MapTile createTile(float xPos, float zPos)
     {
-        Transform newTileTransform = Instantiate(TilePrefab, new Vector3(xPos * MapTile.tileSize, 0, zPos * MapTile.tileSize), TilePrefab.rotation, mapTransform);
+        Transform newTileTransform = Instantiate(TilePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), TilePrefab.rotation, mapTransform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile();
         return newTile;
@@ -58,24 +64,24 @@ public class GameMap : MonoBehaviour {
 
     public Transform createWall(float xPos, float zPos, int wallID)
     {
-        Transform newWall = Instantiate(WallPrefab, new Vector3(xPos * MapTile.tileSize, 0, zPos * MapTile.tileSize), WallPrefab.rotation, mapTransform);
+        Transform newWall = Instantiate(WallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), WallPrefab.rotation, mapTransform);
 
         if (wallID == 0)
         {
-            newWall.position += Vector3.forward * MapTile.tileSize / 2;
+            newWall.position += Vector3.forward * tileSize / 2;
         }
         else if (wallID == 1)
         {
-            newWall.position += Vector3.right * MapTile.tileSize / 2;
+            newWall.position += Vector3.right * tileSize / 2;
             newWall.Rotate(Vector3.up * 90);
         }
         else if (wallID == 2)
         {
-            newWall.position += Vector3.back * MapTile.tileSize / 2;
+            newWall.position += Vector3.back * tileSize / 2;
         }
         else if (wallID == 3)
         {
-            newWall.position += Vector3.left * MapTile.tileSize / 2;
+            newWall.position += Vector3.left * tileSize / 2;
             newWall.Rotate(Vector3.up * 90);
         }
 
