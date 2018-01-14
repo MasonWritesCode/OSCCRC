@@ -51,7 +51,7 @@ public class GameMap : MonoBehaviour {
 
     public MapTile tileAt(Vector3 point)
     {
-        return mapTiles[(int)(point.z), (int)(point.x)];
+        return mapTiles[(int)(point.z / tileSize), (int)(point.x / tileSize)];
     }
 
     public MapTile createTile(float xPos, float zPos)
