@@ -7,7 +7,7 @@ public class GameMap : MonoBehaviour {
     public int mapWidth = 12;
     public MapTile[,] mapTiles;
 
-    // These must be considered static for now, because I am treating the size of tiles as pulled from the prefab as static.
+    // These must be considered static for now, because I am treating the size of tiles as pulled from the prefab as static in Tile class
     public Transform TilePrefab;
     public Transform WallPrefab;
 
@@ -87,26 +87,4 @@ public class GameMap : MonoBehaviour {
         Destroy(wall.gameObject);
     }
 
-    // Only used temporarily for testing. This should be removed soon.
-    ///*
-    void Update () {
-        if (Input.GetKeyDown(KeyCode.Comma))
-        {
-            mapTiles[0, 0].improvement = MapTile.TileImprovement.None;
-        }
-        else if (Input.GetKeyDown(KeyCode.Period))
-        {
-            mapTiles[0, 0].improvement = MapTile.TileImprovement.Hole;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Semicolon))
-        {
-            mapTiles[0, 0].walls.north = !mapTiles[0, 0].walls.north;
-        }
-        else if (Input.GetKeyDown(KeyCode.Quote))
-        {
-            mapTiles[0, 0].walls.west = !mapTiles[0, 0].walls.west;
-        }
-    }
-    //*/
 }
