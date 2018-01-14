@@ -6,9 +6,7 @@ public class MapTile : MonoBehaviour {
 
     // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
 
-        //  Fix walls to use GameMap
-
-    // Material resource locations will have to be manually added and adjusted in the start function as tile improvements change
+    // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
     public enum TileImprovement { None, Hole, Goal, Left, Right, Up, Down, Wrap }
     public static Dictionary<TileImprovement, string> improvementResources = new Dictionary<TileImprovement, string>();
 
@@ -27,8 +25,6 @@ public class MapTile : MonoBehaviour {
         private int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
 
         // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
-        // How we create walls might change later, depending on how we want a potential editor to do wall placement. Right now, always place on tiles.
-        // If we do add an editor, it would likely make sense to have a separate prefab for each wall direction. I'm not doing that now because I didn't.
         private void changeWall(int wallID, bool isCreating)
         {
             if (isCreating && m_walls[wallID] == null)
@@ -84,55 +80,80 @@ public class MapTile : MonoBehaviour {
             // The companion wall always has the same existance state
             if (isCreating)
             {
-                map.mapTiles[otherTileX, otherTileZ].walls.m_walls[(wallID + 2) % 4] = m_walls[wallID];
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = m_walls[wallID];
             }
             else if (!isCreating)
             {
-                map.mapTiles[otherTileX, otherTileZ].walls.m_walls[(wallID + 2) % 4] = null;
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = null;
             }
         }
     }
 
 
-    public TileImprovement improvement { get { return m_improvement; } set { m_improvement = value; setTileMaterial(); } }
+    public TileImprovement improvement { get { return m_improvement; } set { setTileMaterial(value); } }
     public Walls walls;
-
-    public static float tileSize;
 
     private TileImprovement m_improvement;
 
-    private static bool isStaticInitialized = false;
+    static MapTile()
+    {
+        improvementResources.Add(TileImprovement.None, "Tile");
+        improvementResources.Add(TileImprovement.Hole, "Hole");
+        improvementResources.Add(TileImprovement.Goal, "Hole");
+        improvementResources.Add(TileImprovement.Left, "Hole");
+        improvementResources.Add(TileImprovement.Right, "Hole");
+        improvementResources.Add(TileImprovement.Up, "Hole");
+        improvementResources.Add(TileImprovement.Down, "Hole");
+        improvementResources.Add(TileImprovement.Wrap, "Hole");
+    }
 
     public void initTile()
     {
-        m_improvement = TileImprovement.None;
         walls = new Walls();
         walls.origin = GetComponent<Transform>().position;
+        improvement = TileImprovement.None;
     }
 
-    private void setTileMaterial()
+    private void setTileMaterial(TileImprovement improvement)
     {
-        Material newMaterial = Resources.Load(improvementResources[m_improvement]) as Material;
+        string materialPath = "";
+        if (improvementResources.ContainsKey(improvement))
+        {
+            materialPath = improvementResources[improvement];
+        }
+        else
+        {
+            Debug.Log("Warning: Improvement " + improvement.ToString() + " was not assigned a resource name!");
+        }
+        if (improvement == TileImprovement.None)
+        {
+            // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
+            if ((walls.origin.x + walls.origin.z) % 2 == 0)
+            {
+                materialPath = "Tile";
+            }
+            else
+            {
+                materialPath = "TileAlt";
+            }
+        }
+
+        Material newMaterial = Resources.Load("Materials/" + materialPath) as Material;
         if (newMaterial)
         {
             GetComponent<MeshRenderer>().material = newMaterial;
         }
+        else
+        {
+            Debug.Log("Warning: Material " + materialPath + " was not found!");
+        }
+
+        m_improvement = improvement;
     }
 
     // Use this for initialization
     void Start() {
-        if (!isStaticInitialized)
-        {
-            isStaticInitialized = true;
-            improvementResources.Add(TileImprovement.None, "Materials/Tile(Yellow)");
-            improvementResources.Add(TileImprovement.Hole, "Materials/Hole");
-            improvementResources.Add(TileImprovement.Goal, "Materials/Hole");
-            improvementResources.Add(TileImprovement.Left, "Materials/Hole");
-            improvementResources.Add(TileImprovement.Right, "Materials/Hole");
-            improvementResources.Add(TileImprovement.Up, "Materials/Hole");
-            improvementResources.Add(TileImprovement.Down, "Materials/Hole");
-            improvementResources.Add(TileImprovement.Wrap, "Materials/Hole");
-        }
+
     }
 
 }
