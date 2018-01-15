@@ -8,17 +8,20 @@ public class GridMovement : MonoBehaviour {
 	public GameMap map;
 	public string direction;
 
-	private float duration;
+	MapTile mouseTile;
+	MapTile destinationTile;
+
+	public enum Directions {north, south, east, west};
 
 	// Use this for initialization
 	void Start () {
 		map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-		duration = 0;
 	}
 
 	void Update() {
-		MapTile mouseTile;
+		//MapTile mouseTile;
 		float degrees;
+		bool skip = false;
 
 		//TODO: check for arrow tiles, pits, goal, etc.
 
@@ -33,10 +36,10 @@ public class GridMovement : MonoBehaviour {
 		}
 		transform.position = new Vector3 (x,0.0f,z);
 
-
 		// Using tileAt works fine when moving north or east. When moving south, it doesn't work as intended. 
 		// if xPos is at .9927, the floor treats it as 0, obviously, and the mouse will turn before it has actually
 		// fully entered the tile
+		/*
 		if (direction == "south" || direction == "west") {
 			float xPos = Mathf.FloorToInt (transform.position.x);
 			float zPos = Mathf.FloorToInt (transform.position.z);
@@ -47,9 +50,11 @@ public class GridMovement : MonoBehaviour {
 		else {
 			mouseTile = map.tileAt(transform.position);
 		}
+		*/
 
 		mouseTile = map.tileAt(transform.position);
 
+		//Debug.Log (Vector3.Distance(mouseTile.transform.position,transform.position));
 
 		//yeah, this could be cleaner, but it works.
 		if (mouseTile.walls.north && direction == "north") {
@@ -73,11 +78,17 @@ public class GridMovement : MonoBehaviour {
 			//since the transform.Translate() isn't exactly ensuring that happens
 			//this is probably a dumb idea
 
-			//float xPos = Mathf.FloorToInt(transform.position.x);
+			//float xPos = Mathf.CeilToInt(transform.position.x);
 			float xPos = transform.position.x;
-			float zPos = Mathf.FloorToInt(transform.position.z);
+			float zPos = Mathf.Round(transform.position.z);
 			transform.position = new Vector3 (xPos,0.0f,zPos);
 			//
+			if (transform.position == mouseTile.transform.position) // we hit our destination, so get a new tile
+			{
+				Debug.Log ("north");
+				destinationTile = map.tileAt(transform.position + Vector3.forward * map.tileSize); // after rotating, so facing the desired direction
+			}
+			skip = true;
 		} 
 		else if (mouseTile.walls.south && direction == "south") {
 			Debug.Log (transform.position);
@@ -97,8 +108,15 @@ public class GridMovement : MonoBehaviour {
 			transform.Rotate (new Vector3 (0, degrees, 0));
 			//float xPos = Mathf.FloorToInt(transform.position.x);
 			float xPos = transform.position.x;
-			float zPos = Mathf.FloorToInt(transform.position.z);
+			float zPos = Mathf.Round(transform.position.z);
 			transform.position = new Vector3 (xPos,0.0f,zPos);
+
+			if (transform.position == mouseTile.transform.position) // we hit our destination, so get a new tile
+			{
+				Debug.Log ("south");
+				destinationTile = map.tileAt(transform.position + Vector3.forward * map.tileSize); // after rotating, so facing the desired direction
+			}
+			skip = true;
 		}
 		else if (mouseTile.walls.east && direction == "east") {
 			Debug.Log (transform.position);
@@ -116,10 +134,17 @@ public class GridMovement : MonoBehaviour {
 				direction = "south";
 			}
 			transform.Rotate (new Vector3 (0, degrees, 0));
-			float xPos = Mathf.FloorToInt(transform.position.x);
-			//float zPos = Mathf.FloorToInt(transform.position.z);
+			float xPos = Mathf.Round(transform.position.x);
+			//float zPos = Mathf.CeilToInt(transform.position.z);
 			float zPos = transform.position.z;
 			transform.position = new Vector3 (xPos,0.0f,zPos);
+
+			if (transform.position == mouseTile.transform.position) // we hit our destination, so get a new tile
+			{
+				Debug.Log ("east");
+				destinationTile = map.tileAt(transform.position + Vector3.forward * map.tileSize); // after rotating, so facing the desired direction
+			}
+			skip = true;
 		}
 		else if (mouseTile.walls.west && direction == "west") {
 			Debug.Log (transform.position);
@@ -137,14 +162,31 @@ public class GridMovement : MonoBehaviour {
 				direction = "north";
 			}
 			transform.Rotate (new Vector3 (0, degrees, 0));
-			float xPos = Mathf.FloorToInt(transform.position.x);
+			float xPos = Mathf.Round(transform.position.x);
 			//float zPos = Mathf.FloorToInt(transform.position.z);
 			float zPos = transform.position.z;
 			transform.position = new Vector3 (xPos,0.0f,zPos);
+
+			if (transform.position == mouseTile.transform.position) // we hit our destination, so get a new tile
+			{
+				Debug.Log ("west");
+				destinationTile = map.tileAt(transform.position + Vector3.forward * map.tileSize); // after rotating, so facing the desired direction
+			}
+			skip = true;
 		}
 
+		if (!skip) {
+			if (transform.position == mouseTile.transform.position) { // we hit our destination, so get a new tile
+				Debug.Log ("default");
+				destinationTile = map.tileAt (transform.position + Vector3.forward * map.tileSize); // after rotating, so facing the desired direction
+			}
+		}
+			
+		//transform.position = Vector3.ClampMagnitude (Vector3.forward * speed,Vector3.Distance(map.transform.position,transform.position));
+		transform.Translate(Vector3.ClampMagnitude(Vector3.forward * speed, Vector3.Distance(destinationTile.transform.position, transform.position)));
+
 		//transform.Translate (new Vector3 (0, 0, 1 * speed) * Time.deltaTime);
-		transform.Translate(Vector3.forward * speed);
+		//transform.Translate(Vector3.forward * speed);
 		//duration += (1 * speed) * Time.deltaTime;
 	}
 }

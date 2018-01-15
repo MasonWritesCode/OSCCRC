@@ -59,7 +59,7 @@ public class GameMap : MonoBehaviour {
 
     public MapTile tileAt(Vector3 point)
     {
-		return mapTiles[(int)Mathf.Floor(point.z / tileSize), (int)Mathf.Floor(point.x / tileSize)];
+		return mapTiles[(int)Mathf.Round(point.z / tileSize), (int)Mathf.Round(point.x / tileSize)];
     }
 
     public MapTile createTile(float xPos, float zPos)
