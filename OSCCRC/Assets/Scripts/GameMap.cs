@@ -11,6 +11,8 @@ public class GameMap : MonoBehaviour {
     public Transform TilePrefab;
     public Transform WallPrefab;
 
+	public Transform MousePrefab;
+
     private Transform mapTransform;
     private MapTile[,] mapTiles;
 
@@ -47,11 +49,17 @@ public class GameMap : MonoBehaviour {
                 }
             }
         }
+
+		//added for testing purposes. To be removed
+		placeMouse ( 3, 2, "north");
+		mapTiles[8,5].walls.east = true;
+		mapTiles[8,5].walls.south = true;
+		//
 	}
 
     public MapTile tileAt(Vector3 point)
     {
-        return mapTiles[(int)(point.z / tileSize), (int)(point.x / tileSize)];
+		return mapTiles[(int)Mathf.Floor(point.z / tileSize), (int)Mathf.Floor(point.x / tileSize)];
     }
 
     public MapTile createTile(float xPos, float zPos)
@@ -93,4 +101,9 @@ public class GameMap : MonoBehaviour {
         Destroy(wall.gameObject);
     }
 
+	public void placeMouse(float xPos, float zPos, string direction)
+	{
+		Transform newMouse = Instantiate (MousePrefab, new Vector3 (xPos * tileSize, 0, zPos * tileSize), MousePrefab.rotation, mapTransform);
+		newMouse.GetComponent<GridMovement>().direction = direction;
+	}
 }
