@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapTile : MonoBehaviour {
+public class MapTile : MonoBehaviour
+{
 
     // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
 
     // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
-    public enum TileImprovement { None, Hole, Goal, Left, Right, Up, Down, Wrap }
-    public static Dictionary<TileImprovement, string> improvementResources = new Dictionary<TileImprovement, string>();
+    public enum TileImprovement { None, Hole, Goal, Spawner, Left, Right, Up, Down }
+    private static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>();
+    private static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>();
 
     public class Walls
     {
@@ -90,40 +92,47 @@ public class MapTile : MonoBehaviour {
     }
 
 
-    public TileImprovement improvement { get { return m_improvement; } set { setTileMaterial(value); } }
+    public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public Walls walls;
 
     private TileImprovement m_improvement;
+    private GameObject m_tileObject;
 
     static MapTile()
     {
-        improvementResources.Add(TileImprovement.None, "Tile");
-        improvementResources.Add(TileImprovement.Hole, "Hole");
-        improvementResources.Add(TileImprovement.Goal, "Hole");
-        improvementResources.Add(TileImprovement.Left, "Hole");
-        improvementResources.Add(TileImprovement.Right, "Hole");
-        improvementResources.Add(TileImprovement.Up, "Hole");
-        improvementResources.Add(TileImprovement.Down, "Hole");
-        improvementResources.Add(TileImprovement.Wrap, "Hole");
+        improvementTextures.Add(TileImprovement.None, "Tile");
+        improvementTextures.Add(TileImprovement.Hole, "Hole");
+        improvementTextures.Add(TileImprovement.Left, "Hole");
+        improvementTextures.Add(TileImprovement.Right, "Hole");
+        improvementTextures.Add(TileImprovement.Up, "Hole");
+        improvementTextures.Add(TileImprovement.Down, "Hole");
     }
 
     public void initTile()
     {
+        m_tileObject = null;
         walls = new Walls();
         walls.origin = GetComponent<Transform>().position;
         improvement = TileImprovement.None;
     }
 
-    private void setTileMaterial(TileImprovement improvement)
+    private void setTileImprovement(TileImprovement improvement)
     {
-        string materialPath = "";
-        if (improvementResources.ContainsKey(improvement))
+        if (improvement == m_improvement)
         {
-            materialPath = improvementResources[improvement];
+            return;
         }
-        else
+
+        string materialPath = string.Empty;
+        string objectPath = string.Empty;
+
+        if (improvementTextures.ContainsKey(improvement))
         {
-            Debug.Log("Warning: Improvement " + improvement.ToString() + " was not assigned a resource name!");
+            materialPath = improvementTextures[improvement];
+        }
+        if (improvementObjects.ContainsKey(improvement))
+        {
+            objectPath = improvementObjects[improvement];
         }
         if (improvement == TileImprovement.None)
         {
@@ -138,21 +147,43 @@ public class MapTile : MonoBehaviour {
             }
         }
 
-        Material newMaterial = Resources.Load("Materials/" + materialPath) as Material;
-        if (newMaterial)
+        if (materialPath != string.Empty)
         {
-            GetComponent<MeshRenderer>().material = newMaterial;
+            Material newMaterial = Resources.Load("Materials/" + materialPath) as Material;
+            if (newMaterial)
+            {
+                GetComponent<MeshRenderer>().material = newMaterial;
+            }
+            else
+            {
+                Debug.Log("Warning: Material " + materialPath + " was not found!");
+            }
         }
-        else
+
+        if (m_tileObject != null)
         {
-            Debug.Log("Warning: Material " + materialPath + " was not found!");
+            Destroy(m_tileObject);
+            m_tileObject = null;
+        }
+        if (objectPath != string.Empty)
+        {
+            GameObject newObject = Resources.Load("Materials/" + materialPath) as GameObject;
+            if (newObject)
+            {
+                m_tileObject = Instantiate(newObject, GetComponent<Transform>());
+            }
+            else
+            {
+                Debug.Log("Warning: Object Prefab " + objectPath + " was not found!");
+            }
         }
 
         m_improvement = improvement;
     }
 
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
 
     }
 
