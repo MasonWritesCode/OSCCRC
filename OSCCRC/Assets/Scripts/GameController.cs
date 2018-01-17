@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
+	public bool isPaused;
+
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement)
     {
         // This checks if a player is allowed to place the desired improvement, and does so if they can
@@ -14,7 +16,7 @@ public class GameController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-
+		isPaused = false; // temporary
 	}
 	
 	// Update is called once per frame
