@@ -185,10 +185,7 @@ public class GameMap : MonoBehaviour
                         GridMovement.Directions unused = (GridMovement.Directions)int.Parse(fin.ReadLine());
                         tileImprovement = MapTile.TileImprovement.None;
                     }
-                    else
-                    {
-                        mapTiles[j, i].improvement = tileImprovement;
-                    }
+                    mapTiles[j, i].improvement = tileImprovement;
 
                     int wallsValue = int.Parse(fin.ReadLine());
                     if ((wallsValue >> 0 & 1) == 1)
