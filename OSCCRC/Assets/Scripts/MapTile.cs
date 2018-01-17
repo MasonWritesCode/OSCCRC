@@ -8,9 +8,7 @@ public class MapTile : MonoBehaviour
     // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
 
     // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
-    public enum TileImprovement { None, Hole, Goal, Spawner, Left, Right, Up, Down }
-    private static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>();
-    private static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>();
+    public enum TileImprovement { None, Hole, Goal, Spawner, Left, Right, Up, Down, Mouse, Cat }
 
     public class Walls
     {
@@ -95,17 +93,22 @@ public class MapTile : MonoBehaviour
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public Walls walls;
 
+    // relevant for mice and cats only, for use in saving and loading maps
+    internal GridMovement.Directions directionID = GridMovement.Directions.east;
+
+    private static Dictionary<TileImprovement, string> m_improvementTextures = new Dictionary<TileImprovement, string>();
+    private static Dictionary<TileImprovement, string> m_improvementObjects = new Dictionary<TileImprovement, string>();
     private TileImprovement m_improvement;
     private GameObject m_tileObject;
 
     static MapTile()
     {
-        improvementTextures.Add(TileImprovement.None, "Tile");
-        improvementTextures.Add(TileImprovement.Hole, "Hole");
-        improvementTextures.Add(TileImprovement.Left, "Hole");
-        improvementTextures.Add(TileImprovement.Right, "Hole");
-        improvementTextures.Add(TileImprovement.Up, "Hole");
-        improvementTextures.Add(TileImprovement.Down, "Hole");
+        m_improvementTextures.Add(TileImprovement.None, "Tile");
+        m_improvementTextures.Add(TileImprovement.Hole, "Hole");
+        m_improvementTextures.Add(TileImprovement.Left, "Hole");
+        m_improvementTextures.Add(TileImprovement.Right, "Hole");
+        m_improvementTextures.Add(TileImprovement.Up, "Hole");
+        m_improvementTextures.Add(TileImprovement.Down, "Hole");
     }
 
     public void initTile()
@@ -113,6 +116,9 @@ public class MapTile : MonoBehaviour
         m_tileObject = null;
         walls = new Walls();
         walls.origin = GetComponent<Transform>().position;
+        m_tileObject = null;
+        // workaround of ignoring attempts to set same tile improvement again, because prefab doesn't alternate the none tile
+        m_improvement = TileImprovement.Hole;
         improvement = TileImprovement.None;
     }
 
@@ -126,13 +132,13 @@ public class MapTile : MonoBehaviour
         string materialPath = string.Empty;
         string objectPath = string.Empty;
 
-        if (improvementTextures.ContainsKey(improvement))
+        if (m_improvementTextures.ContainsKey(improvement))
         {
-            materialPath = improvementTextures[improvement];
+            materialPath = m_improvementTextures[improvement];
         }
-        if (improvementObjects.ContainsKey(improvement))
+        if (m_improvementObjects.ContainsKey(improvement))
         {
-            objectPath = improvementObjects[improvement];
+            objectPath = m_improvementObjects[improvement];
         }
         if (improvement == TileImprovement.None)
         {
@@ -167,7 +173,7 @@ public class MapTile : MonoBehaviour
         }
         if (objectPath != string.Empty)
         {
-            GameObject newObject = Resources.Load("Materials/" + materialPath) as GameObject;
+            GameObject newObject = Resources.Load("Prefabs/" + objectPath) as GameObject;
             if (newObject)
             {
                 m_tileObject = Instantiate(newObject, GetComponent<Transform>());
@@ -179,12 +185,6 @@ public class MapTile : MonoBehaviour
         }
 
         m_improvement = improvement;
-    }
-
-    // Use this for initialization
-    void Start()
-    {
-
     }
 
 }
