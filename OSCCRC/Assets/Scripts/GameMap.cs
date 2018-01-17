@@ -51,7 +51,10 @@ public class GameMap : MonoBehaviour {
         }
 
 		//added for testing purposes. To be removed
-		placeMouse ( 3, 2, "north");
+		placeMouse ( 3, 2, GridMovement.Directions.north);
+		placeMouse ( 3, 2, GridMovement.Directions.east);
+		placeMouse ( 4, 5, GridMovement.Directions.south);
+		placeMouse ( 6, 2, GridMovement.Directions.west);
 		mapTiles[8,5].walls.east = true;
 		mapTiles[8,5].walls.south = true;
 		//
@@ -101,7 +104,7 @@ public class GameMap : MonoBehaviour {
         Destroy(wall.gameObject);
     }
 
-	public void placeMouse(float xPos, float zPos, string direction)
+	public void placeMouse(float xPos, float zPos, GridMovement.Directions direction)
 	{
 		Transform newMouse = Instantiate (MousePrefab, new Vector3 (xPos * tileSize, 0, zPos * tileSize), MousePrefab.rotation, mapTransform);
 		newMouse.GetComponent<GridMovement>().direction = direction;
