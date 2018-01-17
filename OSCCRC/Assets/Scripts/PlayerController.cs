@@ -22,35 +22,46 @@ public class PlayerController : MonoBehaviour {
 	
 	void Update () {
         // The mouse hovers over a tile to select it as the one where improvements will be placed
-        Ray tileSelector = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitObject;
-        if (Physics.Raycast(tileSelector, out hitObject, 1 << LayerMask.NameToLayer("Player Selectable")))
+        if (Input.GetAxis("Mouse X") > 0 || Input.GetAxis("Mouse Y") > 0)
         {
-            MapTile newTile = hitObject.transform.GetComponent<MapTile>();
-            if (newTile != null && newTile != currentTile)
+            Ray tileSelector = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitObject;
+            if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Player Selectable")))
             {
-                // Currently using a spotlight to highlight the currently slected tile
-                highlighter.position = newTile.transform.position + Vector3.up * 2;
-                currentTile = newTile;
+                MapTile newTile = hitObject.transform.GetComponent<MapTile>();
+                if (newTile != null && newTile != currentTile)
+                {
+                    // Currently using a spotlight to highlight the currently slected tile
+                    highlighter.position = newTile.transform.position + Vector3.up * 2;
+                    currentTile = newTile;
+                }
+            }
+            else
+            {
+                highlighter.position = Vector3.one * -99;
+                currentTile = null;
             }
         }
 
         // Pretty sure the user can only place directional tiles in game
-        if (Input.GetButtonDown("Up"))
+        if (currentTile != null)
         {
-            gameController.requestPlacement(currentTile, MapTile.TileImprovement.Up);
-        }
-        else if (Input.GetButtonDown("Right"))
-        {
-            gameController.requestPlacement(currentTile, MapTile.TileImprovement.Right);
-        }
-        else if (Input.GetButtonDown("Down"))
-        {
-            gameController.requestPlacement(currentTile, MapTile.TileImprovement.Down);
-        }
-        else if (Input.GetButtonDown("Left"))
-        {
-            gameController.requestPlacement(currentTile, MapTile.TileImprovement.Left);
+            if (Input.GetButtonDown("Up"))
+            {
+                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Up);
+            }
+            else if (Input.GetButtonDown("Right"))
+            {
+                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Right);
+            }
+            else if (Input.GetButtonDown("Down"))
+            {
+                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Down);
+            }
+            else if (Input.GetButtonDown("Left"))
+            {
+                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Left);
+            }
         }
 
     }
