@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44392988, g: 0.49330902, b: 0.5727899, a: 1}
+  m_IndirectSpecularColor: {r: 0.44393003, g: 0.49330938, b: 0.57279044, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -268,6 +268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb37ff7cf511404e87e25d8d72a78ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPaused: 0
 --- !u!4 &903401645
 Transform:
   m_ObjectHideFlags: 0
@@ -432,8 +433,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapHeight: 9
   mapWidth: 12
+  tileSize: 0
   TilePrefab: {fileID: 4342955680738992, guid: ca3219b235b491d4db2198ad4012d788, type: 2}
   WallPrefab: {fileID: 4808878419091172, guid: 83fc38f3dc987bc4f92a627d2cc0e8ad, type: 2}
+  MousePrefab: {fileID: 4496375182435818, guid: 5a06fde1719355f4dae20edd7fbca778,
+    type: 2}
 --- !u!1 &1406404668
 GameObject:
   m_ObjectHideFlags: 0
