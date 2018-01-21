@@ -152,10 +152,8 @@ public class MapTile : MonoBehaviour
                 materialPath = "TileAlt";
             }
         }
-
-		// I'm not familiar enough with Unity, but I'm sure there's a better way to do this. Using the 2D texture as a Material didn't work, hence the if/else if
-		// If this is the best way, maybe we should totally go textures over materials?
-		if (materialPath != string.Empty && (materialPath == "Tile" || materialPath == "TileAlt" || materialPath == "Hole"))
+			
+		if (materialPath != string.Empty)
         {
             Material newMaterial = Resources.Load("Materials/" + materialPath) as Material;
             if (newMaterial)
@@ -167,18 +165,6 @@ public class MapTile : MonoBehaviour
                 Debug.Log("Warning: Material " + materialPath + " was not found!");
             }
         }
-		else if (materialPath != string.Empty) {
-			Texture newMaterial = Resources.Load("Materials/" + materialPath) as Texture;
-			if (newMaterial)
-			{
-				GetComponent<MeshRenderer>().material = null;
-				GetComponent<MeshRenderer>().material.mainTexture = newMaterial;
-			}
-			else
-			{
-				Debug.Log("Warning: Material " + materialPath + " was not found!");
-			}
-		}
 
         if (m_tileObject != null)
         {
