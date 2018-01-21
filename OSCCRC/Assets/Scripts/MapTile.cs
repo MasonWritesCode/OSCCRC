@@ -105,10 +105,10 @@ public class MapTile : MonoBehaviour
     {
         m_improvementTextures.Add(TileImprovement.None, "Tile");
         m_improvementTextures.Add(TileImprovement.Hole, "Hole");
-        m_improvementTextures.Add(TileImprovement.Left, "Hole");
-        m_improvementTextures.Add(TileImprovement.Right, "Hole");
-        m_improvementTextures.Add(TileImprovement.Up, "Hole");
-        m_improvementTextures.Add(TileImprovement.Down, "Hole");
+        m_improvementTextures.Add(TileImprovement.Left, "Left");
+        m_improvementTextures.Add(TileImprovement.Right, "Right");
+        m_improvementTextures.Add(TileImprovement.Up, "Up");
+        m_improvementTextures.Add(TileImprovement.Down, "Down");
     }
 
     public void initTile()
@@ -153,7 +153,9 @@ public class MapTile : MonoBehaviour
             }
         }
 
-        if (materialPath != string.Empty)
+		// I'm not familiar enough with Unity, but I'm sure there's a better way to do this. Using the 2D texture as a Material didn't work, hence the if/else if
+		// If this is the best way, maybe we should totally go textures over materials?
+		if (materialPath != string.Empty && (materialPath == "Tile" || materialPath == "TileAlt" || materialPath == "Hole"))
         {
             Material newMaterial = Resources.Load("Materials/" + materialPath) as Material;
             if (newMaterial)
@@ -165,6 +167,18 @@ public class MapTile : MonoBehaviour
                 Debug.Log("Warning: Material " + materialPath + " was not found!");
             }
         }
+		else if (materialPath != string.Empty) {
+			Texture newMaterial = Resources.Load("Materials/" + materialPath) as Texture;
+			if (newMaterial)
+			{
+				GetComponent<MeshRenderer>().material = null;
+				GetComponent<MeshRenderer>().material.mainTexture = newMaterial;
+			}
+			else
+			{
+				Debug.Log("Warning: Material " + materialPath + " was not found!");
+			}
+		}
 
         if (m_tileObject != null)
         {
