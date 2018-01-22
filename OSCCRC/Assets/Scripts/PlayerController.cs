@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour {
 	
 	void Update () {
         // The mouse hovers over a tile to select it as the one where improvements will be placed
-        if (Input.GetAxis("Mouse X") > 0 || Input.GetAxis("Mouse Y") > 0)
+        if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
         {
             Ray tileSelector = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hitObject;
