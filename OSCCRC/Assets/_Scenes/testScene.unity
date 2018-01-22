@@ -436,7 +436,7 @@ MonoBehaviour:
   tileSize: 0
   TilePrefab: {fileID: 4342955680738992, guid: ca3219b235b491d4db2198ad4012d788, type: 2}
   WallPrefab: {fileID: 4808878419091172, guid: 83fc38f3dc987bc4f92a627d2cc0e8ad, type: 2}
-  MousePrefab: {fileID: 4496375182435818, guid: 5a06fde1719355f4dae20edd7fbca778,
+  MousePrefab: {fileID: 4117449160366982, guid: 9630bc329599be44390fa481189c97a1,
     type: 2}
 --- !u!1 &1406404668
 GameObject:
@@ -715,7 +715,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1892929172}
   m_LocalRotation: {x: 0.6427876, y: 0, z: 0, w: 0.7660445}
-  m_LocalPosition: {x: 4, y: 9, z: 2}
+  m_LocalPosition: {x: 4, y: 8, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
