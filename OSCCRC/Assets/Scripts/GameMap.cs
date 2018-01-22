@@ -28,12 +28,18 @@ public class GameMap : MonoBehaviour
         MapTile.Walls.map = this;
 
         mapTransform = GetComponent<Transform>();
+        // We have to initialize all tiles before we can set any walls
         for (int j = 0; j < mapHeight; ++j)
         {
             for (int i = 0; i < mapWidth; ++i)
             {
                 mapTiles[j, i] = createTile(i, j);
-
+            }
+        }
+        for (int j = 0; j < mapHeight; ++j)
+        {
+            for (int i = 0; i < mapWidth; ++i)
+            {
                 if (j == 0)
                 {
                     mapTiles[j, i].walls.south = true;
@@ -60,6 +66,8 @@ public class GameMap : MonoBehaviour
         placeMouse(6, 2, GridMovement.Directions.west);
         mapTiles[8, 5].walls.east = true;
         mapTiles[8, 5].walls.south = true;
+        mapTiles[0, 4].walls.south = false;
+        mapTiles[5, 0].walls.west = false;
         //
     }
 
