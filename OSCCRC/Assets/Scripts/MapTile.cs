@@ -18,10 +18,10 @@ public class MapTile : MonoBehaviour
         public bool west { get { return m_walls[3] != null; } set { changeWall(3, value); } }
 
         internal Vector3 origin = new Vector3();
-        internal Transform[] m_walls = new Transform[4];
 
         internal static GameMap map;
 
+        private Transform[] m_walls = new Transform[4];
         private int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
 
         // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
@@ -43,48 +43,55 @@ public class MapTile : MonoBehaviour
             }
 
             // Determine where the other wall is if it exists
-            int otherTileX = (int)origin.x, otherTileZ = (int)origin.z;
+            float otherTileX = origin.x, otherTileZ = origin.z;
             if (wallID == 0)
             {
-                ++otherTileZ;
-                if (otherTileZ > maxHeightIndex)
+                otherTileZ += map.tileSize;
+                if (otherTileZ > (maxHeightIndex * map.tileSize))
                 {
-                    return;
+                    otherTileZ = 0;
                 }
             }
             else if (wallID == 1)
             {
-                ++otherTileX;
-                if (otherTileX > maxWidthIndex)
+                otherTileX += map.tileSize;
+                if (otherTileX > (maxWidthIndex * map.tileSize))
                 {
-                    return;
+                    otherTileX = 0;
                 }
             }
             else if (wallID == 2)
             {
-                --otherTileZ;
+                otherTileZ -= map.tileSize;
                 if (otherTileZ < 0)
                 {
-                    return;
+                    otherTileZ = maxHeightIndex * map.tileSize;
                 }
             }
             else if (wallID == 3)
             {
-                --otherTileX;
+                otherTileX -= map.tileSize;
                 if (otherTileX < 0)
                 {
-                    return;
+                    otherTileX = maxWidthIndex * map.tileSize;
                 }
             }
 
             // The companion wall always has the same existance state
-            if (isCreating)
+            if (otherTileZ == (maxHeightIndex * map.tileSize) || otherTileX == (maxWidthIndex * map.tileSize) || otherTileZ == 0 || otherTileX == 0)
             {
-                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = m_walls[wallID];
+                // Walls on edges share state with wrapped around tile, but they don't share the same wall object
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall((wallID + 2) % 4, isCreating );
             }
-            else if (!isCreating)
+            else
             {
-                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = null;
+                // This can be done on a single line if you don't hate the ugliness of the ternary operator like I do
+                Transform wallSet = null;
+                if (isCreating)
+                {
+                    wallSet = m_walls[wallID];
+                }
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = wallSet;
             }
         }
     }
