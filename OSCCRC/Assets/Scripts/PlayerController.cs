@@ -8,12 +8,12 @@ public class PlayerController : MonoBehaviour {
 
     public int playerID;
     public Transform highlighter;
-
     private MapTile currentTile = null;
-    private GameController gameController;
+
+    private GameController m_gameController;
 
 	void Start () {
-        gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
 
         // We will need to differentiate the inputs of players if we add multiplayer.
         // I don't know how that will work yet, but just assign a playerID of 1 to the player controls for now
@@ -43,26 +43,58 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        // Pretty sure the user can only place directional tiles in game
+        // Placements: pretty sure the user can only place directional tiles in game
         if (currentTile != null)
         {
             if (Input.GetButtonDown("Up"))
             {
-                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Up);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Up);
             }
             else if (Input.GetButtonDown("Right"))
             {
-                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Right);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Right);
             }
             else if (Input.GetButtonDown("Down"))
             {
-                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Down);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Down);
             }
             else if (Input.GetButtonDown("Left"))
             {
-                gameController.requestPlacement(currentTile, MapTile.TileImprovement.Left);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Left);
             }
         }
 
+        // Other controls, like pausing or menu
+        if (Input.GetButtonDown("Pause"))
+        {
+            m_gameController.isPaused = !m_gameController.isPaused;
+        }
+        // We don't have a menu yet, so quit the game when menu should be opened just for now
+        if (Input.GetButtonDown("Menu"))
+        {
+            Application.Quit();
+        }
+        // Toggle framerate display between Basic, Advanced, and Off
+        if (Input.GetButtonDown("FramerateToggle"))
+        {
+            FramerateDisplay fpsScript = GameObject.Find("GameController").GetComponent<FramerateDisplay>();
+            Canvas fpsDisplay = GameObject.Find("FPSDisplay").GetComponent<Canvas>();
+
+            if (!fpsScript.enabled)
+            {
+                fpsDisplay.enabled = true;
+                fpsScript.enabled = true;
+                fpsScript.isAdvanced = false;
+            }
+            else if (!fpsScript.isAdvanced)
+            {
+                fpsScript.isAdvanced = true;
+            }
+            else
+            {
+                fpsScript.enabled = false;
+                fpsDisplay.enabled = false;
+            }
+        }
     }
 }
