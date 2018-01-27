@@ -12,17 +12,15 @@ public class GameMap : MonoBehaviour
     private Transform mapTransform;
     private MapTile[,] mapTiles;
 
-    // create tile and create wall functions?
-
-    void Start()
+    void createMap(int height, int width)
     {
+        mapHeight = height; mapWidth = width;
         mapTiles = new MapTile[mapHeight, mapWidth];
 
         tileSize = GameResources.objects["Tile"].localScale.x;
         MapTile.Walls.map = this;
 
         mapTransform = GetComponent<Transform>();
-        // We have to initialize all tiles before we can set any walls
         for (int j = 0; j < mapHeight; ++j)
         {
             for (int i = 0; i < mapWidth; ++i)
@@ -30,39 +28,6 @@ public class GameMap : MonoBehaviour
                 mapTiles[j, i] = createTile(i, j);
             }
         }
-        for (int j = 0; j < mapHeight; ++j)
-        {
-            for (int i = 0; i < mapWidth; ++i)
-            {
-                if (j == 0)
-                {
-                    mapTiles[j, i].walls.south = true;
-                }
-                else if (j == mapHeight - 1)
-                {
-                    mapTiles[j, i].walls.north = true;
-                }
-                if (i == 0)
-                {
-                    mapTiles[j, i].walls.west = true;
-                }
-                else if (i == mapWidth - 1)
-                {
-                    mapTiles[j, i].walls.east = true;
-                }
-            }
-        }
-
-        //added for testing purposes. To be removed
-        placeMouse(3, 2, GridMovement.Directions.north);
-        placeMouse(3, 2, GridMovement.Directions.east);
-        placeMouse(4, 5, GridMovement.Directions.south);
-        placeMouse(6, 2, GridMovement.Directions.west);
-        mapTiles[8, 5].walls.east = true;
-        mapTiles[8, 5].walls.south = true;
-        mapTiles[0, 4].walls.south = false;
-        mapTiles[5, 0].walls.west = false;
-        //
     }
 
     public MapTile tileAt(Vector3 point)
@@ -147,20 +112,9 @@ public class GameMap : MonoBehaviour
             // Set new map values
             mapHeight = int.Parse(fin.ReadLine());
             mapWidth = int.Parse(fin.ReadLine());
-            mapTiles = new MapTile[mapHeight, mapWidth];
 
-            tileSize = GameResources.objects["Tile"].localScale.x;
-            MapTile.Walls.map = this;
+            createMap(mapHeight, mapWidth);
 
-            mapTransform = GetComponent<Transform>();
-            // We have to initialize all tiles before we can set any walls
-            for (int j = 0; j < mapHeight; ++j)
-            {
-                for (int i = 0; i < mapWidth; ++i)
-                {
-                    mapTiles[j, i] = createTile(i, j);
-                }
-            }
             for (int j = 0; j < mapHeight; ++j)
             {
                 for (int i = 0; i < mapWidth; ++i)
@@ -255,5 +209,43 @@ public class GameMap : MonoBehaviour
         Transform mousePrefab = GameResources.objects["Mouse"];
         Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), mousePrefab.rotation, mapTransform);
         newMouse.GetComponent<GridMovement>().direction = direction;
+    }
+
+    void Start()
+    {
+        bool useImportedMap = false;
+        if (useImportedMap)
+        {
+            importMap("Dev");
+        }
+        else
+        {
+            // mapHeight and mapWidth are initialized in the Unity editor
+            createMap(mapHeight, mapWidth);
+
+            // Create a wall around edges of map by default
+            for (int j = 0; j < mapHeight; ++j)
+            {
+                for (int i = 0; i < mapWidth; ++i)
+                {
+                    if (j == 0)
+                    {
+                        mapTiles[j, i].walls.south = true;
+                    }
+                    else if (j == mapHeight - 1)
+                    {
+                        mapTiles[j, i].walls.north = true;
+                    }
+                    if (i == 0)
+                    {
+                        mapTiles[j, i].walls.west = true;
+                    }
+                    else if (i == mapWidth - 1)
+                    {
+                        mapTiles[j, i].walls.east = true;
+                    }
+                }
+            }
+        }
     }
 }
