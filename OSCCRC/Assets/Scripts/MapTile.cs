@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class MapTile : MonoBehaviour
 {
-
-    // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
-
     // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
     public enum TileImprovement { None, Hole, Goal, Spawner, Left, Right, Up, Down, Mouse, Cat }
 
@@ -106,7 +103,7 @@ public class MapTile : MonoBehaviour
     private static Dictionary<TileImprovement, string> m_improvementTextures = new Dictionary<TileImprovement, string>();
     private static Dictionary<TileImprovement, string> m_improvementObjects = new Dictionary<TileImprovement, string>();
     private TileImprovement m_improvement;
-    private GameObject m_tileObject;
+    private Transform m_tileObject;
 
     static MapTile()
     {
@@ -136,40 +133,39 @@ public class MapTile : MonoBehaviour
             return;
         }
 
-        string materialPath = string.Empty;
-        string objectPath = string.Empty;
+        string materialName = string.Empty;
+        string objectName = string.Empty;
 
         if (m_improvementTextures.ContainsKey(improvement))
         {
-            materialPath = m_improvementTextures[improvement];
+            materialName = m_improvementTextures[improvement];
         }
         if (m_improvementObjects.ContainsKey(improvement))
         {
-            objectPath = m_improvementObjects[improvement];
+            objectName = m_improvementObjects[improvement];
         }
         if (improvement == TileImprovement.None)
         {
             // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
             if ((walls.origin.x + walls.origin.z) % 2 == 0)
             {
-                materialPath = "Tile";
+                materialName = "Tile";
             }
             else
             {
-                materialPath = "TileAlt";
+                materialName = "TileAlt";
             }
         }
 			
-		if (materialPath != string.Empty)
+		if (materialName != string.Empty)
         {
-            Material newMaterial = Resources.Load("Materials/" + materialPath) as Material;
-            if (newMaterial)
+            if (GameResources.materials.ContainsKey(materialName))
             {
-                GetComponent<MeshRenderer>().material = newMaterial;
+                GetComponent<MeshRenderer>().material = GameResources.materials[materialName];
             }
             else
             {
-                Debug.Log("Warning: Material " + materialPath + " was not found!");
+                Debug.Log("Warning: Material " + materialName + " was not found!");
             }
         }
 
@@ -178,16 +174,15 @@ public class MapTile : MonoBehaviour
             Destroy(m_tileObject);
             m_tileObject = null;
         }
-        if (objectPath != string.Empty)
+        if (objectName != string.Empty)
         {
-            GameObject newObject = Resources.Load("Prefabs/" + objectPath) as GameObject;
-            if (newObject)
+            if (GameResources.objects.ContainsKey(objectName))
             {
-                m_tileObject = Instantiate(newObject, GetComponent<Transform>());
+                m_tileObject = Instantiate(GameResources.objects[objectName], GetComponent<Transform>());
             }
             else
             {
-                Debug.Log("Warning: Object Prefab " + objectPath + " was not found!");
+                Debug.Log("Warning: Object Prefab " + objectName + " was not found!");
             }
         }
 

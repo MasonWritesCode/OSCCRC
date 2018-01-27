@@ -9,12 +9,6 @@ public class GameMap : MonoBehaviour
     public int mapWidth = 12;
     public float tileSize;
 
-    // These must be considered static for now, because I am treating the size of tiles as pulled from the prefab as static in Tile class
-    public Transform TilePrefab;
-    public Transform WallPrefab;
-
-    public Transform MousePrefab;
-
     private Transform mapTransform;
     private MapTile[,] mapTiles;
 
@@ -24,7 +18,7 @@ public class GameMap : MonoBehaviour
     {
         mapTiles = new MapTile[mapHeight, mapWidth];
 
-        tileSize = TilePrefab.localScale.x;
+        tileSize = GameResources.objects["Tile"].localScale.x;
         MapTile.Walls.map = this;
 
         mapTransform = GetComponent<Transform>();
@@ -71,18 +65,6 @@ public class GameMap : MonoBehaviour
         //
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.F6))
-        {
-            exportMap("dev");
-        }
-        else if (Input.GetKeyDown(KeyCode.F7))
-        {
-            importMap("dev");
-        }
-    }
-
     public MapTile tileAt(Vector3 point)
     {
         return mapTiles[Mathf.RoundToInt(point.z / tileSize), Mathf.RoundToInt(point.x / tileSize)];
@@ -90,7 +72,8 @@ public class GameMap : MonoBehaviour
 
     public MapTile createTile(float xPos, float zPos)
     {
-        Transform newTileTransform = Instantiate(TilePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), TilePrefab.rotation, mapTransform);
+        Transform tilePrefab = GameResources.objects["Tile"];
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), tilePrefab.rotation, mapTransform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile();
         return newTile;
@@ -98,7 +81,8 @@ public class GameMap : MonoBehaviour
 
     public Transform createWall(float xPos, float zPos, int wallID)
     {
-        Transform newWall = Instantiate(WallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), WallPrefab.rotation, mapTransform);
+        Transform wallPrefab = GameResources.objects["Wall"];
+        Transform newWall = Instantiate(wallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), wallPrefab.rotation, mapTransform);
 
         if (wallID == 0)
         {
@@ -165,7 +149,7 @@ public class GameMap : MonoBehaviour
             mapWidth = int.Parse(fin.ReadLine());
             mapTiles = new MapTile[mapHeight, mapWidth];
 
-            tileSize = TilePrefab.localScale.x;
+            tileSize = GameResources.objects["Tile"].localScale.x;
             MapTile.Walls.map = this;
 
             mapTransform = GetComponent<Transform>();
@@ -268,7 +252,8 @@ public class GameMap : MonoBehaviour
 
     public void placeMouse(float xPos, float zPos, GridMovement.Directions direction)
     {
-        Transform newMouse = Instantiate(MousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), MousePrefab.rotation, mapTransform);
+        Transform mousePrefab = GameResources.objects["Mouse"];
+        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), mousePrefab.rotation, mapTransform);
         newMouse.GetComponent<GridMovement>().direction = direction;
     }
 }
