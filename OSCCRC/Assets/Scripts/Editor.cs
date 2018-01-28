@@ -188,7 +188,13 @@ public class Editor : MonoBehaviour {
             }
             else
             {
-                m_placeholderObject.position = Input.mousePosition + m_positionOffset;
+                Ray posRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Plane floor = new Plane(Vector3.up, Vector3.zero);
+                float distance;
+                if (floor.Raycast(posRay, out distance))
+                {
+                    m_placeholderObject.position = posRay.GetPoint(distance) + m_positionOffset;
+                }
             }
         }
 
