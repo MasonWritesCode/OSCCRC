@@ -9,10 +9,10 @@ public class MapTile : MonoBehaviour
 
     public class Walls
     {
-        public bool north { get { return m_walls[0] != null; } set { changeWall(0, value); } }
-        public bool east { get { return m_walls[1] != null; } set { changeWall(1, value); } }
-        public bool south { get { return m_walls[2] != null; } set { changeWall(2, value); } }
-        public bool west { get { return m_walls[3] != null; } set { changeWall(3, value); } }
+        public bool north { get { return m_walls[m_dirToInt[GridMovement.Directions.north]] != null; } set { changeWall(GridMovement.Directions.north, value); } }
+        public bool east { get { return m_walls[m_dirToInt[GridMovement.Directions.east]] != null; } set { changeWall(GridMovement.Directions.east, value); } }
+        public bool south { get { return m_walls[m_dirToInt[GridMovement.Directions.south]] != null; } set { changeWall(GridMovement.Directions.south, value); } }
+        public bool west { get { return m_walls[m_dirToInt[GridMovement.Directions.west]] != null; } set { changeWall(GridMovement.Directions.west, value); } }
 
         internal Vector3 origin = new Vector3();
 
@@ -20,18 +20,35 @@ public class MapTile : MonoBehaviour
 
         private Transform[] m_walls = new Transform[4];
         private int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
+        private static Dictionary<GridMovement.Directions, int> m_dirToInt = new Dictionary<GridMovement.Directions, int>();
+        private static Dictionary<int, GridMovement.Directions> m_intToDir = new Dictionary<int, GridMovement.Directions>();
+
+        static Walls()
+        {
+            // Just in case someone wants to change the enum order, map the directions to an int to avoid possible breakage
+            // This is a lot of extra stuff to do to avoid a problem that probably will never happen, but oh well.
+            m_dirToInt.Add(GridMovement.Directions.north, 0);
+            m_dirToInt.Add(GridMovement.Directions.east, 1);
+            m_dirToInt.Add(GridMovement.Directions.south, 2);
+            m_dirToInt.Add(GridMovement.Directions.west, 3);
+            m_intToDir.Add(0, GridMovement.Directions.north);
+            m_intToDir.Add(1, GridMovement.Directions.east);
+            m_intToDir.Add(2, GridMovement.Directions.south);
+            m_intToDir.Add(3, GridMovement.Directions.west);
+        }
 
         // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
-        private void changeWall(int wallID, bool isCreating)
+        private void changeWall(GridMovement.Directions wallID, bool isCreating)
         {
-            if (isCreating && m_walls[wallID] == null)
+            int idNum = m_dirToInt[wallID];
+            if (isCreating && m_walls[idNum] == null)
             {
-                m_walls[wallID] = map.createWall(origin.x, origin.z, wallID);
+                m_walls[idNum] = map.createWall(origin.x, origin.z, wallID);
             }
-            else if (!isCreating && m_walls[wallID] != null)
+            else if (!isCreating && m_walls[idNum] != null)
             {
-                map.destroyWall(m_walls[wallID]);
-                m_walls[wallID] = null;
+                map.destroyWall(m_walls[idNum]);
+                m_walls[idNum] = null;
             }
             else
             {
@@ -41,7 +58,7 @@ public class MapTile : MonoBehaviour
 
             // Determine where the other wall is if it exists
             float otherTileX = origin.x, otherTileZ = origin.z;
-            if (wallID == 0)
+            if (idNum == 0)
             {
                 otherTileZ += map.tileSize;
                 if (otherTileZ > (maxHeightIndex * map.tileSize))
@@ -49,7 +66,7 @@ public class MapTile : MonoBehaviour
                     otherTileZ = 0;
                 }
             }
-            else if (wallID == 1)
+            else if (idNum == 1)
             {
                 otherTileX += map.tileSize;
                 if (otherTileX > (maxWidthIndex * map.tileSize))
@@ -57,7 +74,7 @@ public class MapTile : MonoBehaviour
                     otherTileX = 0;
                 }
             }
-            else if (wallID == 2)
+            else if (idNum == 2)
             {
                 otherTileZ -= map.tileSize;
                 if (otherTileZ < 0)
@@ -65,7 +82,7 @@ public class MapTile : MonoBehaviour
                     otherTileZ = maxHeightIndex * map.tileSize;
                 }
             }
-            else if (wallID == 3)
+            else if (idNum == 3)
             {
                 otherTileX -= map.tileSize;
                 if (otherTileX < 0)
@@ -78,7 +95,7 @@ public class MapTile : MonoBehaviour
             if (otherTileZ == (maxHeightIndex * map.tileSize) || otherTileX == (maxWidthIndex * map.tileSize) || otherTileZ == 0 || otherTileX == 0)
             {
                 // Walls on edges share state with wrapped around tile, but they don't share the same wall object
-                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall((wallID + 2) % 4, isCreating );
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall(m_intToDir[(idNum + 2) % 4], isCreating );
             }
             else
             {
@@ -86,9 +103,9 @@ public class MapTile : MonoBehaviour
                 Transform wallSet = null;
                 if (isCreating)
                 {
-                    wallSet = m_walls[wallID];
+                    wallSet = m_walls[idNum];
                 }
-                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(wallID + 2) % 4] = wallSet;
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(idNum + 2) % 4] = wallSet;
             }
         }
     }
@@ -171,7 +188,7 @@ public class MapTile : MonoBehaviour
 
         if (m_tileObject != null)
         {
-            Destroy(m_tileObject);
+            Destroy(m_tileObject.gameObject);
             m_tileObject = null;
         }
         if (objectName != string.Empty)

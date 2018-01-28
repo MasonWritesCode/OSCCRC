@@ -44,25 +44,25 @@ public class GameMap : MonoBehaviour
         return newTile;
     }
 
-    public Transform createWall(float xPos, float zPos, int wallID)
+    public Transform createWall(float xPos, float zPos, GridMovement.Directions direction)
     {
         Transform wallPrefab = GameResources.objects["Wall"];
         Transform newWall = Instantiate(wallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), wallPrefab.rotation, mapTransform);
 
-        if (wallID == 0)
+        if (direction == GridMovement.Directions.north)
         {
             newWall.position += Vector3.forward * tileSize / 2;
         }
-        else if (wallID == 1)
+        else if (direction == GridMovement.Directions.east)
         {
             newWall.position += Vector3.right * tileSize / 2;
             newWall.Rotate(Vector3.up * 90);
         }
-        else if (wallID == 2)
+        else if (direction == GridMovement.Directions.south)
         {
             newWall.position += Vector3.back * tileSize / 2;
         }
-        else if (wallID == 3)
+        else if (direction == GridMovement.Directions.west)
         {
             newWall.position += Vector3.left * tileSize / 2;
             newWall.Rotate(Vector3.up * 90);

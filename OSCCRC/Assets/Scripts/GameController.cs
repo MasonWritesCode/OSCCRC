@@ -8,7 +8,8 @@ public class GameController : MonoBehaviour {
 
     public enum GameMode { Editor, Puzzle, Multiplayer };
 
-    public static readonly GameMode mode = GameMode.Puzzle;
+    //public static readonly GameMode mode = GameMode.Puzzle;
+    public static readonly GameMode mode = GameMode.Editor;
 
     private bool m_isPaused;
 
@@ -35,9 +36,12 @@ public class GameController : MonoBehaviour {
     // Use this for initialization
     void Start () {
 		isPaused = false; // temporary
+
         if (mode == GameMode.Editor)
         {
             isPaused = true;
+
+            GetComponent<Editor>().enabled = true;
         }
 
         //added for testing purposes. To be removed

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
@@ -8,7 +6,7 @@ public class PlayerController : MonoBehaviour {
 
     public int playerID;
     public Transform highlighter;
-    private MapTile currentTile = null;
+    public MapTile currentTile = null;
 
     private GameController m_gameController;
 

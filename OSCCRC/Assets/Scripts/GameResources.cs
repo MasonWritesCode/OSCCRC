@@ -29,6 +29,7 @@ public class GameResources : MonoBehaviour {
         materials.Add("Right", Resources.Load(currentDir + "Right") as Material);
         materials.Add("Up", Resources.Load(currentDir + "Up") as Material);
         materials.Add("Down", Resources.Load(currentDir + "Down") as Material);
+        materials.Add("Placeholder", Resources.Load(currentDir + "ObjectPlace") as Material);
 
         currentDir = resourcePackDir + "/Prefabs/";
         objects.Add("Tile", (Resources.Load(currentDir + "TilePrefab") as GameObject).transform);
