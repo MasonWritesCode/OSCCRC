@@ -9,10 +9,10 @@ public class MapTile : MonoBehaviour
 
     public class Walls
     {
-        public bool north { get { return m_walls[m_dirToInt[GridMovement.Directions.north]] != null; } set { changeWall(GridMovement.Directions.north, value); } }
-        public bool east { get { return m_walls[m_dirToInt[GridMovement.Directions.east]] != null; } set { changeWall(GridMovement.Directions.east, value); } }
-        public bool south { get { return m_walls[m_dirToInt[GridMovement.Directions.south]] != null; } set { changeWall(GridMovement.Directions.south, value); } }
-        public bool west { get { return m_walls[m_dirToInt[GridMovement.Directions.west]] != null; } set { changeWall(GridMovement.Directions.west, value); } }
+        public bool north { get { return m_walls[m_dirToInt[Directions.Direction.North]] != null; } set { changeWall(Directions.Direction.North, value); } }
+        public bool east { get { return m_walls[m_dirToInt[Directions.Direction.East]] != null; } set { changeWall(Directions.Direction.East, value); } }
+        public bool south { get { return m_walls[m_dirToInt[Directions.Direction.South]] != null; } set { changeWall(Directions.Direction.South, value); } }
+        public bool west { get { return m_walls[m_dirToInt[Directions.Direction.West]] != null; } set { changeWall(Directions.Direction.West, value); } }
 
         internal Vector3 origin = new Vector3();
 
@@ -20,25 +20,20 @@ public class MapTile : MonoBehaviour
 
         private Transform[] m_walls = new Transform[4];
         private int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
-        private static Dictionary<GridMovement.Directions, int> m_dirToInt = new Dictionary<GridMovement.Directions, int>();
-        private static Dictionary<int, GridMovement.Directions> m_intToDir = new Dictionary<int, GridMovement.Directions>();
+        private static Dictionary<Directions.Direction, int> m_dirToInt = new Dictionary<Directions.Direction, int>();
 
         static Walls()
         {
             // Just in case someone wants to change the enum order, map the directions to an int to avoid possible breakage
             // This is a lot of extra stuff to do to avoid a problem that probably will never happen, but oh well.
-            m_dirToInt.Add(GridMovement.Directions.north, 0);
-            m_dirToInt.Add(GridMovement.Directions.east, 1);
-            m_dirToInt.Add(GridMovement.Directions.south, 2);
-            m_dirToInt.Add(GridMovement.Directions.west, 3);
-            m_intToDir.Add(0, GridMovement.Directions.north);
-            m_intToDir.Add(1, GridMovement.Directions.east);
-            m_intToDir.Add(2, GridMovement.Directions.south);
-            m_intToDir.Add(3, GridMovement.Directions.west);
+            m_dirToInt.Add(Directions.Direction.North, 0);
+            m_dirToInt.Add(Directions.Direction.East, 1);
+            m_dirToInt.Add(Directions.Direction.South, 2);
+            m_dirToInt.Add(Directions.Direction.West, 3);
         }
 
         // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
-        private void changeWall(GridMovement.Directions wallID, bool isCreating)
+        private void changeWall(Directions.Direction wallID, bool isCreating)
         {
             int idNum = m_dirToInt[wallID];
             if (isCreating && m_walls[idNum] == null)
@@ -95,7 +90,7 @@ public class MapTile : MonoBehaviour
             if (otherTileZ == (maxHeightIndex * map.tileSize) || otherTileX == (maxWidthIndex * map.tileSize) || otherTileZ == 0 || otherTileX == 0)
             {
                 // Walls on edges share state with wrapped around tile, but they don't share the same wall object
-                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall(m_intToDir[(idNum + 2) % 4], isCreating );
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall(Directions.getOppositeDir(wallID), isCreating );
             }
             else
             {
@@ -113,9 +108,7 @@ public class MapTile : MonoBehaviour
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public Walls walls;
-
-    // relevant for mice and cats only, for use in saving and loading maps
-    internal GridMovement.Directions directionID = GridMovement.Directions.east;
+    public Directions.Direction direction;
 
     private static Dictionary<TileImprovement, string> m_improvementTextures = new Dictionary<TileImprovement, string>();
     private static Dictionary<TileImprovement, string> m_improvementObjects = new Dictionary<TileImprovement, string>();
@@ -134,6 +127,7 @@ public class MapTile : MonoBehaviour
 
     public void initTile()
     {
+        direction = Directions.Direction.North;
         m_tileObject = null;
         walls = new Walls();
         walls.origin = GetComponent<Transform>().position;
@@ -196,6 +190,7 @@ public class MapTile : MonoBehaviour
             if (GameResources.objects.ContainsKey(objectName))
             {
                 m_tileObject = Instantiate(GameResources.objects[objectName], GetComponent<Transform>());
+                Directions.rotate(ref m_tileObject, direction);
             }
             else
             {

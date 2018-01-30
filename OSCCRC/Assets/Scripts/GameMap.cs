@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameMap : MonoBehaviour
 {
-
     public int mapHeight = 9;
     public int mapWidth = 12;
     public float tileSize;
@@ -44,29 +43,28 @@ public class GameMap : MonoBehaviour
         return newTile;
     }
 
-    public Transform createWall(float xPos, float zPos, GridMovement.Directions direction)
+    public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
         Transform wallPrefab = GameResources.objects["Wall"];
         Transform newWall = Instantiate(wallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), wallPrefab.rotation, mapTransform);
 
-        if (direction == GridMovement.Directions.north)
+        if (direction == Directions.Direction.North)
         {
             newWall.position += Vector3.forward * tileSize / 2;
         }
-        else if (direction == GridMovement.Directions.east)
+        else if (direction == Directions.Direction.East)
         {
             newWall.position += Vector3.right * tileSize / 2;
-            newWall.Rotate(Vector3.up * 90);
         }
-        else if (direction == GridMovement.Directions.south)
+        else if (direction == Directions.Direction.South)
         {
             newWall.position += Vector3.back * tileSize / 2;
         }
-        else if (direction == GridMovement.Directions.west)
+        else if (direction == Directions.Direction.West)
         {
             newWall.position += Vector3.left * tileSize / 2;
-            newWall.Rotate(Vector3.up * 90);
         }
+        Directions.rotate(ref newWall, direction);
 
         return newWall;
     }
@@ -122,13 +120,13 @@ public class GameMap : MonoBehaviour
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
                     if (tileImprovement == MapTile.TileImprovement.Mouse)
                     {
-                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, (GridMovement.Directions)int.Parse(fin.ReadLine()));
+                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, (Directions.Direction)int.Parse(fin.ReadLine()));
                         tileImprovement = MapTile.TileImprovement.None;
                     }
                     else if (tileImprovement == MapTile.TileImprovement.Cat)
                     {
                         // We aren't placing cats yet
-                        GridMovement.Directions unused = (GridMovement.Directions)int.Parse(fin.ReadLine());
+                        Directions.Direction unused = (Directions.Direction)int.Parse(fin.ReadLine());
                         tileImprovement = MapTile.TileImprovement.None;
                     }
                     mapTiles[j, i].improvement = tileImprovement;
@@ -178,7 +176,7 @@ public class GameMap : MonoBehaviour
                     fout.WriteLine((int)tileImprovement);
                     if (tileImprovement == MapTile.TileImprovement.Mouse || tileImprovement == MapTile.TileImprovement.Cat)
                     {
-                        fout.WriteLine((int)tile.directionID);
+                        fout.WriteLine((int)tile.direction);
                     }
 
                     int wallsValue = 0;
@@ -204,10 +202,11 @@ public class GameMap : MonoBehaviour
         }
     }
 
-    public void placeMouse(float xPos, float zPos, GridMovement.Directions direction)
+    public void placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
         Transform mousePrefab = GameResources.objects["Mouse"];
         Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), mousePrefab.rotation, mapTransform);
+        Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
     }
 

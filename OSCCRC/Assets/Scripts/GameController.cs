@@ -46,10 +46,10 @@ public class GameController : MonoBehaviour {
 
         //added for testing purposes. To be removed
         GameMap map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-        map.placeMouse(3, 2, GridMovement.Directions.north);
-        map.placeMouse(3, 2, GridMovement.Directions.east);
-        map.placeMouse(4, 5, GridMovement.Directions.south);
-        map.placeMouse(6, 2, GridMovement.Directions.west);
+        map.placeMouse(3, 2, Directions.Direction.North);
+        map.placeMouse(3, 2, Directions.Direction.East);
+        map.placeMouse(4, 5, Directions.Direction.South);
+        map.placeMouse(6, 2, Directions.Direction.West);
         map.tileAt(new Vector3(5, 0, 8)).walls.east = true;
         map.tileAt(new Vector3(5, 0, 8)).walls.south = true;
         map.tileAt(new Vector3(4, 0, 0)).walls.south = false;

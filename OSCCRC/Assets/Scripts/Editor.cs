@@ -5,16 +5,17 @@ using UnityEngine;
 public class Editor : MonoBehaviour {
 
     // TODO: Finish after doing necessary refactoring first
+    //       Use scrollwheel for rotation (probably)
     //       Make controllable via UI instead of arbitrary keys
     //       Add abilty to change map size (even if it never makes it to editor UI)
     //       Allow map saving and loading with input name (needs ui)
 
-    private enum ObjectType { None, Wall, Improvement, MovingObject }
+    private enum ObjectType { None, Wall, Improvement }
 
     private Transform m_placeholderObject;
     private MapTile.TileImprovement m_selectedImprovement;
     private ObjectType m_placeholderType;
-    private GridMovement.Directions m_direction;
+    private Directions.Direction m_direction;
     private GameMap m_gameMap;
     private PlayerController m_controls;
     private Vector3 m_positionOffset;
@@ -34,7 +35,7 @@ public class Editor : MonoBehaviour {
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
         m_placeholderObject = null;
-        m_direction = GridMovement.Directions.east;
+        m_direction = Directions.Direction.East;
         m_positionOffset = Vector3.zero;
 	}
 	
@@ -45,32 +46,32 @@ public class Editor : MonoBehaviour {
         // I'm not familiar with UI in Unity, so select what you want to place with buttons for now until UI gets set up.
         ObjectType newType = ObjectType.None;
         MapTile.TileImprovement newImprovement = MapTile.TileImprovement.None;
-        GridMovement.Directions newDir = m_direction;
+        Directions.Direction newDir = m_direction;
 
         // Keys to select which improvement
         if (Input.GetKeyDown(KeyCode.LeftBracket))
         {
             // Wall North
             newType = ObjectType.Wall;
-            newDir = GridMovement.Directions.north;
+            newDir = Directions.Direction.North;
         }
         if (Input.GetKeyDown(KeyCode.Period))
         {
             // Wall East
             newType = ObjectType.Wall;
-            newDir = GridMovement.Directions.east;
+            newDir = Directions.Direction.East;
         }
         if (Input.GetKeyDown(KeyCode.RightBracket))
         {
             // Wall South
             newType = ObjectType.Wall;
-            newDir = GridMovement.Directions.south;
+            newDir = Directions.Direction.South;
         }
         if (Input.GetKeyDown(KeyCode.Comma))
         {
             // Wall West
             newType = ObjectType.Wall;
-            newDir = GridMovement.Directions.west;
+            newDir = Directions.Direction.West;
         }
         if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
         {
@@ -117,13 +118,13 @@ public class Editor : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Alpha8) || Input.GetKeyDown(KeyCode.Keypad8))
         {
             // Mouse
-            newType = ObjectType.MovingObject;
+            newType = ObjectType.Improvement;
             newImprovement = MapTile.TileImprovement.Mouse;
         }
         if (Input.GetKeyDown(KeyCode.Alpha9) || Input.GetKeyDown(KeyCode.Keypad9))
         {
             // Cat
-            newType = ObjectType.MovingObject;
+            newType = ObjectType.Improvement;
             newImprovement = MapTile.TileImprovement.Cat;
         }
         if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0))
@@ -167,12 +168,6 @@ public class Editor : MonoBehaviour {
                     m_placeholderObject = m_gameMap.createTile(0, 0).transform;
                     m_placeholderObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
                 }
-                else if (m_placeholderType == ObjectType.MovingObject)
-                {
-                    // TODO
-                    // Need to map improvement to resource like maptile, but don't want to copy from maptile or make public...
-                    // m_placeholderObject = Instantiate(GameResources.objects[m_selectedImprovement]);
-                }
 
                 m_placeholderObject.GetComponent<MeshRenderer>().material = GameResources.materials["Placeholder"];
             }
@@ -205,25 +200,27 @@ public class Editor : MonoBehaviour {
         {
             if (m_placeholderType == ObjectType.Wall)
             {
-                if (m_direction == GridMovement.Directions.north)
+                if (m_direction == Directions.Direction.North)
                 {
                     selectedTile.walls.north = !selectedTile.walls.north;
                 }
-                if (m_direction == GridMovement.Directions.east)
+                if (m_direction == Directions.Direction.East)
                 {
                     selectedTile.walls.east = !selectedTile.walls.east;
                 }
-                if (m_direction == GridMovement.Directions.south)
+                if (m_direction == Directions.Direction.South)
                 {
                     selectedTile.walls.south = !selectedTile.walls.south;
                 }
-                if (m_direction == GridMovement.Directions.west)
+                if (m_direction == Directions.Direction.West)
                 {
                     selectedTile.walls.west = !selectedTile.walls.west;
                 }
             }
-            else if (m_placeholderType == ObjectType.Improvement || m_placeholderType == ObjectType.MovingObject)
+            else if (m_placeholderType == ObjectType.Improvement)
             {
+                selectedTile.direction = m_direction;
+
                 if (selectedTile.improvement == m_selectedImprovement)
                 {
                     selectedTile.improvement = MapTile.TileImprovement.None;
@@ -231,11 +228,6 @@ public class Editor : MonoBehaviour {
                 else
                 {
                     selectedTile.improvement = m_selectedImprovement;
-                }
-
-                if (m_placeholderType == ObjectType.MovingObject)
-                {
-                    // TODO: Need to map rotation to a direction
                 }
             }
         }

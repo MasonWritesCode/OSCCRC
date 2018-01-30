@@ -6,19 +6,18 @@ public class GridMovement : MonoBehaviour {
 
 	public float speed;
 	public GameMap map;
-	public Directions direction;
+	public Directions.Direction direction;
 
 	MapTile mouseTile;
 	Vector3 destinationPos;
 
 	GameController gameController;
 
-	public enum Directions {north, south, east, west};
+    // We have to store transform in a variable to pass it out as ref
+    Transform m_transform;
 
     void updateDirection()
     {
-        float degrees = 0;
-
         //check for goals and holes
         if (mouseTile.improvement == MapTile.TileImprovement.Goal)
         {
@@ -34,118 +33,98 @@ public class GridMovement : MonoBehaviour {
         //checking for arrows
         if (mouseTile.improvement == MapTile.TileImprovement.Up)
         {
-            direction = Directions.north;
-            transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+            direction = Directions.Direction.North;
         }
         else if (mouseTile.improvement == MapTile.TileImprovement.Down)
         {
-            direction = Directions.south;
-            transform.eulerAngles = new Vector3(0.0f, 180.0f, 0.0f);
+            direction = Directions.Direction.South;
         }
         else if (mouseTile.improvement == MapTile.TileImprovement.Left)
         {
-            direction = Directions.west;
-            transform.eulerAngles = new Vector3(0.0f, 270.0f, 0.0f);
+            direction = Directions.Direction.West;
         }
         else if (mouseTile.improvement == MapTile.TileImprovement.Right)
         {
-            direction = Directions.east;
-            transform.eulerAngles = new Vector3(0.0f, 90.0f, 0.0f);
+            direction = Directions.Direction.East;
         }
 
         //Checking for walls
-        if (mouseTile.walls.north && direction == GridMovement.Directions.north)
+        if (mouseTile.walls.north && direction == Directions.Direction.North)
         {
             if (mouseTile.walls.east)
             {
                 if (mouseTile.walls.west)
                 {
-                    degrees = 180;
-                    direction = GridMovement.Directions.south;
+                    direction = Directions.Direction.South;
                 }
                 else
                 {
-                    degrees = -90;
-                    direction = GridMovement.Directions.west;
+                    direction = Directions.Direction.West;
                 }
             }
             else
             {
-                degrees = 90;
-                direction = GridMovement.Directions.east;
+                direction = Directions.Direction.East;
             }
-
-            transform.Rotate(new Vector3(0, degrees, 0));
         }
-        else if (mouseTile.walls.south && direction == GridMovement.Directions.south)
+        else if (mouseTile.walls.south && direction == Directions.Direction.South)
         {
             if (mouseTile.walls.west)
             {
                 if (mouseTile.walls.east)
                 {
-                    degrees = 180;
-                    direction = GridMovement.Directions.north;
+                    direction = Directions.Direction.North;
                 }
                 else
                 {
-                    degrees = -90;
-                    direction = GridMovement.Directions.east;
+                    direction = Directions.Direction.East;
                 }
 
             }
             else
             {
-                degrees = 90;
-                direction = GridMovement.Directions.west;
+                direction = Directions.Direction.West;
             }
-
-            transform.Rotate(new Vector3(0, degrees, 0));
         }
-        else if (mouseTile.walls.east && direction == GridMovement.Directions.east)
+        else if (mouseTile.walls.east && direction == Directions.Direction.East)
         {
             if (mouseTile.walls.south)
             {
                 if (mouseTile.walls.north)
                 {
-                    degrees = 180;
-                    direction = GridMovement.Directions.west;
+                    direction = Directions.Direction.West;
                 }
                 else
                 {
-                    degrees = -90;
-                    direction = GridMovement.Directions.north;
+                    direction = Directions.Direction.North;
                 }
             }
             else
             {
-                degrees = 90;
-                direction = GridMovement.Directions.south;
+                direction = Directions.Direction.South;
             }
-            transform.Rotate(new Vector3(0, degrees, 0));
         }
-        else if (mouseTile.walls.west && direction == GridMovement.Directions.west)
+        else if (mouseTile.walls.west && direction == Directions.Direction.West)
         {
             if (mouseTile.walls.north)
             {
                 if (mouseTile.walls.south)
                 {
-                    degrees = 180;
-                    direction = GridMovement.Directions.east;
+                    direction = Directions.Direction.East;
                 }
                 else
                 {
-                    degrees = -90;
-                    direction = GridMovement.Directions.south;
+                    direction = Directions.Direction.South;
                 }
 
             }
             else
             {
-                degrees = 90;
-                direction = GridMovement.Directions.north;
+                direction = Directions.Direction.North;
             }
-            transform.Rotate(new Vector3(0, degrees, 0));
         }
+
+        Directions.rotate(ref m_transform, direction);
 
         destinationPos = transform.position + transform.forward * map.tileSize; // after rotating, so facing the desired direction
     }
@@ -153,19 +132,11 @@ public class GridMovement : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-
 		gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
 
-		// assign the initial rotation
-		if(direction == GridMovement.Directions.south) {
-			transform.Rotate (new Vector3 (0, 180, 0));
-		}
-		else if(direction == GridMovement.Directions.east) {
-			transform.Rotate (new Vector3 (0, 90, 0));
-		}
-		else if(direction == GridMovement.Directions.west) {
-			transform.Rotate (new Vector3 (0, -90, 0));
-		}
+        m_transform = GetComponent<Transform>();
+
+        Directions.rotate(ref m_transform, direction);
 	}
 
 	void FixedUpdate() {
