@@ -7,7 +7,6 @@ public class Editor : MonoBehaviour {
     // TODO: Finish after doing necessary refactoring first
     //       Use scrollwheel for rotation (probably)
     //       Make controllable via UI instead of arbitrary keys
-    //       Add abilty to change map size (even if it never makes it to editor UI)
     //       Allow map saving and loading with input name (needs ui)
 
     private enum ObjectType { None, Wall, Improvement }
@@ -167,9 +166,15 @@ public class Editor : MonoBehaviour {
                     // TODO: Need to use associated object, and tile if there isn't an associated object
                     m_placeholderObject = m_gameMap.createTile(0, 0).transform;
                     m_placeholderObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                    MapTile placeholderTile = m_placeholderObject.GetComponent<MapTile>();
+                    placeholderTile.improvement = m_selectedImprovement;
                 }
 
-                m_placeholderObject.GetComponent<MeshRenderer>().material = GameResources.materials["Placeholder"];
+                // We want to use a material with transparent render mode, but use the same texture as the object we are creating
+                MeshRenderer matr = m_placeholderObject.GetComponent<MeshRenderer>();
+                Texture tex = matr.material.mainTexture;
+                matr.material = GameResources.materials["Placeholder"];
+                matr.material.mainTexture = tex;
             }
         }
 
