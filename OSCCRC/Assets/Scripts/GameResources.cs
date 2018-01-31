@@ -25,6 +25,7 @@ public class GameResources : MonoBehaviour {
         materials.Add("Tile", Resources.Load(currentDir + "Tile") as Material);
         materials.Add("TileAlt", Resources.Load(currentDir + "TileAlt") as Material);
         materials.Add("Hole", Resources.Load(currentDir + "Hole") as Material);
+        materials.Add("Goal", Resources.Load(currentDir + "Goal") as Material);
         materials.Add("Left", Resources.Load(currentDir + "Left") as Material);
         materials.Add("Right", Resources.Load(currentDir + "Right") as Material);
         materials.Add("Up", Resources.Load(currentDir + "Up") as Material);

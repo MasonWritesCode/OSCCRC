@@ -142,6 +142,10 @@ public class Editor : MonoBehaviour {
             {
                 newType = m_placeholderType;
             }
+            if (newImprovement == MapTile.TileImprovement.None)
+            {
+                newImprovement = m_selectedImprovement;
+            }
         }
         else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
         {
@@ -150,15 +154,19 @@ public class Editor : MonoBehaviour {
             {
                 newType = m_placeholderType;
             }
+            if (newImprovement == MapTile.TileImprovement.None)
+            {
+                newImprovement = m_selectedImprovement;
+            }
         }
 
         // Allow rotating arrow tiles to get different tiles.
         // Kind of annoying because we treat directional tiles as separate improvements
-        if (   newType == ObjectType.Improvement
-            && (   m_selectedImprovement == MapTile.TileImprovement.Left
-                || m_selectedImprovement == MapTile.TileImprovement.Right
-                || m_selectedImprovement == MapTile.TileImprovement.Up
-                || m_selectedImprovement == MapTile.TileImprovement.Down
+        if (newType == ObjectType.Improvement
+            && (newImprovement == MapTile.TileImprovement.Left
+                || newImprovement == MapTile.TileImprovement.Right
+                || newImprovement == MapTile.TileImprovement.Up
+                || newImprovement == MapTile.TileImprovement.Down
                )
            )
         {

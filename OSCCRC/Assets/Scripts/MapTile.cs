@@ -119,6 +119,7 @@ public class MapTile : MonoBehaviour
     {
         m_improvementTextures.Add(TileImprovement.None, "Tile");
         m_improvementTextures.Add(TileImprovement.Hole, "Hole");
+        m_improvementTextures.Add(TileImprovement.Goal, "Goal");
         m_improvementTextures.Add(TileImprovement.Left, "Left");
         m_improvementTextures.Add(TileImprovement.Right, "Right");
         m_improvementTextures.Add(TileImprovement.Up, "Up");
