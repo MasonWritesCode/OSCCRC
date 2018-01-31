@@ -13,30 +13,43 @@ public class GameResources : MonoBehaviour {
 
     private string m_resourcePack = string.Empty;
 
-    void loadResources(string resourcePackDir)
+    void loadResources(string resourcePack)
     {
         materials = new Dictionary<string, Material>();
         objects = new Dictionary<string, Transform>();
 
-        m_resourcePack = resourcePackDir;
+        m_resourcePack = resourcePack;
         string currentDir;
 
-        currentDir = resourcePackDir + "/Materials/";
-        materials.Add("Tile", Resources.Load(currentDir + "Tile") as Material);
-        materials.Add("TileAlt", Resources.Load(currentDir + "TileAlt") as Material);
-        materials.Add("Hole", Resources.Load(currentDir + "Hole") as Material);
-        materials.Add("Goal", Resources.Load(currentDir + "Goal") as Material);
-        materials.Add("Left", Resources.Load(currentDir + "Left") as Material);
-        materials.Add("Right", Resources.Load(currentDir + "Right") as Material);
-        materials.Add("Up", Resources.Load(currentDir + "Up") as Material);
-        materials.Add("Down", Resources.Load(currentDir + "Down") as Material);
-        materials.Add("Placeholder", Resources.Load(currentDir + "ObjectPlace") as Material);
+        currentDir = "/Materials/";
+        materials.Add("Tile", resourceFromDir(currentDir + "Tile") as Material);
+        materials.Add("TileAlt", resourceFromDir(currentDir + "TileAlt") as Material);
+        materials.Add("Hole", resourceFromDir(currentDir + "Hole") as Material);
+        materials.Add("Goal", resourceFromDir(currentDir + "Goal") as Material);
+        materials.Add("Left", resourceFromDir(currentDir + "Left") as Material);
+        materials.Add("Right", resourceFromDir(currentDir + "Right") as Material);
+        materials.Add("Up", resourceFromDir(currentDir + "Up") as Material);
+        materials.Add("Down", resourceFromDir(currentDir + "Down") as Material);
+        materials.Add("Placeholder", resourceFromDir(currentDir + "ObjectPlace") as Material);
 
-        currentDir = resourcePackDir + "/Prefabs/";
-        objects.Add("Tile", (Resources.Load(currentDir + "TilePrefab") as GameObject).transform);
-        objects.Add("Wall", (Resources.Load(currentDir + "WallPrefab") as GameObject).transform);
-        objects.Add("Mouse", (Resources.Load(currentDir + "Mouse") as GameObject).transform);
-        objects.Add("Cat", (Resources.Load(currentDir + "Cat") as GameObject).transform);
+        currentDir = "/Prefabs/";
+        objects.Add("Tile", (resourceFromDir(currentDir + "TilePrefab") as GameObject).transform);
+        objects.Add("Wall", (resourceFromDir(currentDir + "WallPrefab") as GameObject).transform);
+        objects.Add("Mouse", (resourceFromDir(currentDir + "Mouse") as GameObject).transform);
+        objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
+    }
+
+    private Object resourceFromDir(string path)
+    {
+        Object resource = Resources.Load(m_resourcePack + path);
+
+        if (resource == null)
+        {
+            // Pull missing items from default pack to allow partial packs
+            resource = Resources.Load("Default" + path);
+        }
+
+        return resource;
     }
 
     void Awake () {

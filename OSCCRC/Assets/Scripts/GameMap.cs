@@ -50,19 +50,19 @@ public class GameMap : MonoBehaviour
 
         if (direction == Directions.Direction.North)
         {
-            newWall.position += Vector3.forward * tileSize / 2;
+            newWall.localPosition += Vector3.forward * (tileSize / 2);
         }
         else if (direction == Directions.Direction.East)
         {
-            newWall.position += Vector3.right * tileSize / 2;
+            newWall.localPosition += Vector3.right * (tileSize / 2);
         }
         else if (direction == Directions.Direction.South)
         {
-            newWall.position += Vector3.back * tileSize / 2;
+            newWall.localPosition += Vector3.back * (tileSize / 2);
         }
         else if (direction == Directions.Direction.West)
         {
-            newWall.position += Vector3.left * tileSize / 2;
+            newWall.localPosition += Vector3.left * (tileSize / 2);
         }
         Directions.rotate(ref newWall, direction);
 
