@@ -41,4 +41,26 @@ public class Directions : MonoBehaviour {
 
         return (Direction)(newNum);
     }
+
+    public static Direction nextClockwiseDir(Direction dir)
+    {
+        int dirNum = (int)dir;
+
+        int newNum = (dirNum << 1) % 15;
+
+        return (Direction)(newNum);
+    }
+
+    public static Direction nextCounterClockwiseDir(Direction dir)
+    {
+        int dirNum = (int)dir;
+
+        int newNum = dirNum >> 1;
+        if (newNum == 0)
+        {
+            newNum = 8;
+        }
+
+        return (Direction)(newNum);
+    }
 }

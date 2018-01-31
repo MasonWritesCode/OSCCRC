@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class Editor : MonoBehaviour {
 
-    // TODO: Finish after doing necessary refactoring first
-    //       Use scrollwheel for rotation (probably)
-    //       Make controllable via UI instead of arbitrary keys
+    // TODO: Make controllable via UI instead of arbitrary keys
     //       Allow map saving and loading with input name (needs ui)
 
     private enum ObjectType { None, Wall, Improvement }
@@ -95,24 +93,28 @@ public class Editor : MonoBehaviour {
             // Left
             newType = ObjectType.Improvement;
             newImprovement = MapTile.TileImprovement.Left;
+            newDir = Directions.Direction.West;
         }
         if (Input.GetKeyDown(KeyCode.Alpha5) || Input.GetKeyDown(KeyCode.Keypad5))
         {
             // Right
             newType = ObjectType.Improvement;
             newImprovement = MapTile.TileImprovement.Right;
+            newDir = Directions.Direction.East;
         }
         if (Input.GetKeyDown(KeyCode.Alpha6) || Input.GetKeyDown(KeyCode.Keypad6))
         {
             // Up
             newType = ObjectType.Improvement;
             newImprovement = MapTile.TileImprovement.Up;
+            newDir = Directions.Direction.North;
         }
         if (Input.GetKeyDown(KeyCode.Alpha7) || Input.GetKeyDown(KeyCode.Keypad7))
         {
             // Down
             newType = ObjectType.Improvement;
             newImprovement = MapTile.TileImprovement.Down;
+            newDir = Directions.Direction.South;
         }
         if (Input.GetKeyDown(KeyCode.Alpha8) || Input.GetKeyDown(KeyCode.Keypad8))
         {
@@ -133,6 +135,51 @@ public class Editor : MonoBehaviour {
             newImprovement = MapTile.TileImprovement.None;
         }
 
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
+        {
+            newDir = Directions.nextClockwiseDir(m_direction);
+            if (newType == ObjectType.None)
+            {
+                newType = m_placeholderType;
+            }
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
+        {
+            newDir = Directions.nextCounterClockwiseDir(m_direction);
+            if (newType == ObjectType.None)
+            {
+                newType = m_placeholderType;
+            }
+        }
+
+        // Allow rotating arrow tiles to get different tiles.
+        // Kind of annoying because we treat directional tiles as separate improvements
+        if (   newType == ObjectType.Improvement
+            && (   m_selectedImprovement == MapTile.TileImprovement.Left
+                || m_selectedImprovement == MapTile.TileImprovement.Right
+                || m_selectedImprovement == MapTile.TileImprovement.Up
+                || m_selectedImprovement == MapTile.TileImprovement.Down
+               )
+           )
+        {
+            if (newDir == Directions.Direction.North)
+            {
+                newImprovement = MapTile.TileImprovement.Up;
+            }
+            else if (newDir == Directions.Direction.East)
+            {
+                newImprovement = MapTile.TileImprovement.Right;
+            }
+            else if (newDir == Directions.Direction.South)
+            {
+                newImprovement = MapTile.TileImprovement.Down;
+            }
+            else if (newDir == Directions.Direction.West)
+            {
+                newImprovement = MapTile.TileImprovement.Left;
+            }
+        }
+
 
         if (newType != ObjectType.None)
         {
@@ -140,6 +187,7 @@ public class Editor : MonoBehaviour {
             {
                 Destroy(m_placeholderObject.gameObject);
                 m_placeholderObject = null;
+                m_placeholderType = ObjectType.None;
             }
 
             // If reselecting same object "put it away" instead so that no object is selected for placement
