@@ -140,6 +140,13 @@ public class MapTile : MonoBehaviour
 
     private void setTileImprovement(TileImprovement improvement)
     {
+        if (improvement == TileImprovement.Mouse || improvement == TileImprovement.Cat)
+        {
+            // A tile only owns a mouse/cat in the context of saving and loading maps.
+            // improvement = m_improvement;
+            m_improvement = improvement;
+            return;
+        }
         if (improvement == m_improvement)
         {
             return;

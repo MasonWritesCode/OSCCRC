@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class Editor : MonoBehaviour {
 
-    // TODO: Make controllable via UI instead of arbitrary keys
+    // TODO: Make placeholder creation safe for object pooling
+    //       Make controllable via UI instead of arbitrary keys
     //       Allow map saving and loading with input name (needs ui)
+    //       Re-pausing should return editor to its original state before unpausing
+    //       Add ability to adjust speed when unpaused (wait for ui?)
 
     private enum ObjectType { None, Wall, Improvement }
 
@@ -13,9 +16,12 @@ public class Editor : MonoBehaviour {
     private MapTile.TileImprovement m_selectedImprovement;
     private ObjectType m_placeholderType;
     private Directions.Direction m_direction;
+    private Vector3 m_positionOffset;
+
+    private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
     private GameMap m_gameMap;
     private PlayerController m_controls;
-    private Vector3 m_positionOffset;
+    private GameController m_gameControl;
 
     void OnDisable() {
         if (m_placeholderObject != null)
@@ -29,6 +35,8 @@ public class Editor : MonoBehaviour {
 	void Start () {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
         m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
+        m_gameControl = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
         m_placeholderObject = null;
@@ -220,17 +228,34 @@ public class Editor : MonoBehaviour {
                 else if (m_placeholderType == ObjectType.Improvement)
                 {
                     // TODO: Need to use associated object, and tile if there isn't an associated object
-                    m_placeholderObject = m_gameMap.createTile(0, 0).transform;
-                    m_placeholderObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-                    MapTile placeholderTile = m_placeholderObject.GetComponent<MapTile>();
-                    placeholderTile.improvement = m_selectedImprovement;
+                    if (m_selectedImprovement == MapTile.TileImprovement.Mouse)
+                    {
+                        m_placeholderObject = Instantiate(GameResources.objects["Mouse"]);
+                        Directions.rotate(ref m_placeholderObject, m_direction);
+                    }
+                    else if (m_selectedImprovement == MapTile.TileImprovement.Cat)
+                    {
+                        m_placeholderObject = Instantiate(GameResources.objects["Cat"]);
+                        Directions.rotate(ref m_placeholderObject, m_direction);
+                    }
+                    else
+                    {
+                        m_placeholderObject = m_gameMap.createTile(0, 0).transform;
+                        m_placeholderObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                        MapTile placeholderTile = m_placeholderObject.GetComponent<MapTile>();
+                        placeholderTile.improvement = m_selectedImprovement;
+                    }
                 }
 
                 // We want to use a material with transparent render mode, but use the same texture as the object we are creating
+                // This currently doesn't work with mice and cats because they aren't a single mesh and I;m not writing code to recursively check for sub-objects right now
                 MeshRenderer matr = m_placeholderObject.GetComponent<MeshRenderer>();
-                Texture tex = matr.material.mainTexture;
-                matr.material = GameResources.materials["Placeholder"];
-                matr.material.mainTexture = tex;
+                if (matr)
+                {
+                    Texture tex = matr.material.mainTexture;
+                    matr.material = GameResources.materials["Placeholder"];
+                    matr.material.mainTexture = tex;
+                }
             }
         }
 
@@ -255,9 +280,9 @@ public class Editor : MonoBehaviour {
         }
 
 
-        // Place object. We currently toggle the selected type between choice and false/none
-        // We can change it to have right click remove and left click place, but I don't know which is better.
-        if (Input.GetButtonDown("Select") && selectedTile != null)
+        // Place object if paused. We currently toggle the selected type between choice and false/none
+        // We can change it to have right click remove and left click place, but I don't know if that is better.
+        if (Input.GetButtonDown("Select") && selectedTile != null && m_gameControl.isPaused)
         {
             if (m_placeholderType == ObjectType.Wall)
             {
@@ -289,6 +314,30 @@ public class Editor : MonoBehaviour {
                 else
                 {
                     selectedTile.improvement = m_selectedImprovement;
+                }
+
+                // If a mouse or cat was placed, we have to do special actions to remove it
+                if (m_movingObjects.ContainsKey(selectedTile))
+                {
+                    if (m_movingObjects[selectedTile] != null)
+                    {
+                        Destroy(m_movingObjects[selectedTile].gameObject);
+                    }
+                    m_movingObjects.Remove(selectedTile);
+                }
+
+                if (selectedTile.improvement == MapTile.TileImprovement.Mouse || selectedTile.improvement == MapTile.TileImprovement.Cat)
+                {
+                    Transform newMovingObj = null;
+                    if (selectedTile.improvement == MapTile.TileImprovement.Mouse)
+                    {
+                        newMovingObj = m_gameMap.placeMouse(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
+                    }
+                    else if (selectedTile.improvement == MapTile.TileImprovement.Cat)
+                    {
+                        newMovingObj = m_gameMap.placeCat(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
+                    }
+                    m_movingObjects.Add(selectedTile, newMovingObj);
                 }
             }
         }

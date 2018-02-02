@@ -121,13 +121,11 @@ public class GameMap : MonoBehaviour
                     if (tileImprovement == MapTile.TileImprovement.Mouse)
                     {
                         placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, (Directions.Direction)int.Parse(fin.ReadLine()));
-                        tileImprovement = MapTile.TileImprovement.None;
                     }
                     else if (tileImprovement == MapTile.TileImprovement.Cat)
                     {
                         // We aren't placing cats yet
-                        Directions.Direction unused = (Directions.Direction)int.Parse(fin.ReadLine());
-                        tileImprovement = MapTile.TileImprovement.None;
+                        placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, (Directions.Direction)int.Parse(fin.ReadLine()));
                     }
                     mapTiles[j, i].improvement = tileImprovement;
 
@@ -202,12 +200,24 @@ public class GameMap : MonoBehaviour
         }
     }
 
-    public void placeMouse(float xPos, float zPos, Directions.Direction direction)
+    public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
         Transform mousePrefab = GameResources.objects["Mouse"];
         Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), mousePrefab.rotation, mapTransform);
         Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
+
+        return newMouse;
+    }
+
+    public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
+    {
+        Transform catPrefab = GameResources.objects["Cat"];
+        Transform newCat = Instantiate(catPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), catPrefab.rotation, mapTransform);
+        Directions.rotate(ref newCat, direction);
+        newCat.GetComponent<GridMovement>().direction = direction;
+
+        return newCat;
     }
 
     void Start()
