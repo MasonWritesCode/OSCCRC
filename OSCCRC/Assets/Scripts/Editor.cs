@@ -232,11 +232,13 @@ public class Editor : MonoBehaviour {
                     if (m_selectedImprovement == MapTile.TileImprovement.Mouse)
                     {
                         m_placeholderObject = Instantiate(GameResources.objects["Mouse"]);
+                        m_placeholderObject.GetComponent<GridMovement>().enabled = false;
                         Directions.rotate(ref m_placeholderObject, m_direction);
                     }
                     else if (m_selectedImprovement == MapTile.TileImprovement.Cat)
                     {
                         m_placeholderObject = Instantiate(GameResources.objects["Cat"]);
+                        m_placeholderObject.GetComponent<GridMovement>().enabled = false;
                         Directions.rotate(ref m_placeholderObject, m_direction);
                     }
                     else
@@ -351,8 +353,9 @@ public class Editor : MonoBehaviour {
         }
         else if (m_wasUnpaused)
         {
-            m_gameMap.importMap("_editorAuto");
             m_wasUnpaused = false;
+            m_gameMap.importMap("_editorAuto");
+            mapAllObjToTile(m_gameMap);
         }
 
 
@@ -364,9 +367,27 @@ public class Editor : MonoBehaviour {
         else if (Input.GetKeyDown(KeyCode.F7))
         {
             m_gameMap.importMap("dev");
+            mapAllObjToTile(m_gameMap);
 
             // Go ahead and save to the loaded state
             m_gameMap.exportMap("_editorAuto");
+        }
+    }
+
+    private void mapAllObjToTile(GameMap map)
+    {
+        m_movingObjects.Clear();
+
+        List<GridMovement> movingObjs = new List<GridMovement>();
+        map.GetComponentsInChildren<GridMovement>(true, movingObjs);
+        foreach (GridMovement i in movingObjs)
+        {
+            // Should be destroyed by map import, but seems to still be around?
+            // Checking if isActiveAndEnabled seems to work. 
+            if (i.isActiveAndEnabled)
+            {
+                m_movingObjects.Add(map.tileAt(i.transform.position), i.transform);
+            }
         }
     }
 }

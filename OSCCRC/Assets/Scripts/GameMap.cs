@@ -126,12 +126,13 @@ public class GameMap : MonoBehaviour
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
                     if (tileImprovement == MapTile.TileImprovement.Mouse)
                     {
-                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, (Directions.Direction)int.Parse(fin.ReadLine()));
+                        mapTiles[j, i].direction = (Directions.Direction)int.Parse(fin.ReadLine());
+                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].direction);
                     }
                     else if (tileImprovement == MapTile.TileImprovement.Cat)
                     {
-                        // We aren't placing cats yet
-                        placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, (Directions.Direction)int.Parse(fin.ReadLine()));
+                        mapTiles[j, i].direction = (Directions.Direction)int.Parse(fin.ReadLine());
+                        placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].direction);
                     }
                     mapTiles[j, i].improvement = tileImprovement;
 
