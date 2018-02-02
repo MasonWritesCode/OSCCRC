@@ -48,6 +48,10 @@ public class GameResources : MonoBehaviour {
             // Pull missing items from default pack to allow partial packs
             resource = Resources.Load("Default" + path);
         }
+        if (resource == null)
+        {
+            Debug.LogWarning("Was not able to find default resource: " + path);
+        }
 
         return resource;
     }

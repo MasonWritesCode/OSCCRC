@@ -76,7 +76,13 @@ public class GameMap : MonoBehaviour
 
     public void importMap(string fileName)
     {
-        using (StreamReader fin = new StreamReader(Application.dataPath + "/Maps/" + fileName + ".map"))
+        string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
+        if (!File.Exists(mapPath))
+        {
+            Debug.LogWarning("Tried to load a map but it wasn't found! " + mapPath);
+            return;
+        }
+        using (StreamReader fin = new StreamReader(mapPath))
         {
             int versionNumber;
             bool recognizedVers = int.TryParse(fin.ReadLine(), out versionNumber);
@@ -84,7 +90,7 @@ public class GameMap : MonoBehaviour
             // For now, assume if this is good, everything else is good too
             if (!recognizedVers || versionNumber != 1)
             {
-                Debug.Log("Failed to read map file " + fileName);
+                Debug.LogWarning("Failed to read map file " + fileName);
                 return;
             }
 
@@ -155,7 +161,6 @@ public class GameMap : MonoBehaviour
     {
         const int versionNumber = 1;
 
-        Debug.Log(Application.dataPath);
         using (StreamWriter fout = new StreamWriter(Application.dataPath + "/Maps/" + fileName + ".map", false))
         {
             fout.WriteLine(versionNumber);

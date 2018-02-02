@@ -7,7 +7,6 @@ public class Editor : MonoBehaviour {
     // TODO: Make placeholder creation safe for object pooling
     //       Make controllable via UI instead of arbitrary keys
     //       Allow map saving and loading with input name (needs ui)
-    //       Re-pausing should return editor to its original state before unpausing
     //       Add ability to adjust speed when unpaused (wait for ui?)
 
     private enum ObjectType { None, Wall, Improvement }
@@ -22,6 +21,7 @@ public class Editor : MonoBehaviour {
     private GameMap m_gameMap;
     private PlayerController m_controls;
     private GameController m_gameControl;
+    private bool m_wasUnpaused;
 
     void OnDisable() {
         if (m_placeholderObject != null)
@@ -31,7 +31,6 @@ public class Editor : MonoBehaviour {
         }
     }
 
-	// Use this for initialization
 	void Start () {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
         m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
@@ -42,9 +41,11 @@ public class Editor : MonoBehaviour {
         m_placeholderObject = null;
         m_direction = Directions.Direction.East;
         m_positionOffset = Vector3.zero;
-	}
-	
-	// Update is called once per frame
+        m_wasUnpaused = false;
+
+        m_gameMap.exportMap("_editorAuto");
+    }
+
 	void Update () {
         MapTile selectedTile = m_controls.currentTile;
 
@@ -248,7 +249,7 @@ public class Editor : MonoBehaviour {
                 }
 
                 // We want to use a material with transparent render mode, but use the same texture as the object we are creating
-                // This currently doesn't work with mice and cats because they aren't a single mesh and I;m not writing code to recursively check for sub-objects right now
+                // This currently doesn't work with mice and cats because they aren't a single mesh and I'm not writing code to recursively check for sub-objects right now
                 MeshRenderer matr = m_placeholderObject.GetComponent<MeshRenderer>();
                 if (matr)
                 {
@@ -340,6 +341,18 @@ public class Editor : MonoBehaviour {
                     m_movingObjects.Add(selectedTile, newMovingObj);
                 }
             }
+
+            m_gameMap.exportMap("_editorAuto");
+        }
+
+        if (!m_gameControl.isPaused)
+        {
+            m_wasUnpaused = true;
+        }
+        else if (m_wasUnpaused)
+        {
+            m_gameMap.importMap("_editorAuto");
+            m_wasUnpaused = false;
         }
 
 
@@ -351,6 +364,9 @@ public class Editor : MonoBehaviour {
         else if (Input.GetKeyDown(KeyCode.F7))
         {
             m_gameMap.importMap("dev");
+
+            // Go ahead and save to the loaded state
+            m_gameMap.exportMap("_editorAuto");
         }
     }
 }

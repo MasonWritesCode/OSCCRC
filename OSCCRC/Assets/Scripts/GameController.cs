@@ -46,6 +46,11 @@ public class GameController : MonoBehaviour {
 
         //added for testing purposes. To be removed
         GameMap map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        if (mode == GameMode.Puzzle)
+        {
+            map.importMap("dev");
+        }
+        /*
         map.placeMouse(3, 2, Directions.Direction.North);
         map.placeMouse(3, 2, Directions.Direction.East);
         map.placeMouse(4, 5, Directions.Direction.South);
@@ -54,6 +59,7 @@ public class GameController : MonoBehaviour {
         map.tileAt(new Vector3(5, 0, 8)).walls.south = true;
         map.tileAt(new Vector3(4, 0, 0)).walls.south = false;
         map.tileAt(new Vector3(0, 0, 5)).walls.west = false;
+        // */
         //
     }
 

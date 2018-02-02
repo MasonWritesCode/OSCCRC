@@ -184,7 +184,7 @@ public class MapTile : MonoBehaviour
             }
             else
             {
-                Debug.Log("Warning: Material " + materialName + " was not found!");
+                Debug.LogWarning("Material " + materialName + " was not found!");
             }
         }
 
@@ -202,7 +202,7 @@ public class MapTile : MonoBehaviour
             }
             else
             {
-                Debug.Log("Warning: Object Prefab " + objectName + " was not found!");
+                Debug.LogWarning("Object Prefab " + objectName + " was not found!");
             }
         }
 
