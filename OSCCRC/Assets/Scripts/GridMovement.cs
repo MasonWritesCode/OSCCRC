@@ -7,6 +7,7 @@ public class GridMovement : MonoBehaviour {
 	public float speed;
 	public GameMap map;
 	public Directions.Direction direction;
+	public bool isCat;
 
 	MapTile mouseTile;
 	Vector3 destinationPos;
@@ -178,5 +179,19 @@ public class GridMovement : MonoBehaviour {
                 updateDirection();
             }
         }
+	}
+		
+	void OnTriggerEnter(Collider other)
+	{
+		Debug.Log("OnTriggerEnter");
+		Debug.Log(other.name);
+
+		if (!gameController.isPaused) {
+			if (isCat && other.name.Contains("Mouse")) {
+				if (!other.GetComponent<GridMovement> ().isCat) {
+					Destroy (other.gameObject);
+				}
+			}
+		}
 	}
 }
