@@ -4,82 +4,28 @@ using UnityEngine;
 
 public class GameMap : MonoBehaviour
 {
-
     public int mapHeight = 9;
     public int mapWidth = 12;
     public float tileSize;
 
-    // These must be considered static for now, because I am treating the size of tiles as pulled from the prefab as static in Tile class
-    public Transform TilePrefab;
-    public Transform WallPrefab;
-
-    public Transform MousePrefab;
-
     private Transform mapTransform;
     private MapTile[,] mapTiles;
 
-    // create tile and create wall functions?
-
-    void Start()
+    void createMap(int height, int width)
     {
+        mapHeight = height; mapWidth = width;
         mapTiles = new MapTile[mapHeight, mapWidth];
 
-        tileSize = TilePrefab.localScale.x;
+        tileSize = GameResources.objects["Tile"].localScale.x;
         MapTile.Walls.map = this;
 
         mapTransform = GetComponent<Transform>();
-        // We have to initialize all tiles before we can set any walls
         for (int j = 0; j < mapHeight; ++j)
         {
             for (int i = 0; i < mapWidth; ++i)
             {
                 mapTiles[j, i] = createTile(i, j);
             }
-        }
-        for (int j = 0; j < mapHeight; ++j)
-        {
-            for (int i = 0; i < mapWidth; ++i)
-            {
-                if (j == 0)
-                {
-                    mapTiles[j, i].walls.south = true;
-                }
-                else if (j == mapHeight - 1)
-                {
-                    mapTiles[j, i].walls.north = true;
-                }
-                if (i == 0)
-                {
-                    mapTiles[j, i].walls.west = true;
-                }
-                else if (i == mapWidth - 1)
-                {
-                    mapTiles[j, i].walls.east = true;
-                }
-            }
-        }
-
-        //added for testing purposes. To be removed
-        placeMouse(3, 2, GridMovement.Directions.north);
-        placeMouse(3, 2, GridMovement.Directions.east);
-        placeMouse(4, 5, GridMovement.Directions.south);
-        placeMouse(6, 2, GridMovement.Directions.west);
-        mapTiles[8, 5].walls.east = true;
-        mapTiles[8, 5].walls.south = true;
-        mapTiles[0, 4].walls.south = false;
-        mapTiles[5, 0].walls.west = false;
-        //
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.F6))
-        {
-            exportMap("dev");
-        }
-        else if (Input.GetKeyDown(KeyCode.F7))
-        {
-            importMap("dev");
         }
     }
 
@@ -90,34 +36,35 @@ public class GameMap : MonoBehaviour
 
     public MapTile createTile(float xPos, float zPos)
     {
-        Transform newTileTransform = Instantiate(TilePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), TilePrefab.rotation, mapTransform);
+        Transform tilePrefab = GameResources.objects["Tile"];
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), tilePrefab.rotation, mapTransform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile();
         return newTile;
     }
 
-    public Transform createWall(float xPos, float zPos, int wallID)
+    public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
-        Transform newWall = Instantiate(WallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), WallPrefab.rotation, mapTransform);
+        Transform wallPrefab = GameResources.objects["Wall"];
+        Transform newWall = Instantiate(wallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), wallPrefab.rotation, mapTransform);
 
-        if (wallID == 0)
+        if (direction == Directions.Direction.North)
         {
-            newWall.position += Vector3.forward * tileSize / 2;
+            newWall.localPosition += Vector3.forward * (tileSize / 2);
         }
-        else if (wallID == 1)
+        else if (direction == Directions.Direction.East)
         {
-            newWall.position += Vector3.right * tileSize / 2;
-            newWall.Rotate(Vector3.up * 90);
+            newWall.localPosition += Vector3.right * (tileSize / 2);
         }
-        else if (wallID == 2)
+        else if (direction == Directions.Direction.South)
         {
-            newWall.position += Vector3.back * tileSize / 2;
+            newWall.localPosition += Vector3.back * (tileSize / 2);
         }
-        else if (wallID == 3)
+        else if (direction == Directions.Direction.West)
         {
-            newWall.position += Vector3.left * tileSize / 2;
-            newWall.Rotate(Vector3.up * 90);
+            newWall.localPosition += Vector3.left * (tileSize / 2);
         }
+        Directions.rotate(ref newWall, direction);
 
         return newWall;
     }
@@ -129,7 +76,13 @@ public class GameMap : MonoBehaviour
 
     public void importMap(string fileName)
     {
-        using (StreamReader fin = new StreamReader(Application.dataPath + "/Maps/" + fileName + ".map"))
+        string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
+        if (!File.Exists(mapPath))
+        {
+            Debug.LogWarning("Tried to load a map but it wasn't found! " + mapPath);
+            return;
+        }
+        using (StreamReader fin = new StreamReader(mapPath))
         {
             int versionNumber;
             bool recognizedVers = int.TryParse(fin.ReadLine(), out versionNumber);
@@ -137,7 +90,7 @@ public class GameMap : MonoBehaviour
             // For now, assume if this is good, everything else is good too
             if (!recognizedVers || versionNumber != 1)
             {
-                Debug.Log("Failed to read map file " + fileName);
+                Debug.LogWarning("Failed to read map file " + fileName);
                 return;
             }
 
@@ -163,20 +116,9 @@ public class GameMap : MonoBehaviour
             // Set new map values
             mapHeight = int.Parse(fin.ReadLine());
             mapWidth = int.Parse(fin.ReadLine());
-            mapTiles = new MapTile[mapHeight, mapWidth];
 
-            tileSize = TilePrefab.localScale.x;
-            MapTile.Walls.map = this;
+            createMap(mapHeight, mapWidth);
 
-            mapTransform = GetComponent<Transform>();
-            // We have to initialize all tiles before we can set any walls
-            for (int j = 0; j < mapHeight; ++j)
-            {
-                for (int i = 0; i < mapWidth; ++i)
-                {
-                    mapTiles[j, i] = createTile(i, j);
-                }
-            }
             for (int j = 0; j < mapHeight; ++j)
             {
                 for (int i = 0; i < mapWidth; ++i)
@@ -184,14 +126,13 @@ public class GameMap : MonoBehaviour
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
                     if (tileImprovement == MapTile.TileImprovement.Mouse)
                     {
-                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, (GridMovement.Directions)int.Parse(fin.ReadLine()));
-                        tileImprovement = MapTile.TileImprovement.None;
+                        mapTiles[j, i].direction = (Directions.Direction)int.Parse(fin.ReadLine());
+                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].direction);
                     }
                     else if (tileImprovement == MapTile.TileImprovement.Cat)
                     {
-                        // We aren't placing cats yet
-                        GridMovement.Directions unused = (GridMovement.Directions)int.Parse(fin.ReadLine());
-                        tileImprovement = MapTile.TileImprovement.None;
+                        mapTiles[j, i].direction = (Directions.Direction)int.Parse(fin.ReadLine());
+                        placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].direction);
                     }
                     mapTiles[j, i].improvement = tileImprovement;
 
@@ -221,7 +162,6 @@ public class GameMap : MonoBehaviour
     {
         const int versionNumber = 1;
 
-        Debug.Log(Application.dataPath);
         using (StreamWriter fout = new StreamWriter(Application.dataPath + "/Maps/" + fileName + ".map", false))
         {
             fout.WriteLine(versionNumber);
@@ -240,7 +180,7 @@ public class GameMap : MonoBehaviour
                     fout.WriteLine((int)tileImprovement);
                     if (tileImprovement == MapTile.TileImprovement.Mouse || tileImprovement == MapTile.TileImprovement.Cat)
                     {
-                        fout.WriteLine((int)tile.directionID);
+                        fout.WriteLine((int)tile.direction);
                     }
 
                     int wallsValue = 0;
@@ -266,9 +206,61 @@ public class GameMap : MonoBehaviour
         }
     }
 
-    public void placeMouse(float xPos, float zPos, GridMovement.Directions direction)
+    public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
-        Transform newMouse = Instantiate(MousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), MousePrefab.rotation, mapTransform);
+        Transform mousePrefab = GameResources.objects["Mouse"];
+        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), mousePrefab.rotation, mapTransform);
+        Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
+
+        return newMouse;
+    }
+
+    public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
+    {
+        Transform catPrefab = GameResources.objects["Cat"];
+        Transform newCat = Instantiate(catPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), catPrefab.rotation, mapTransform);
+        Directions.rotate(ref newCat, direction);
+        newCat.GetComponent<GridMovement>().direction = direction;
+
+        return newCat;
+    }
+
+    void Start()
+    {
+        bool useImportedMap = false;
+        if (useImportedMap)
+        {
+            importMap("Dev");
+        }
+        else
+        {
+            // mapHeight and mapWidth are initialized in the Unity editor
+            createMap(mapHeight, mapWidth);
+
+            // Create a wall around edges of map by default
+            for (int j = 0; j < mapHeight; ++j)
+            {
+                for (int i = 0; i < mapWidth; ++i)
+                {
+                    if (j == 0)
+                    {
+                        mapTiles[j, i].walls.south = true;
+                    }
+                    else if (j == mapHeight - 1)
+                    {
+                        mapTiles[j, i].walls.north = true;
+                    }
+                    if (i == 0)
+                    {
+                        mapTiles[j, i].walls.west = true;
+                    }
+                    else if (i == mapWidth - 1)
+                    {
+                        mapTiles[j, i].walls.east = true;
+                    }
+                }
+            }
+        }
     }
 }

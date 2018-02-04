@@ -38,6 +38,7 @@ public class FramerateDisplay : MonoBehaviour {
             if (m_updateNumber < 0)
             {
                 // overflow happened (is it reasonable this would ever happen? If so, make it a long), so reset the average framerate counter
+                Debug.LogWarning("Framerate counter had an overflow!");
                 m_averageFramerate = 0.0f;
                 m_updateNumber = 1;
             }
