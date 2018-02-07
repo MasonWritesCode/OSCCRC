@@ -15,7 +15,7 @@ public class GridMovement : MonoBehaviour {
 	GameController gameController;
 
     // We have to store transform in a variable to pass it out as ref
-    Transform m_transform;
+    private Transform m_transform;
 
     void updateDirection()
     {
@@ -150,7 +150,7 @@ public class GridMovement : MonoBehaviour {
                 updateDirection();
             }
 
-			transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed, Vector3.Distance (destinationPos, transform.position)));
+			transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.deltaTime, Vector3.Distance (destinationPos, transform.position)));
 
             // Wrap around to opposite side of map if necessary
             Vector3 pos = transform.position;
@@ -183,10 +183,7 @@ public class GridMovement : MonoBehaviour {
 		
 	void OnTriggerEnter(Collider other)
 	{
-		Debug.Log("OnTriggerEnter");
-		Debug.Log(other.name);
-
-		if (!gameController.isPaused) {
+		if (gameController && !gameController.isPaused) {
 			if (isCat && other.name.Contains("Mouse")) {
 				if (!other.GetComponent<GridMovement> ().isCat) {
 					Destroy (other.gameObject);
