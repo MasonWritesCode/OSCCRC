@@ -137,6 +137,12 @@ public class GridMovement : MonoBehaviour {
 
         m_transform = GetComponent<Transform>();
 
+        Animator anim = GetComponent<Animator>();
+        if (anim)
+        {
+            anim.speed = speed / 2;
+        }
+
         Directions.rotate(ref m_transform, direction);
 	}
 
