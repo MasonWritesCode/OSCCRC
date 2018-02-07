@@ -16,6 +16,7 @@ public class GridMovement : MonoBehaviour {
 
     // We have to store transform in a variable to pass it out as ref
     private Transform m_transform;
+    private Vector3 m_oldPos;
 
     void updateDirection()
     {
@@ -156,7 +157,13 @@ public class GridMovement : MonoBehaviour {
                 updateDirection();
             }
 
-			transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.deltaTime, Vector3.Distance (destinationPos, transform.position)));
+            m_oldPos = m_transform.position;
+            m_transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.deltaTime, Vector3.Distance (destinationPos, m_transform.position)));
+            if (m_transform.position == m_oldPos)
+            {
+                // Our distance to destination is not small enough to match, but not big enough for translate to do anything, so prevent from getting stuck
+                m_transform.position = mouseTile.transform.position;
+            }
 
             // Wrap around to opposite side of map if necessary
             Vector3 pos = transform.position;
