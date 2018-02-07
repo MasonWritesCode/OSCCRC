@@ -4,7 +4,7 @@ public class PlayerController : MonoBehaviour {
 
     // I heard Unity is going to be overhauling its input system soon. It would be nice to subscribe to event callbacks rather than poll every frame.
 
-    public int playerID;
+    [Range(1, 4)] public int playerID;
     public Transform highlighter;
     public MapTile currentTile = null;
 

@@ -41,7 +41,11 @@ public class GameController : MonoBehaviour {
         {
             isPaused = true;
 
-            GetComponent<Editor>().enabled = true;
+            Editor editor = GetComponent<Editor>();
+            if (editor && !editor.enabled)
+            {
+                editor.enabled = true;
+            }
         }
 
         //added for testing purposes. To be removed

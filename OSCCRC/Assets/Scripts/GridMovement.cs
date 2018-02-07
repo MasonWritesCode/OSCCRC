@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridMovement : MonoBehaviour {
 
-	public float speed;
+    [Range(0, 255)] public float speed;
 	public GameMap map;
 	public Directions.Direction direction;
 	public bool isCat;

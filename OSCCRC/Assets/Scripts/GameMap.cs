@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GameMap : MonoBehaviour
 {
-    public int mapHeight = 9;
-    public int mapWidth = 12;
+    [Range(0, 255)] public int mapHeight = 9;
+    [Range(0, 255)] public int mapWidth = 12;
     public float tileSize;
 
     private Transform mapTransform;
