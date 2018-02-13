@@ -11,19 +11,19 @@ public class Directions : MonoBehaviour {
     {
         if (dir == Direction.North)
         {
-            transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 0.0f, transform.eulerAngles.z);
         }
         else if (dir == Direction.South)
         {
-            transform.eulerAngles = new Vector3(0.0f, 180.0f, 0.0f);
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 180.0f, transform.eulerAngles.z);
         }
         else if (dir == Direction.West)
         {
-            transform.eulerAngles = new Vector3(0.0f, 270.0f, 0.0f);
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 270.0f, transform.eulerAngles.z);
         }
         else if (dir == Direction.East)
         {
-            transform.eulerAngles = new Vector3(0.0f, 90.0f, 0.0f);
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 90.0f, transform.eulerAngles.z);
         }
     }
 
