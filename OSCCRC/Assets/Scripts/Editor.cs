@@ -204,7 +204,6 @@ public class Editor : MonoBehaviour {
             {
                 Destroy(m_placeholderObject.gameObject);
                 m_placeholderObject = null;
-                m_placeholderType = ObjectType.None;
             }
 
             // If reselecting same object "put it away" instead so that no object is selected for placement
@@ -350,6 +349,15 @@ public class Editor : MonoBehaviour {
         if (!m_gameControl.isPaused)
         {
             m_wasUnpaused = true;
+
+            // Don't leave anything selected when unpausing
+            if (m_placeholderObject != null)
+            {
+                Destroy(m_placeholderObject.gameObject);
+                m_placeholderObject = null;
+            }
+            m_placeholderType = ObjectType.None;
+            m_selectedImprovement = MapTile.TileImprovement.None;
         }
         else if (m_wasUnpaused)
         {
