@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4445170262849314}
   - component: {fileID: 33757818906230814}
-  - component: {fileID: 135338273920273510}
   - component: {fileID: 23749679716525048}
   m_Layer: 0
   m_Name: Sphere (5)
@@ -38,7 +37,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4740978190663308}
   - component: {fileID: 33336706829769726}
-  - component: {fileID: 135671082281942042}
   - component: {fileID: 23237021872642442}
   m_Layer: 0
   m_Name: Sphere (3)
@@ -56,7 +54,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4241875193814532}
   - component: {fileID: 33440225995654430}
-  - component: {fileID: 135745440823630752}
   - component: {fileID: 23135336702036976}
   m_Layer: 0
   m_Name: Sphere (2)
@@ -76,8 +73,7 @@ GameObject:
   - component: {fileID: 114052251384721900}
   - component: {fileID: 95502869000028644}
   - component: {fileID: 65530446471626550}
-  - component: {fileID: 135019794986272590}
-  - component: {fileID: 54608494378523350}
+  - component: {fileID: 54332728872675912}
   m_Layer: 0
   m_Name: Mouse
   m_TagString: Untagged
@@ -94,7 +90,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4685054513053544}
   - component: {fileID: 33938684268949154}
-  - component: {fileID: 135809134649774068}
   - component: {fileID: 23678010115096466}
   m_Layer: 0
   m_Name: Sphere (4)
@@ -112,7 +107,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4012743236836810}
   - component: {fileID: 33926602174297112}
-  - component: {fileID: 136917399168609690}
   - component: {fileID: 23958134702803310}
   m_Layer: 0
   m_Name: Capsule
@@ -130,7 +124,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4067208951521912}
   - component: {fileID: 33532586394920498}
-  - component: {fileID: 135052786551839296}
   - component: {fileID: 23103563732435636}
   m_Layer: 0
   m_Name: Sphere (1)
@@ -148,7 +141,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4691111293654832}
   - component: {fileID: 33927027892907476}
-  - component: {fileID: 136067018141809058}
   - component: {fileID: 23003257083167680}
   m_Layer: 0
   m_Name: Capsule (1)
@@ -166,7 +158,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4818894521641760}
   - component: {fileID: 33524145743279978}
-  - component: {fileID: 135489476296023632}
   - component: {fileID: 23805900207301698}
   m_Layer: 0
   m_Name: Sphere
@@ -628,7 +619,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1540082887966304}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!54 &54608494378523350
+--- !u!54 &54332728872675912
 Rigidbody:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -650,10 +641,10 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1468713278425226}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
+  m_IsTrigger: 1
+  m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.5, y: 0.5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!95 &95502869000028644
 Animator:
@@ -687,113 +678,3 @@ MonoBehaviour:
   map: {fileID: 0}
   direction: 0
   isCat: 0
---- !u!135 &135019794986272590
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1468713278425226}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135052786551839296
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1846705596790900}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135338273920273510
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1008804980676860}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135489476296023632
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1936114350859902}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135671082281942042
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1110898972730842}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135745440823630752
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1398182029404712}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135809134649774068
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1540082887966304}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!136 &136067018141809058
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1922529031436662}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!136 &136917399168609690
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1708178535305020}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
