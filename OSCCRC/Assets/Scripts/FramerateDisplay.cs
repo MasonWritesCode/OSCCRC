@@ -15,11 +15,17 @@ public class FramerateDisplay : MonoBehaviour {
     private float m_averageFramerate = 0.0f;
     private float m_minFramerate = -1.0f;
 
-	void Start () {
+    private void OnEnable()
+    {
+        // We don't want to show an very old frame's info (especially when isAdvanced doesn't match)
+        textDisplay.text = "FPS: ";
+    }
+
+    void Start () {
         textDisplay.text = "FPS: ";
 	}
 	
-	void Update () {
+	void LateUpdate () {
         m_timeRemaining -= Time.unscaledDeltaTime;
         m_timeAccum += Time.unscaledDeltaTime;
         ++m_frameAccum;
