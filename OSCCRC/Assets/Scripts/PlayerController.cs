@@ -46,19 +46,19 @@ public class PlayerController : MonoBehaviour {
         {
             if (Input.GetButtonDown("Up"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Up);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North);
             }
             else if (Input.GetButtonDown("Right"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Right);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East);
             }
             else if (Input.GetButtonDown("Down"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Down);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South);
             }
             else if (Input.GetButtonDown("Left"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Left);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West);
             }
         }
 

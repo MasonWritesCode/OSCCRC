@@ -33,21 +33,9 @@ public class GridMovement : MonoBehaviour {
         }
 
         //checking for arrows
-        if (mouseTile.improvement == MapTile.TileImprovement.Up)
+        if (mouseTile.improvement == MapTile.TileImprovement.Direction)
         {
-            direction = Directions.Direction.North;
-        }
-        else if (mouseTile.improvement == MapTile.TileImprovement.Down)
-        {
-            direction = Directions.Direction.South;
-        }
-        else if (mouseTile.improvement == MapTile.TileImprovement.Left)
-        {
-            direction = Directions.Direction.West;
-        }
-        else if (mouseTile.improvement == MapTile.TileImprovement.Right)
-        {
-            direction = Directions.Direction.East;
+            direction = mouseTile.improvementDirection;
         }
 
         //Checking for walls

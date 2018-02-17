@@ -101,28 +101,28 @@ public class Editor : MonoBehaviour {
         {
             // Left
             newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Left;
+            newImprovement = MapTile.TileImprovement.Direction;
             newDir = Directions.Direction.West;
         }
         if (Input.GetKeyDown(KeyCode.Alpha5) || Input.GetKeyDown(KeyCode.Keypad5))
         {
             // Right
             newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Right;
+            newImprovement = MapTile.TileImprovement.Direction;
             newDir = Directions.Direction.East;
         }
         if (Input.GetKeyDown(KeyCode.Alpha6) || Input.GetKeyDown(KeyCode.Keypad6))
         {
             // Up
             newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Up;
+            newImprovement = MapTile.TileImprovement.Direction;
             newDir = Directions.Direction.North;
         }
         if (Input.GetKeyDown(KeyCode.Alpha7) || Input.GetKeyDown(KeyCode.Keypad7))
         {
             // Down
             newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Down;
+            newImprovement = MapTile.TileImprovement.Direction;
             newDir = Directions.Direction.South;
         }
         if (Input.GetKeyDown(KeyCode.Alpha8) || Input.GetKeyDown(KeyCode.Keypad8))
@@ -166,34 +166,6 @@ public class Editor : MonoBehaviour {
             if (newImprovement == MapTile.TileImprovement.None)
             {
                 newImprovement = m_selectedImprovement;
-            }
-        }
-
-        // Allow rotating arrow tiles to get different tiles.
-        // Kind of annoying because we treat directional tiles as separate improvements
-        if (newType == ObjectType.Improvement
-            && (newImprovement == MapTile.TileImprovement.Left
-                || newImprovement == MapTile.TileImprovement.Right
-                || newImprovement == MapTile.TileImprovement.Up
-                || newImprovement == MapTile.TileImprovement.Down
-               )
-           )
-        {
-            if (newDir == Directions.Direction.North)
-            {
-                newImprovement = MapTile.TileImprovement.Up;
-            }
-            else if (newDir == Directions.Direction.East)
-            {
-                newImprovement = MapTile.TileImprovement.Right;
-            }
-            else if (newDir == Directions.Direction.South)
-            {
-                newImprovement = MapTile.TileImprovement.Down;
-            }
-            else if (newDir == Directions.Direction.West)
-            {
-                newImprovement = MapTile.TileImprovement.Left;
             }
         }
 
@@ -245,6 +217,7 @@ public class Editor : MonoBehaviour {
                         m_placeholderObject = m_gameMap.createTile(0, 0).transform;
                         m_placeholderObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
                         MapTile placeholderTile = m_placeholderObject.GetComponent<MapTile>();
+                        placeholderTile.improvementDirection = m_direction;
                         placeholderTile.improvement = m_selectedImprovement;
                     }
                 }
@@ -307,15 +280,40 @@ public class Editor : MonoBehaviour {
             }
             else if (m_placeholderType == ObjectType.Improvement)
             {
-                selectedTile.direction = m_direction;
-
-                if (selectedTile.improvement == m_selectedImprovement)
+                if (m_selectedImprovement == MapTile.TileImprovement.Mouse || m_selectedImprovement == MapTile.TileImprovement.Cat)
                 {
-                    selectedTile.improvement = MapTile.TileImprovement.None;
+                    if (selectedTile.movingObject == m_selectedImprovement && selectedTile.movingObjDirection == m_direction)
+                    {
+                        selectedTile.movingObject = MapTile.TileImprovement.None;
+                    }
+                    else
+                    {
+                        selectedTile.movingObjDirection = m_direction;
+                        selectedTile.movingObject = m_selectedImprovement;
+
+                        if (selectedTile.improvement != MapTile.TileImprovement.None)
+                        {
+                            selectedTile.improvement = MapTile.TileImprovement.None;
+                        }
+                    }
                 }
                 else
                 {
-                    selectedTile.improvement = m_selectedImprovement;
+                    if (selectedTile.improvement == m_selectedImprovement && selectedTile.improvementDirection == m_direction)
+                    {
+                        selectedTile.improvement = MapTile.TileImprovement.None;
+                    }
+                    else
+                    {
+                        selectedTile.improvementDirection = m_direction;
+                        selectedTile.improvement = m_selectedImprovement;
+
+                        if (selectedTile.improvement != MapTile.TileImprovement.Direction)
+                        {
+                            // We can only have a mouse or cat in addition to direction tiles
+                            selectedTile.movingObject = MapTile.TileImprovement.None;
+                        }
+                    }
                 }
 
                 // If a mouse or cat was placed, we have to do special actions to remove it
@@ -328,14 +326,14 @@ public class Editor : MonoBehaviour {
                     m_movingObjects.Remove(selectedTile);
                 }
 
-                if (selectedTile.improvement == MapTile.TileImprovement.Mouse || selectedTile.improvement == MapTile.TileImprovement.Cat)
+                if (selectedTile.movingObject == MapTile.TileImprovement.Mouse || selectedTile.movingObject == MapTile.TileImprovement.Cat)
                 {
                     Transform newMovingObj = null;
-                    if (selectedTile.improvement == MapTile.TileImprovement.Mouse)
+                    if (selectedTile.movingObject == MapTile.TileImprovement.Mouse)
                     {
                         newMovingObj = m_gameMap.placeMouse(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
                     }
-                    else if (selectedTile.improvement == MapTile.TileImprovement.Cat)
+                    else if (selectedTile.movingObject == MapTile.TileImprovement.Cat)
                     {
                         newMovingObj = m_gameMap.placeCat(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
                     }

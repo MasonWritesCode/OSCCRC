@@ -9,6 +9,11 @@ public class Directions : MonoBehaviour {
 
     public static void rotate (ref Transform transform, Direction dir)
     {
+        if (transform == null)
+        {
+            return;
+        }
+
         if (dir == Direction.North)
         {
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 0.0f, transform.eulerAngles.z);

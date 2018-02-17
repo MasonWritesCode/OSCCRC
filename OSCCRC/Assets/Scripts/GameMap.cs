@@ -100,11 +100,8 @@ public class GameMap : MonoBehaviour
                 for (int i = 0; i < mapWidth; ++i)
                 {
                     mapTiles[j, i].walls.north = mapTiles[j, i].walls.east = mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
-                    Destroy(mapTiles[j, i].gameObject);
-                    mapTiles[j, i] = null;
                 }
             }
-            mapTiles = null;
             // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
             List<GridMovement> deadMeat = new List<GridMovement>();
             GetComponentsInChildren<GridMovement>(true, deadMeat);
@@ -113,45 +110,71 @@ public class GameMap : MonoBehaviour
                 Destroy(i.gameObject);
             }
 
-            // Set new map values
-            mapHeight = int.Parse(fin.ReadLine());
-            mapWidth = int.Parse(fin.ReadLine());
+            // Create a new map if necessary
+            int newMapHeight = int.Parse(fin.ReadLine());
+            int newMapWidth = int.Parse(fin.ReadLine());
 
-            createMap(mapHeight, mapWidth);
+            if (newMapHeight != mapHeight && newMapWidth != mapWidth)
+            {
+                for (int j = 0; j < mapHeight; ++j)
+                {
+                    for (int i = 0; i < mapWidth; ++i)
+                    {
+                        Destroy(mapTiles[j, i].gameObject);
+                        mapTiles[j, i] = null;
+                    }
+                }
+                mapTiles = null;
 
+                createMap(newMapHeight, newMapWidth);
+            }    
+
+            // Add stuff onto the tiles
             for (int j = 0; j < mapHeight; ++j)
             {
                 for (int i = 0; i < mapWidth; ++i)
                 {
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
-                    if (tileImprovement == MapTile.TileImprovement.Mouse)
+                    if (tileImprovement != MapTile.TileImprovement.None)
                     {
-                        mapTiles[j, i].direction = (Directions.Direction)int.Parse(fin.ReadLine());
-                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].direction);
+                        mapTiles[j, i].improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
                     }
-                    else if (tileImprovement == MapTile.TileImprovement.Cat)
+                    MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
+                    if (movingObj != MapTile.TileImprovement.None)
                     {
-                        mapTiles[j, i].direction = (Directions.Direction)int.Parse(fin.ReadLine());
-                        placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].direction);
+                        mapTiles[j, i].movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+
+                        if (movingObj == MapTile.TileImprovement.Mouse)
+                        {
+                            placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                        }
+                        else if (movingObj == MapTile.TileImprovement.Cat)
+                        {
+                            placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                        }
                     }
                     mapTiles[j, i].improvement = tileImprovement;
+                    mapTiles[j, i].movingObject = movingObj;
 
                     int wallsValue = int.Parse(fin.ReadLine());
-                    if ((wallsValue >> 0 & 1) == 1)
+                    if (wallsValue != 0)
                     {
-                        mapTiles[j, i].walls.north = true;
-                    }
-                    if ((wallsValue >> 1 & 1) == 1)
-                    {
-                        mapTiles[j, i].walls.east = true;
-                    }
-                    if ((wallsValue >> 2 & 1) == 1)
-                    {
-                        mapTiles[j, i].walls.south = true;
-                    }
-                    if ((wallsValue >> 3 & 1) == 1)
-                    {
-                        mapTiles[j, i].walls.west = true;
+                        if ((wallsValue >> 0 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.north = true;
+                        }
+                        if ((wallsValue >> 1 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.east = true;
+                        }
+                        if ((wallsValue >> 2 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.south = true;
+                        }
+                        if ((wallsValue >> 3 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.west = true;
+                        }
                     }
                 }
             }
@@ -174,13 +197,16 @@ public class GameMap : MonoBehaviour
                 {
                     MapTile tile = mapTiles[j, i];
 
-                    // We currently can hold both the tile improvement and walls value in a single digit int each
-                    // We should combine these together into a single two-digit number later in case we add more tile improvements
-                    MapTile.TileImprovement tileImprovement = tile.improvement;
-                    fout.WriteLine((int)tileImprovement);
-                    if (tileImprovement == MapTile.TileImprovement.Mouse || tileImprovement == MapTile.TileImprovement.Cat)
+                    fout.WriteLine((int)tile.improvement);
+                    if (tile.improvement != MapTile.TileImprovement.None)
                     {
-                        fout.WriteLine((int)tile.direction);
+                        fout.WriteLine((int)tile.improvementDirection);
+                    }
+
+                    fout.WriteLine((int)tile.movingObject);
+                    if (tile.movingObject != MapTile.TileImprovement.None)
+                    {
+                        fout.WriteLine((int)tile.movingObjDirection);
                     }
 
                     int wallsValue = 0;

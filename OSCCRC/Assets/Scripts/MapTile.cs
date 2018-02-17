@@ -5,7 +5,7 @@ using UnityEngine;
 public class MapTile : MonoBehaviour
 {
     // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
-    public enum TileImprovement { None, Hole, Goal, Spawner, Left, Right, Up, Down, Mouse, Cat }
+    public enum TileImprovement { None, Hole, Goal, Spawner, Direction, Mouse, Cat }
 
     public class Walls
     {
@@ -107,12 +107,17 @@ public class MapTile : MonoBehaviour
 
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
+    public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
     public Walls walls;
-    public Directions.Direction direction;
+    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(ref m_tileObject, value); } }
+    public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
 
     private static Dictionary<TileImprovement, string> m_improvementTextures = new Dictionary<TileImprovement, string>();
     private static Dictionary<TileImprovement, string> m_improvementObjects = new Dictionary<TileImprovement, string>();
     private TileImprovement m_improvement;
+    private TileImprovement m_movingObject;
+    private Directions.Direction m_improvementDir;
+    private Directions.Direction m_movingDir;
     private Transform m_tileObject;
 
     static MapTile()
@@ -120,15 +125,13 @@ public class MapTile : MonoBehaviour
         m_improvementTextures.Add(TileImprovement.None, "Tile");
         m_improvementTextures.Add(TileImprovement.Hole, "Hole");
         m_improvementTextures.Add(TileImprovement.Goal, "Goal");
-        m_improvementTextures.Add(TileImprovement.Left, "Left");
-        m_improvementTextures.Add(TileImprovement.Right, "Right");
-        m_improvementTextures.Add(TileImprovement.Up, "Up");
-        m_improvementTextures.Add(TileImprovement.Down, "Down");
+        m_improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
     }
 
     public void initTile()
     {
-        direction = Directions.Direction.North;
+        improvementDirection = Directions.Direction.North;
+        movingObjDirection = Directions.Direction.North;
         m_tileObject = null;
         walls = new Walls();
         walls.origin = GetComponent<Transform>().position;
@@ -136,6 +139,7 @@ public class MapTile : MonoBehaviour
         // workaround of ignoring attempts to set same tile improvement again, because prefab doesn't alternate the none tile
         m_improvement = TileImprovement.Hole;
         improvement = TileImprovement.None;
+        movingObject = TileImprovement.None;
     }
 
     private void setTileImprovement(TileImprovement improvement)
@@ -143,8 +147,7 @@ public class MapTile : MonoBehaviour
         if (improvement == TileImprovement.Mouse || improvement == TileImprovement.Cat)
         {
             // A tile only owns a mouse/cat in the context of saving and loading maps.
-            // improvement = m_improvement;
-            m_improvement = improvement;
+            m_movingObject = improvement;
             return;
         }
         if (improvement == m_improvement)
@@ -163,7 +166,8 @@ public class MapTile : MonoBehaviour
         {
             objectName = m_improvementObjects[improvement];
         }
-        if (improvement == TileImprovement.None)
+
+        if (improvement == TileImprovement.None || materialName == string.Empty)
         {
             // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
             if ((walls.origin.x + walls.origin.z) % 2 == 0)
@@ -175,7 +179,7 @@ public class MapTile : MonoBehaviour
                 materialName = "TileAlt";
             }
         }
-			
+
 		if (materialName != string.Empty)
         {
             if (GameResources.materials.ContainsKey(materialName))
@@ -198,7 +202,7 @@ public class MapTile : MonoBehaviour
             if (GameResources.objects.ContainsKey(objectName))
             {
                 m_tileObject = Instantiate(GameResources.objects[objectName], GetComponent<Transform>());
-                Directions.rotate(ref m_tileObject, direction);
+                Directions.rotate(ref m_tileObject, m_improvementDir);
             }
             else
             {
