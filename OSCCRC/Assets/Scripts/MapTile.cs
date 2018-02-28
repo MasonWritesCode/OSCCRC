@@ -9,41 +9,37 @@ public class MapTile : MonoBehaviour
 
     public class Walls
     {
-        public bool north { get { return m_walls[m_dirToInt[Directions.Direction.North]] != null; } set { changeWall(Directions.Direction.North, value); } }
-        public bool east { get { return m_walls[m_dirToInt[Directions.Direction.East]] != null; } set { changeWall(Directions.Direction.East, value); } }
-        public bool south { get { return m_walls[m_dirToInt[Directions.Direction.South]] != null; } set { changeWall(Directions.Direction.South, value); } }
-        public bool west { get { return m_walls[m_dirToInt[Directions.Direction.West]] != null; } set { changeWall(Directions.Direction.West, value); } }
+        public bool north { get { return m_walls[Directions.Direction.North] != null; } set { changeWall(Directions.Direction.North, value); } }
+        public bool east { get { return m_walls[Directions.Direction.East] != null; } set { changeWall(Directions.Direction.East, value); } }
+        public bool south { get { return m_walls[Directions.Direction.South] != null; } set { changeWall(Directions.Direction.South, value); } }
+        public bool west { get { return m_walls[Directions.Direction.West] != null; } set { changeWall(Directions.Direction.West, value); } }
 
         internal Vector3 origin = new Vector3();
 
         internal static GameMap map;
 
-        private Transform[] m_walls = new Transform[4];
-        private int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
-        private static Dictionary<Directions.Direction, int> m_dirToInt = new Dictionary<Directions.Direction, int>();
+        private readonly int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
+        private Dictionary<Directions.Direction, Transform> m_walls= new Dictionary<Directions.Direction, Transform>();
 
-        static Walls()
+        public Walls()
         {
-            // Just in case someone wants to change the enum order, map the directions to an int to avoid possible breakage
-            // This is a lot of extra stuff to do to avoid a problem that probably will never happen, but oh well.
-            m_dirToInt.Add(Directions.Direction.North, 0);
-            m_dirToInt.Add(Directions.Direction.East, 1);
-            m_dirToInt.Add(Directions.Direction.South, 2);
-            m_dirToInt.Add(Directions.Direction.West, 3);
+            m_walls.Add(Directions.Direction.North, null);
+            m_walls.Add(Directions.Direction.East, null);
+            m_walls.Add(Directions.Direction.South, null);
+            m_walls.Add(Directions.Direction.West, null);
         }
 
         // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
         private void changeWall(Directions.Direction wallID, bool isCreating)
         {
-            int idNum = m_dirToInt[wallID];
-            if (isCreating && m_walls[idNum] == null)
+            if (isCreating && m_walls[wallID] == null)
             {
-                m_walls[idNum] = map.createWall(origin.x, origin.z, wallID);
+                m_walls[wallID] = map.createWall(origin.x, origin.z, wallID);
             }
-            else if (!isCreating && m_walls[idNum] != null)
+            else if (!isCreating && m_walls[wallID] != null)
             {
-                map.destroyWall(m_walls[idNum]);
-                m_walls[idNum] = null;
+                map.destroyWall(m_walls[wallID]);
+                m_walls[wallID] = null;
             }
             else
             {
@@ -53,7 +49,7 @@ public class MapTile : MonoBehaviour
 
             // Determine where the other wall is if it exists
             float otherTileX = origin.x, otherTileZ = origin.z;
-            if (idNum == 0)
+            if (wallID == Directions.Direction.North)
             {
                 otherTileZ += map.tileSize;
                 if (otherTileZ > (maxHeightIndex * map.tileSize))
@@ -61,7 +57,7 @@ public class MapTile : MonoBehaviour
                     otherTileZ = 0;
                 }
             }
-            else if (idNum == 1)
+            else if (wallID == Directions.Direction.East)
             {
                 otherTileX += map.tileSize;
                 if (otherTileX > (maxWidthIndex * map.tileSize))
@@ -69,7 +65,7 @@ public class MapTile : MonoBehaviour
                     otherTileX = 0;
                 }
             }
-            else if (idNum == 2)
+            else if (wallID == Directions.Direction.South)
             {
                 otherTileZ -= map.tileSize;
                 if (otherTileZ < 0)
@@ -77,7 +73,7 @@ public class MapTile : MonoBehaviour
                     otherTileZ = maxHeightIndex * map.tileSize;
                 }
             }
-            else if (idNum == 3)
+            else if (wallID == Directions.Direction.West)
             {
                 otherTileX -= map.tileSize;
                 if (otherTileX < 0)
@@ -87,7 +83,7 @@ public class MapTile : MonoBehaviour
             }
 
             // The companion wall always has the same existance state
-            if (otherTileZ == (maxHeightIndex * map.tileSize) || otherTileX == (maxWidthIndex * map.tileSize) || otherTileZ == 0 || otherTileX == 0)
+            if (Mathf.Abs(origin.z - otherTileZ) == (maxHeightIndex * map.tileSize) || Mathf.Abs(origin.x - otherTileX) == (maxWidthIndex * map.tileSize))
             {
                 // Walls on edges share state with wrapped around tile, but they don't share the same wall object
                 map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall(Directions.getOppositeDir(wallID), isCreating );
@@ -98,9 +94,9 @@ public class MapTile : MonoBehaviour
                 Transform wallSet = null;
                 if (isCreating)
                 {
-                    wallSet = m_walls[idNum];
+                    wallSet = m_walls[wallID];
                 }
-                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(idNum + 2) % 4] = wallSet;
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[Directions.getOppositeDir(wallID)] = wallSet;
             }
         }
     }

@@ -99,6 +99,8 @@ public class GameMap : MonoBehaviour
             {
                 for (int i = 0; i < mapWidth; ++i)
                 {
+                    // North and east walls will be removed by changing the south and west of it's partner tiles
+                    //mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
                     mapTiles[j, i].walls.north = mapTiles[j, i].walls.east = mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
                 }
             }
@@ -156,24 +158,27 @@ public class GameMap : MonoBehaviour
                     mapTiles[j, i].improvement = tileImprovement;
                     mapTiles[j, i].movingObject = movingObj;
 
-                    int wallsValue = int.Parse(fin.ReadLine());
-                    if (wallsValue != 0)
+                    if (i == 0 || j == 0 || (i + j) % 2 == 0)
                     {
-                        if ((wallsValue >> 0 & 1) == 1)
+                        int wallsValue = int.Parse(fin.ReadLine());
+                        if (wallsValue != 0)
                         {
-                            mapTiles[j, i].walls.north = true;
-                        }
-                        if ((wallsValue >> 1 & 1) == 1)
-                        {
-                            mapTiles[j, i].walls.east = true;
-                        }
-                        if ((wallsValue >> 2 & 1) == 1)
-                        {
-                            mapTiles[j, i].walls.south = true;
-                        }
-                        if ((wallsValue >> 3 & 1) == 1)
-                        {
-                            mapTiles[j, i].walls.west = true;
+                            if ((wallsValue >> 0 & 1) == 1)
+                            {
+                                mapTiles[j, i].walls.north = true;
+                            }
+                            if ((wallsValue >> 1 & 1) == 1)
+                            {
+                                mapTiles[j, i].walls.east = true;
+                            }
+                            if ((wallsValue >> 2 & 1) == 1)
+                            {
+                                mapTiles[j, i].walls.south = true;
+                            }
+                            if ((wallsValue >> 3 & 1) == 1)
+                            {
+                                mapTiles[j, i].walls.west = true;
+                            }
                         }
                     }
                 }
@@ -209,24 +214,27 @@ public class GameMap : MonoBehaviour
                         fout.WriteLine((int)tile.movingObjDirection);
                     }
 
-                    int wallsValue = 0;
-                    if (tile.walls.north)
+                    if (i == 0 || j == 0 || (i + j) % 2 == 0)
                     {
-                        wallsValue |= 1 << 0;
+                        int wallsValue = 0;
+                        if (tile.walls.north)
+                        {
+                            wallsValue |= 1 << 0;
+                        }
+                        if (tile.walls.east)
+                        {
+                            wallsValue |= 1 << 1;
+                        }
+                        if (tile.walls.south)
+                        {
+                            wallsValue |= 1 << 2;
+                        }
+                        if (tile.walls.west)
+                        {
+                            wallsValue |= 1 << 3;
+                        }
+                        fout.WriteLine(wallsValue);
                     }
-                    if (tile.walls.east)
-                    {
-                        wallsValue |= 1 << 1;
-                    }
-                    if (tile.walls.south)
-                    {
-                        wallsValue |= 1 << 2;
-                    }
-                    if (tile.walls.west)
-                    {
-                        wallsValue |= 1 << 3;
-                    }
-                    fout.WriteLine(wallsValue);
                 }
             }
         }
