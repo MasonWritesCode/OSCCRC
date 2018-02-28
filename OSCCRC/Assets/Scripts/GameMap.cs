@@ -100,8 +100,7 @@ public class GameMap : MonoBehaviour
                 for (int i = 0; i < mapWidth; ++i)
                 {
                     // North and east walls will be removed by changing the south and west of it's partner tiles
-                    //mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
-                    mapTiles[j, i].walls.north = mapTiles[j, i].walls.east = mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
+                    mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
                 }
             }
             // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
