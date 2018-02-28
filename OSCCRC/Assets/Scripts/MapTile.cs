@@ -136,8 +136,6 @@ public class MapTile : MonoBehaviour
         walls = new Walls();
         walls.origin = GetComponent<Transform>().position;
         m_tileObject = null;
-        // workaround of ignoring attempts to set same tile improvement again, because prefab doesn't alternate the none tile
-        m_improvement = TileImprovement.Hole;
         improvement = TileImprovement.None;
         movingObject = TileImprovement.None;
     }
@@ -147,13 +145,18 @@ public class MapTile : MonoBehaviour
         if (improvement == TileImprovement.Mouse || improvement == TileImprovement.Cat)
         {
             // A tile only owns a mouse/cat in the context of saving and loading maps.
+            Debug.LogWarning("setTileImprovement function should not be used for placing Moving Objects.");
             m_movingObject = improvement;
             return;
         }
+        // We don't actually want to do an early return when the improvement is the same as current
+        // This is because we might load a different resource pack, and want to re-apply the improvements to get the new version
+        /*
         if (improvement == m_improvement)
         {
             return;
         }
+        */
 
         string materialName = string.Empty;
         string objectName = string.Empty;
