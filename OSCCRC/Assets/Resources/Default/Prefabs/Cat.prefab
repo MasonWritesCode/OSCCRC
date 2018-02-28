@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 4932463689872970}
   - component: {fileID: 114070464262402396}
   - component: {fileID: 95781845954143718}
-  - component: {fileID: 65084812887042908}
+  - component: {fileID: 135955852886912508}
   - component: {fileID: 54199121661686834}
   m_Layer: 0
   m_Name: Cat
@@ -706,18 +706,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &65084812887042908
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1583404243129010}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5, z: 0.5}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!95 &95781845954143718
 Animator:
   serializedVersion: 3
@@ -750,3 +738,15 @@ MonoBehaviour:
   map: {fileID: 0}
   direction: 0
   isCat: 1
+--- !u!135 &135955852886912508
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1583404243129010}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}

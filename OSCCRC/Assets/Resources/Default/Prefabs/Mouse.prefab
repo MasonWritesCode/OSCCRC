@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 4476613451300466}
   - component: {fileID: 114052251384721900}
   - component: {fileID: 95502869000028644}
-  - component: {fileID: 65530446471626550}
+  - component: {fileID: 135525755073462502}
   - component: {fileID: 54332728872675912}
   m_Layer: 0
   m_Name: Mouse
@@ -634,18 +634,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &65530446471626550
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1468713278425226}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5, z: 0.5}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!95 &95502869000028644
 Animator:
   serializedVersion: 3
@@ -678,3 +666,15 @@ MonoBehaviour:
   map: {fileID: 0}
   direction: 0
   isCat: 0
+--- !u!135 &135525755073462502
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1468713278425226}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
