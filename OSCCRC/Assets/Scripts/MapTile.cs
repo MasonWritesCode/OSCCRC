@@ -115,6 +115,7 @@ public class MapTile : MonoBehaviour
     private Directions.Direction m_improvementDir;
     private Directions.Direction m_movingDir;
     private Transform m_tileObject;
+    private int m_tileDamage;
 
     static MapTile()
     {
@@ -136,6 +137,23 @@ public class MapTile : MonoBehaviour
         movingObject = TileImprovement.None;
     }
 
+    public void damageTile()
+    {
+        const int hitsToDestroy = 2;
+
+        ++m_tileDamage;
+
+        if (m_tileDamage < hitsToDestroy)
+        {
+            float newScale = ((hitsToDestroy - (m_tileDamage * 0.5f)) / (float)hitsToDestroy);
+            m_tileObject.transform.localScale = new Vector3(newScale, newScale, 1);
+        }
+        else
+        {
+            improvement = TileImprovement.None;
+        }
+    }
+
     private void setTileImprovement(TileImprovement improvement)
     {
         if (improvement == TileImprovement.Mouse || improvement == TileImprovement.Cat)
@@ -153,6 +171,8 @@ public class MapTile : MonoBehaviour
             return;
         }
         */
+
+        m_tileDamage = 0;
 
         string materialName = string.Empty;
         string objectName = string.Empty;

@@ -7,9 +7,9 @@ public class GridMovement : MonoBehaviour {
     [Range(0, 255)] public float speed;
 	public GameMap map;
 	public Directions.Direction direction;
-	public bool isCat;
+    public bool isCat;
 
-	MapTile mouseTile;
+	MapTile tile;
 	Vector3 destinationPos;
 
 	GameController gameController;
@@ -21,29 +21,37 @@ public class GridMovement : MonoBehaviour {
     void updateDirection()
     {
         //check for goals and holes
-        if (mouseTile.improvement == MapTile.TileImprovement.Goal)
+        if (tile.improvement == MapTile.TileImprovement.Goal)
         {
             // TODO: additional handling of goals
             Destroy(gameObject);
         }
-        else if (mouseTile.improvement == MapTile.TileImprovement.Hole)
+        else if (tile.improvement == MapTile.TileImprovement.Hole)
         {
             // TODO: additional handlinng of holes (if needed)
             Destroy(gameObject);
         }
 
         //checking for arrows
-        if (mouseTile.improvement == MapTile.TileImprovement.Direction)
+        if (tile.improvement == MapTile.TileImprovement.Direction)
         {
-            direction = mouseTile.improvementDirection;
+            if (isCat && direction == Directions.getOppositeDir(tile.improvementDirection))
+            {
+                direction = tile.improvementDirection;
+                tile.damageTile();
+            }
+            else
+            {
+                direction = tile.improvementDirection;
+            }
         }
 
         //Checking for walls
-        if (mouseTile.walls.north && direction == Directions.Direction.North)
+        if (tile.walls.north && direction == Directions.Direction.North)
         {
-            if (mouseTile.walls.east)
+            if (tile.walls.east)
             {
-                if (mouseTile.walls.west)
+                if (tile.walls.west)
                 {
                     direction = Directions.Direction.South;
                 }
@@ -57,11 +65,11 @@ public class GridMovement : MonoBehaviour {
                 direction = Directions.Direction.East;
             }
         }
-        else if (mouseTile.walls.south && direction == Directions.Direction.South)
+        else if (tile.walls.south && direction == Directions.Direction.South)
         {
-            if (mouseTile.walls.west)
+            if (tile.walls.west)
             {
-                if (mouseTile.walls.east)
+                if (tile.walls.east)
                 {
                     direction = Directions.Direction.North;
                 }
@@ -76,11 +84,11 @@ public class GridMovement : MonoBehaviour {
                 direction = Directions.Direction.West;
             }
         }
-        else if (mouseTile.walls.east && direction == Directions.Direction.East)
+        else if (tile.walls.east && direction == Directions.Direction.East)
         {
-            if (mouseTile.walls.south)
+            if (tile.walls.south)
             {
-                if (mouseTile.walls.north)
+                if (tile.walls.north)
                 {
                     direction = Directions.Direction.West;
                 }
@@ -94,11 +102,11 @@ public class GridMovement : MonoBehaviour {
                 direction = Directions.Direction.South;
             }
         }
-        else if (mouseTile.walls.west && direction == Directions.Direction.West)
+        else if (tile.walls.west && direction == Directions.Direction.West)
         {
-            if (mouseTile.walls.north)
+            if (tile.walls.north)
             {
-                if (mouseTile.walls.south)
+                if (tile.walls.south)
                 {
                     direction = Directions.Direction.East;
                 }
@@ -137,11 +145,11 @@ public class GridMovement : MonoBehaviour {
 
 	void FixedUpdate() {
 		if (!gameController.isPaused) {
-            mouseTile = map.tileAt (transform.position);
+            tile = map.tileAt (transform.position);
 
 			//TODO: check for other types of tiles: pits, goals, etc.
 
-			if (transform.position == mouseTile.transform.position) { // we hit our destination, so get a new tile
+			if (transform.position == tile.transform.position) { // we hit our destination, so get a new tile
                 updateDirection();
             }
 
@@ -150,7 +158,7 @@ public class GridMovement : MonoBehaviour {
             if (m_transform.position == m_oldPos)
             {
                 // Our distance to destination is not small enough to match, but not big enough for translate to do anything, so prevent from getting stuck
-                m_transform.position = mouseTile.transform.position;
+                m_transform.position = tile.transform.position;
             }
 
             // Wrap around to opposite side of map if necessary
@@ -181,15 +189,18 @@ public class GridMovement : MonoBehaviour {
             }
         }
 	}
-		
-	void OnTriggerEnter(Collider other)
-	{
-		if (gameController && !gameController.isPaused) {
-			if (isCat && other.name.Contains("Mouse")) {
-				if (!other.GetComponent<GridMovement> ().isCat) {
-					Destroy (other.gameObject);
-				}
-			}
-		}
-	}
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (gameController && !gameController.isPaused)
+        {
+            if (isCat && other.name.Contains("Mouse"))
+            {
+                if (!other.GetComponent<GridMovement>().isCat)
+                {
+                    Destroy(other.gameObject);
+                }
+            }
+        }
+    }
 }
