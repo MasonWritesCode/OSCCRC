@@ -10,10 +10,11 @@ public class GameResources : MonoBehaviour {
 
     public static Dictionary<string, Material> materials;
     public static Dictionary<string, Transform> objects;
+    public static string resourcePack { get { return m_resourcePack; } set { loadResources(value); } }
 
-    private string m_resourcePack = string.Empty;
+    private static string m_resourcePack = string.Empty;
 
-    void loadResources(string resourcePack)
+    static void loadResources(string resourcePack)
     {
         materials = new Dictionary<string, Material>();
         objects = new Dictionary<string, Transform>();
@@ -36,7 +37,7 @@ public class GameResources : MonoBehaviour {
         objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
     }
 
-    private Object resourceFromDir(string path)
+    static private Object resourceFromDir(string path)
     {
         Object resource = Resources.Load(m_resourcePack + path);
 
@@ -53,7 +54,8 @@ public class GameResources : MonoBehaviour {
         return resource;
     }
 
-    void Awake () {
+    void Awake()
+    {
         loadResources("Default");
     }
 }

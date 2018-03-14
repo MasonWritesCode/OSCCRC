@@ -32,12 +32,10 @@ public class GameController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-		isPaused = false; // temporary
+		m_isPaused = true;
 
         if (mode == GameMode.Editor)
         {
-            isPaused = true;
-
             Editor editor = GetComponent<Editor>();
             if (editor && !editor.enabled)
             {
@@ -49,7 +47,7 @@ public class GameController : MonoBehaviour {
         GameMap map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
         if (mode == GameMode.Puzzle)
         {
-            map.importMap("dev");
+            map.loadMap("dev");
         }
         /*
         map.placeMouse(3, 2, Directions.Direction.North);

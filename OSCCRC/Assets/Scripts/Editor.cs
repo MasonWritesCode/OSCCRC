@@ -19,6 +19,7 @@ public class Editor : MonoBehaviour {
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
     private GameMap m_gameMap;
+    private GameStage m_gameStage;
     private PlayerController m_controls;
     private GameController m_gameControl;
     private bool m_wasUnpaused;
@@ -33,6 +34,7 @@ public class Editor : MonoBehaviour {
 
 	void Start () {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        m_gameStage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
         m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
         m_gameControl = GameObject.FindWithTag("GameController").GetComponent<GameController>();
 
@@ -43,7 +45,7 @@ public class Editor : MonoBehaviour {
         m_positionOffset = Vector3.zero;
         m_wasUnpaused = false;
 
-        m_gameMap.exportMap("_editorAuto");
+        m_gameMap.saveMap("_editorAuto");
     }
 
 	void Update () {
@@ -302,6 +304,13 @@ public class Editor : MonoBehaviour {
                     if (selectedTile.improvement == m_selectedImprovement && selectedTile.improvementDirection == m_direction)
                     {
                         selectedTile.improvement = MapTile.TileImprovement.None;
+
+                        if (m_selectedImprovement == MapTile.TileImprovement.Direction)
+                        {
+                            // We will probably change this to have the GameController pull placed direction tiles into available placements
+                            // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
+                            m_gameStage.availablePlacements.AddLast(m_direction);
+                        }
                     }
                     else
                     {
@@ -312,6 +321,12 @@ public class Editor : MonoBehaviour {
                         {
                             // We can only have a mouse or cat in addition to direction tiles
                             selectedTile.movingObject = MapTile.TileImprovement.None;
+                        }
+                        else
+                        {
+                            // We will probably change this to have the GameController pull placed direction tiles into available placements
+                            // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
+                            m_gameStage.availablePlacements.Remove(m_direction);
                         }
                     }
                 }
@@ -341,7 +356,7 @@ public class Editor : MonoBehaviour {
                 }
             }
 
-            m_gameMap.exportMap("_editorAuto");
+            m_gameMap.saveMap("_editorAuto");
         }
 
         if (!m_gameControl.isPaused)
@@ -360,7 +375,7 @@ public class Editor : MonoBehaviour {
         else if (m_wasUnpaused)
         {
             m_wasUnpaused = false;
-            m_gameMap.importMap("_editorAuto");
+            m_gameMap.loadMap("_editorAuto");
             mapAllObjToTile(m_gameMap);
         }
 
@@ -368,15 +383,15 @@ public class Editor : MonoBehaviour {
         // Save map
         if (Input.GetKeyDown(KeyCode.F6))
         {
-            m_gameMap.exportMap("dev");
+            m_gameStage.saveStage("dev");
         }
         else if (Input.GetKeyDown(KeyCode.F7))
         {
-            m_gameMap.importMap("dev");
+            m_gameStage.loadStage("dev");
             mapAllObjToTile(m_gameMap);
 
             // Go ahead and save to the loaded state
-            m_gameMap.exportMap("_editorAuto");
+            m_gameMap.saveMap("_editorAuto");
         }
     }
 

@@ -74,7 +74,151 @@ public class GameMap : MonoBehaviour
         Destroy(wall.gameObject);
     }
 
-    public void importMap(string fileName)
+    public bool importMap(StreamReader fin)
+    {
+        // Delete allocated game objects, since we are creating new ones
+        for (int j = 0; j < mapHeight; ++j)
+        {
+            for (int i = 0; i < mapWidth; ++i)
+            {
+                // North and east walls will be removed by changing the south and west of it's partner tiles
+                mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
+            }
+        }
+        // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
+        List<GridMovement> deadMeat = new List<GridMovement>();
+        GetComponentsInChildren<GridMovement>(true, deadMeat);
+        foreach (GridMovement i in deadMeat)
+        {
+            Destroy(i.gameObject);
+        }
+
+        // Create a new map if necessary
+        int newMapHeight = int.Parse(fin.ReadLine());
+        int newMapWidth = int.Parse(fin.ReadLine());
+
+        if (newMapHeight != mapHeight && newMapWidth != mapWidth)
+        {
+            for (int j = 0; j < mapHeight; ++j)
+            {
+                for (int i = 0; i < mapWidth; ++i)
+                {
+                    Destroy(mapTiles[j, i].gameObject);
+                    mapTiles[j, i] = null;
+                }
+            }
+            mapTiles = null;
+
+            createMap(newMapHeight, newMapWidth);
+        }
+
+        // Add stuff onto the tiles
+        for (int j = 0; j < mapHeight; ++j)
+        {
+            for (int i = 0; i < mapWidth; ++i)
+            {
+                MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
+                if (tileImprovement != MapTile.TileImprovement.None)
+                {
+                    mapTiles[j, i].improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+                }
+                MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
+                if (movingObj != MapTile.TileImprovement.None)
+                {
+                    mapTiles[j, i].movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+
+                    if (movingObj == MapTile.TileImprovement.Mouse)
+                    {
+                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                    }
+                    else if (movingObj == MapTile.TileImprovement.Cat)
+                    {
+                        placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                    }
+                }
+                mapTiles[j, i].improvement = tileImprovement;
+                mapTiles[j, i].movingObject = movingObj;
+
+                if (i == 0 || j == 0 || (i + j) % 2 == 0)
+                {
+                    int wallsValue = int.Parse(fin.ReadLine());
+                    if (wallsValue != 0)
+                    {
+                        if ((wallsValue >> 0 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.north = true;
+                        }
+                        if ((wallsValue >> 1 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.east = true;
+                        }
+                        if ((wallsValue >> 2 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.south = true;
+                        }
+                        if ((wallsValue >> 3 & 1) == 1)
+                        {
+                            mapTiles[j, i].walls.west = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public bool exportMap(StreamWriter fout)
+    {
+        fout.WriteLine(mapHeight);
+        fout.WriteLine(mapWidth);
+
+        for (int j = 0; j < mapHeight; ++j)
+        {
+            for (int i = 0; i < mapWidth; ++i)
+            {
+                MapTile tile = mapTiles[j, i];
+
+                fout.WriteLine((int)tile.improvement);
+                if (tile.improvement != MapTile.TileImprovement.None)
+                {
+                    fout.WriteLine((int)tile.improvementDirection);
+                }
+
+                fout.WriteLine((int)tile.movingObject);
+                if (tile.movingObject != MapTile.TileImprovement.None)
+                {
+                    fout.WriteLine((int)tile.movingObjDirection);
+                }
+
+                if (i == 0 || j == 0 || (i + j) % 2 == 0)
+                {
+                    int wallsValue = 0;
+                    if (tile.walls.north)
+                    {
+                        wallsValue |= 1 << 0;
+                    }
+                    if (tile.walls.east)
+                    {
+                        wallsValue |= 1 << 1;
+                    }
+                    if (tile.walls.south)
+                    {
+                        wallsValue |= 1 << 2;
+                    }
+                    if (tile.walls.west)
+                    {
+                        wallsValue |= 1 << 3;
+                    }
+                    fout.WriteLine(wallsValue);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public void loadMap(string fileName)
     {
         string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
         if (!File.Exists(mapPath))
@@ -84,158 +228,20 @@ public class GameMap : MonoBehaviour
         }
         using (StreamReader fin = new StreamReader(mapPath))
         {
-            int versionNumber;
-            bool recognizedVers = int.TryParse(fin.ReadLine(), out versionNumber);
-
-            // For now, assume if this is good, everything else is good too
-            if (!recognizedVers || versionNumber != 1)
+            bool wasLoaded = importMap(fin);
+            if (!wasLoaded)
             {
                 Debug.LogWarning("Failed to read map file " + fileName);
-                return;
-            }
-
-            // Delete allocated game objects, since we are creating new ones
-            for (int j = 0; j < mapHeight; ++j)
-            {
-                for (int i = 0; i < mapWidth; ++i)
-                {
-                    // North and east walls will be removed by changing the south and west of it's partner tiles
-                    mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
-                }
-            }
-            // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
-            List<GridMovement> deadMeat = new List<GridMovement>();
-            GetComponentsInChildren<GridMovement>(true, deadMeat);
-            foreach (GridMovement i in deadMeat)
-            {
-                Destroy(i.gameObject);
-            }
-
-            // Create a new map if necessary
-            int newMapHeight = int.Parse(fin.ReadLine());
-            int newMapWidth = int.Parse(fin.ReadLine());
-
-            if (newMapHeight != mapHeight && newMapWidth != mapWidth)
-            {
-                for (int j = 0; j < mapHeight; ++j)
-                {
-                    for (int i = 0; i < mapWidth; ++i)
-                    {
-                        Destroy(mapTiles[j, i].gameObject);
-                        mapTiles[j, i] = null;
-                    }
-                }
-                mapTiles = null;
-
-                createMap(newMapHeight, newMapWidth);
-            }    
-
-            // Add stuff onto the tiles
-            for (int j = 0; j < mapHeight; ++j)
-            {
-                for (int i = 0; i < mapWidth; ++i)
-                {
-                    MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
-                    if (tileImprovement != MapTile.TileImprovement.None)
-                    {
-                        mapTiles[j, i].improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
-                    }
-                    MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
-                    if (movingObj != MapTile.TileImprovement.None)
-                    {
-                        mapTiles[j, i].movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
-
-                        if (movingObj == MapTile.TileImprovement.Mouse)
-                        {
-                            placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
-                        }
-                        else if (movingObj == MapTile.TileImprovement.Cat)
-                        {
-                            placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
-                        }
-                    }
-                    mapTiles[j, i].improvement = tileImprovement;
-                    mapTiles[j, i].movingObject = movingObj;
-
-                    if (i == 0 || j == 0 || (i + j) % 2 == 0)
-                    {
-                        int wallsValue = int.Parse(fin.ReadLine());
-                        if (wallsValue != 0)
-                        {
-                            if ((wallsValue >> 0 & 1) == 1)
-                            {
-                                mapTiles[j, i].walls.north = true;
-                            }
-                            if ((wallsValue >> 1 & 1) == 1)
-                            {
-                                mapTiles[j, i].walls.east = true;
-                            }
-                            if ((wallsValue >> 2 & 1) == 1)
-                            {
-                                mapTiles[j, i].walls.south = true;
-                            }
-                            if ((wallsValue >> 3 & 1) == 1)
-                            {
-                                mapTiles[j, i].walls.west = true;
-                            }
-                        }
-                    }
-                }
             }
         }
     }
 
-    public void exportMap(string fileName)
+    public void saveMap(string fileName)
     {
-        const int versionNumber = 1;
-
-        using (StreamWriter fout = new StreamWriter(Application.dataPath + "/Maps/" + fileName + ".map", false))
+        string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
+        using (StreamWriter fout = new StreamWriter(mapPath, false))
         {
-            fout.WriteLine(versionNumber);
-            fout.WriteLine(mapHeight);
-            fout.WriteLine(mapWidth);
-
-            for (int j = 0; j < mapHeight; ++j)
-            {
-                for (int i = 0; i < mapWidth; ++i)
-                {
-                    MapTile tile = mapTiles[j, i];
-
-                    fout.WriteLine((int)tile.improvement);
-                    if (tile.improvement != MapTile.TileImprovement.None)
-                    {
-                        fout.WriteLine((int)tile.improvementDirection);
-                    }
-
-                    fout.WriteLine((int)tile.movingObject);
-                    if (tile.movingObject != MapTile.TileImprovement.None)
-                    {
-                        fout.WriteLine((int)tile.movingObjDirection);
-                    }
-
-                    if (i == 0 || j == 0 || (i + j) % 2 == 0)
-                    {
-                        int wallsValue = 0;
-                        if (tile.walls.north)
-                        {
-                            wallsValue |= 1 << 0;
-                        }
-                        if (tile.walls.east)
-                        {
-                            wallsValue |= 1 << 1;
-                        }
-                        if (tile.walls.south)
-                        {
-                            wallsValue |= 1 << 2;
-                        }
-                        if (tile.walls.west)
-                        {
-                            wallsValue |= 1 << 3;
-                        }
-                        fout.WriteLine(wallsValue);
-                    }
-                }
-            }
+            exportMap(fout);
         }
     }
 
@@ -264,7 +270,7 @@ public class GameMap : MonoBehaviour
         bool useImportedMap = false;
         if (useImportedMap)
         {
-            importMap("Dev");
+            loadMap("Dev");
         }
         else
         {

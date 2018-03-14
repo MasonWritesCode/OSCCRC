@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Directions : MonoBehaviour {
+public static class Directions {
 
     // All Game Objects must be designed so that they face north when not rotated!
     // Otherwise, we have no idea what angle to set to make it face a direction
