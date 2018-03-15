@@ -19,7 +19,7 @@ public class MapTile : MonoBehaviour
         internal static GameMap map;
 
         private readonly int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
-        private Dictionary<Directions.Direction, Transform> m_walls= new Dictionary<Directions.Direction, Transform>();
+        private Dictionary<Directions.Direction, Transform> m_walls= new Dictionary<Directions.Direction, Transform>(4);
 
         public Walls()
         {
