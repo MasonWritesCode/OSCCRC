@@ -355,22 +355,25 @@ public class Editor : MonoBehaviour {
                     m_movingObjects.Add(selectedTile, newMovingObj);
                 }
             }
-
-            m_gameMap.saveMap("_editorAuto");
         }
 
         if (!m_gameControl.isPaused)
         {
-            m_wasUnpaused = true;
-
-            // Don't leave anything selected when unpausing
-            if (m_placeholderObject != null)
+            if (!m_wasUnpaused)
             {
-                Destroy(m_placeholderObject.gameObject);
-                m_placeholderObject = null;
+                m_wasUnpaused = true;
+
+                // Don't leave anything selected when unpausing
+                if (m_placeholderObject != null)
+                {
+                    Destroy(m_placeholderObject.gameObject);
+                    m_placeholderObject = null;
+                }
+                m_placeholderType = ObjectType.None;
+                m_selectedImprovement = MapTile.TileImprovement.None;
+
+                m_gameMap.saveMap("_editorAuto");
             }
-            m_placeholderType = ObjectType.None;
-            m_selectedImprovement = MapTile.TileImprovement.None;
         }
         else if (m_wasUnpaused)
         {
