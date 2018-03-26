@@ -8,18 +8,11 @@ public class GameStage : MonoBehaviour {
     public LinkedList<Directions.Direction> availablePlacements = new LinkedList<Directions.Direction>();
     // Not using file name as the stage name gives more flexibility in naming, should we choose to show a map name somewhere
     public string stageName = "Stage";
+    public string musicTrack = "Default";
     public string resourcePackName = "Default";
-
-    private GameMap m_gameMap;
 
     // Increment this whenever we change map or stage file layout after a release
     private const int m_currentFileVersion = 1;
-
-    /*
-    void Awake () {
-        GameResources.resourcePack = resourcePackName;
-	}
-    */
 
     public void loadStage(string fileName)
     {
@@ -42,6 +35,7 @@ public class GameStage : MonoBehaviour {
             }
 
             stageName = fin.ReadLine();
+            musicTrack = fin.ReadLine();
             resourcePackName = fin.ReadLine();
             int numPlacements = int.Parse(fin.ReadLine());
             for (int i = 0; i <  numPlacements; ++i)
@@ -50,8 +44,8 @@ public class GameStage : MonoBehaviour {
             }
 
             // Now load the map itself
-            m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-            bool wasLoaded = m_gameMap.importMap(fin);
+            GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+            bool wasLoaded = gameMap.importMap(fin);
             if (!wasLoaded)
             {
                 Debug.LogWarning("Failed to read stage file " + fileName);
@@ -67,6 +61,7 @@ public class GameStage : MonoBehaviour {
             fout.WriteLine(m_currentFileVersion);
 
             fout.WriteLine(stageName);
+            fout.WriteLine(musicTrack);
             fout.WriteLine(resourcePackName);
             fout.WriteLine(availablePlacements.Count);
             foreach (Directions.Direction d in availablePlacements)
@@ -75,8 +70,8 @@ public class GameStage : MonoBehaviour {
             }
 
             // Now save the map itself
-            m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-            m_gameMap.exportMap(fout);
+            GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+            gameMap.exportMap(fout);
         }
     }
 }
