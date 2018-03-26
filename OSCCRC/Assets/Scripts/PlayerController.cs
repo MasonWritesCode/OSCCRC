@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviour {
         // Toggle framerate display between Basic, Advanced, and Off
         if (Input.GetButtonDown("FramerateToggle"))
         {
-            FramerateDisplay fpsScript = GameObject.Find("GameController").GetComponent<FramerateDisplay>();
+            FramerateDisplay fpsScript = m_gameController.GetComponent<FramerateDisplay>();
             Canvas fpsDisplay = GameObject.Find("FPSDisplay").GetComponent<Canvas>();
 
             if (!fpsScript.enabled)

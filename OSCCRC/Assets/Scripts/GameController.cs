@@ -32,6 +32,11 @@ public class GameController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        /*
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
+        */
+
 		m_isPaused = true;
 
         if (mode == GameMode.Editor)
