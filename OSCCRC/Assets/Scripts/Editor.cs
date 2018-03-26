@@ -6,6 +6,7 @@ public class Editor : MonoBehaviour {
 
     // TODO: Make placeholder creation safe for object pooling
     //       Make controllable via UI instead of arbitrary keys
+    //           (all inputs are in update function so you only have to look in there)
     //       Allow map saving and loading with input name (needs ui)
     //       Add ability to adjust speed when unpaused (wait for ui?)
 
@@ -23,6 +24,7 @@ public class Editor : MonoBehaviour {
     private PlayerController m_controls;
     private GameController m_gameControl;
     private bool m_wasUnpaused;
+    private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 
     void OnDisable() {
         if (m_placeholderObject != null)
@@ -57,6 +59,7 @@ public class Editor : MonoBehaviour {
         Directions.Direction newDir = m_direction;
 
         // Keys to select which improvement
+        // TODO: UI
         if (Input.GetKeyDown(KeyCode.LeftBracket))
         {
             // Wall North
@@ -247,9 +250,8 @@ public class Editor : MonoBehaviour {
             else
             {
                 Ray posRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-                Plane floor = new Plane(Vector3.up, Vector3.zero);
                 float distance;
-                if (floor.Raycast(posRay, out distance))
+                if (m_floorPlane.Raycast(posRay, out distance))
                 {
                     m_placeholderObject.position = posRay.GetPoint(distance) + m_positionOffset;
                 }
@@ -261,100 +263,7 @@ public class Editor : MonoBehaviour {
         // We can change it to have right click remove and left click place, but I don't know if that is better.
         if (Input.GetButtonDown("Select") && selectedTile != null && m_gameControl.isPaused)
         {
-            if (m_placeholderType == ObjectType.Wall)
-            {
-                if (m_direction == Directions.Direction.North)
-                {
-                    selectedTile.walls.north = !selectedTile.walls.north;
-                }
-                if (m_direction == Directions.Direction.East)
-                {
-                    selectedTile.walls.east = !selectedTile.walls.east;
-                }
-                if (m_direction == Directions.Direction.South)
-                {
-                    selectedTile.walls.south = !selectedTile.walls.south;
-                }
-                if (m_direction == Directions.Direction.West)
-                {
-                    selectedTile.walls.west = !selectedTile.walls.west;
-                }
-            }
-            else if (m_placeholderType == ObjectType.Improvement)
-            {
-                if (m_selectedImprovement == MapTile.TileImprovement.Mouse || m_selectedImprovement == MapTile.TileImprovement.Cat)
-                {
-                    if (selectedTile.movingObject == m_selectedImprovement && selectedTile.movingObjDirection == m_direction)
-                    {
-                        selectedTile.movingObject = MapTile.TileImprovement.None;
-                    }
-                    else
-                    {
-                        selectedTile.movingObjDirection = m_direction;
-                        selectedTile.movingObject = m_selectedImprovement;
-
-                        if (selectedTile.improvement != MapTile.TileImprovement.None)
-                        {
-                            selectedTile.improvement = MapTile.TileImprovement.None;
-                        }
-                    }
-                }
-                else
-                {
-                    if (selectedTile.improvement == m_selectedImprovement && selectedTile.improvementDirection == m_direction)
-                    {
-                        selectedTile.improvement = MapTile.TileImprovement.None;
-
-                        if (m_selectedImprovement == MapTile.TileImprovement.Direction)
-                        {
-                            // We will probably change this to have the GameController pull placed direction tiles into available placements
-                            // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
-                            m_gameStage.availablePlacements.AddLast(m_direction);
-                        }
-                    }
-                    else
-                    {
-                        selectedTile.improvementDirection = m_direction;
-                        selectedTile.improvement = m_selectedImprovement;
-
-                        if (selectedTile.improvement != MapTile.TileImprovement.Direction)
-                        {
-                            // We can only have a mouse or cat in addition to direction tiles
-                            selectedTile.movingObject = MapTile.TileImprovement.None;
-                        }
-                        else
-                        {
-                            // We will probably change this to have the GameController pull placed direction tiles into available placements
-                            // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
-                            m_gameStage.availablePlacements.Remove(m_direction);
-                        }
-                    }
-                }
-
-                // If a mouse or cat was placed, we have to do special actions to remove it
-                if (m_movingObjects.ContainsKey(selectedTile))
-                {
-                    if (m_movingObjects[selectedTile] != null)
-                    {
-                        Destroy(m_movingObjects[selectedTile].gameObject);
-                    }
-                    m_movingObjects.Remove(selectedTile);
-                }
-
-                if (selectedTile.movingObject == MapTile.TileImprovement.Mouse || selectedTile.movingObject == MapTile.TileImprovement.Cat)
-                {
-                    Transform newMovingObj = null;
-                    if (selectedTile.movingObject == MapTile.TileImprovement.Mouse)
-                    {
-                        newMovingObj = m_gameMap.placeMouse(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
-                    }
-                    else if (selectedTile.movingObject == MapTile.TileImprovement.Cat)
-                    {
-                        newMovingObj = m_gameMap.placeCat(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
-                    }
-                    m_movingObjects.Add(selectedTile, newMovingObj);
-                }
-            }
+            placeObject(selectedTile);
         }
 
         if (!m_gameControl.isPaused)
@@ -379,26 +288,139 @@ public class Editor : MonoBehaviour {
         {
             m_wasUnpaused = false;
             m_gameMap.loadMap("_editorAuto");
-            mapAllObjToTile(m_gameMap);
+            mapMovingObjToTile(m_gameMap);
         }
 
 
-        // Save map
+        // For now just hotkey a save to "dev" until we have a UI that lets you choose save name
+        // TODO: UI
         if (Input.GetKeyDown(KeyCode.F6))
         {
-            m_gameStage.saveStage("dev");
+            createSave("dev");
         }
         else if (Input.GetKeyDown(KeyCode.F7))
         {
-            m_gameStage.loadStage("dev");
-            mapAllObjToTile(m_gameMap);
-
-            // Go ahead and save to the loaded state
-            m_gameMap.saveMap("_editorAuto");
+            loadSave("dev");
         }
     }
 
-    private void mapAllObjToTile(GameMap map)
+
+    private void createSave(string saveName)
+    {
+        m_gameStage.saveStage(saveName);
+    }
+
+
+    private void loadSave(string saveName)
+    {
+        m_gameStage.loadStage(saveName);
+        mapMovingObjToTile(m_gameMap);
+
+        // Go ahead and save to the loaded state
+        m_gameMap.saveMap("_editorAuto");
+    }
+
+
+    private void placeObject(MapTile selectedTile)
+    {
+        if (m_placeholderType == ObjectType.Wall)
+        {
+            if (m_direction == Directions.Direction.North)
+            {
+                selectedTile.walls.north = !selectedTile.walls.north;
+            }
+            if (m_direction == Directions.Direction.East)
+            {
+                selectedTile.walls.east = !selectedTile.walls.east;
+            }
+            if (m_direction == Directions.Direction.South)
+            {
+                selectedTile.walls.south = !selectedTile.walls.south;
+            }
+            if (m_direction == Directions.Direction.West)
+            {
+                selectedTile.walls.west = !selectedTile.walls.west;
+            }
+        }
+        else if (m_placeholderType == ObjectType.Improvement)
+        {
+            if (m_selectedImprovement == MapTile.TileImprovement.Mouse || m_selectedImprovement == MapTile.TileImprovement.Cat)
+            {
+                if (selectedTile.movingObject == m_selectedImprovement && selectedTile.movingObjDirection == m_direction)
+                {
+                    selectedTile.movingObject = MapTile.TileImprovement.None;
+                }
+                else
+                {
+                    selectedTile.movingObjDirection = m_direction;
+                    selectedTile.movingObject = m_selectedImprovement;
+
+                    if (selectedTile.improvement != MapTile.TileImprovement.None)
+                    {
+                        selectedTile.improvement = MapTile.TileImprovement.None;
+                    }
+                }
+            }
+            else
+            {
+                if (selectedTile.improvement == m_selectedImprovement && selectedTile.improvementDirection == m_direction)
+                {
+                    selectedTile.improvement = MapTile.TileImprovement.None;
+
+                    if (m_selectedImprovement == MapTile.TileImprovement.Direction)
+                    {
+                        // We will probably change this to have the GameController pull placed direction tiles into available placements
+                        // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
+                        m_gameStage.availablePlacements.AddLast(m_direction);
+                    }
+                }
+                else
+                {
+                    selectedTile.improvementDirection = m_direction;
+                    selectedTile.improvement = m_selectedImprovement;
+
+                    if (selectedTile.improvement != MapTile.TileImprovement.Direction)
+                    {
+                        // We can only have a mouse or cat in addition to direction tiles
+                        selectedTile.movingObject = MapTile.TileImprovement.None;
+                    }
+                    else
+                    {
+                        // We will probably change this to have the GameController pull placed direction tiles into available placements
+                        // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
+                        m_gameStage.availablePlacements.Remove(m_direction);
+                    }
+                }
+            }
+
+            // If a mouse or cat was placed, we have to do special actions to remove it
+            if (m_movingObjects.ContainsKey(selectedTile))
+            {
+                if (m_movingObjects[selectedTile] != null)
+                {
+                    Destroy(m_movingObjects[selectedTile].gameObject);
+                }
+                m_movingObjects.Remove(selectedTile);
+            }
+
+            if (selectedTile.movingObject == MapTile.TileImprovement.Mouse || selectedTile.movingObject == MapTile.TileImprovement.Cat)
+            {
+                Transform newMovingObj = null;
+                if (selectedTile.movingObject == MapTile.TileImprovement.Mouse)
+                {
+                    newMovingObj = m_gameMap.placeMouse(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
+                }
+                else if (selectedTile.movingObject == MapTile.TileImprovement.Cat)
+                {
+                    newMovingObj = m_gameMap.placeCat(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
+                }
+                m_movingObjects.Add(selectedTile, newMovingObj);
+            }
+        }
+    }
+
+
+    private void mapMovingObjToTile(GameMap map)
     {
         m_movingObjects.Clear();
 
