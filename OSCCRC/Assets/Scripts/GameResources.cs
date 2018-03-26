@@ -14,8 +14,13 @@ public class GameResources : MonoBehaviour {
 
     private static string m_resourcePack = string.Empty;
 
-    static void loadResources(string resourcePack)
+    public static void loadResources(string resourcePack)
     {
+        if (resourcePack == m_resourcePack)
+        {
+            return;
+        }
+
         materials = new Dictionary<string, Material>();
         objects = new Dictionary<string, Transform>();
 

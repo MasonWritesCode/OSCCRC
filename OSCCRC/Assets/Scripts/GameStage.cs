@@ -37,6 +37,7 @@ public class GameStage : MonoBehaviour {
             stageName = fin.ReadLine();
             musicTrack = fin.ReadLine();
             resourcePackName = fin.ReadLine();
+            GameResources.loadResources(resourcePackName);
             int numPlacements = int.Parse(fin.ReadLine());
             for (int i = 0; i <  numPlacements; ++i)
             {
