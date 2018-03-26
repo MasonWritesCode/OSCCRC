@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
+    // isPaused needs to be moved to IGameMode probably
 	public bool isPaused { get { return m_isPaused; } set { if(mode != GameMode.Multiplayer) { m_isPaused = value; } } }
 
-    public enum GameMode { Editor, Puzzle, Multiplayer };
+    public enum GameMode { None, Editor, Puzzle, Multiplayer };
 
     //public static readonly GameMode mode = GameMode.Puzzle;
     public static readonly GameMode mode = GameMode.Editor;
 
+    private IGameMode game;
     private bool m_isPaused;
 
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement, Directions.Direction dir = Directions.Direction.North)
@@ -25,12 +27,10 @@ public class GameController : MonoBehaviour {
 
         if (improvement == MapTile.TileImprovement.Direction)
         {
-            tile.improvement = improvement;
-            tile.improvementDirection = dir;
+            game.placeDirection(tile, dir);
         }
     }
 
-    // Use this for initialization
     void Start () {
         /*
         QualitySettings.vSyncCount = 0;
@@ -39,12 +39,17 @@ public class GameController : MonoBehaviour {
 
 		m_isPaused = true;
 
-        if (mode == GameMode.Editor)
+        if (mode == GameMode.Editor || mode == GameMode.Puzzle)
         {
-            Editor editor = GetComponent<Editor>();
-            if (editor && !editor.enabled)
+            game = new PuzzleGame();
+
+            if (mode == GameMode.Editor)
             {
-                editor.enabled = true;
+                Editor editor = GetComponent<Editor>();
+                if (editor && !editor.enabled)
+                {
+                    editor.enabled = true;
+                }
             }
         }
 
