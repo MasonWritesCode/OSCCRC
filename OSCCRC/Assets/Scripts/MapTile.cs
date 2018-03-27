@@ -9,20 +9,25 @@ public class MapTile : MonoBehaviour
 
     public class Walls
     {
+        public bool this[Directions.Direction wallID] { get { return m_walls[wallID] != null; } set { changeWall(wallID, value); } }
+        // Probably should use indexer only and make the direction properties deprecated?
         public bool north { get { return m_walls[Directions.Direction.North] != null; } set { changeWall(Directions.Direction.North, value); } }
         public bool east { get { return m_walls[Directions.Direction.East] != null; } set { changeWall(Directions.Direction.East, value); } }
         public bool south { get { return m_walls[Directions.Direction.South] != null; } set { changeWall(Directions.Direction.South, value); } }
         public bool west { get { return m_walls[Directions.Direction.West] != null; } set { changeWall(Directions.Direction.West, value); } }
 
-        internal Vector3 origin = new Vector3();
-
-        internal static GameMap map;
-
-        private readonly int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
+        private Vector3 origin;
+        private GameMap map;
+        private readonly int maxHeightIndex, maxWidthIndex;
         private Dictionary<Directions.Direction, Transform> m_walls= new Dictionary<Directions.Direction, Transform>(4);
 
-        public Walls()
+        public Walls(GameMap parentMap, Vector3 originPos)
         {
+            map = parentMap;
+            origin = originPos;
+            maxHeightIndex = map.mapHeight - 1;
+            maxWidthIndex = map.mapWidth - 1;
+
             m_walls.Add(Directions.Direction.North, null);
             m_walls.Add(Directions.Direction.East, null);
             m_walls.Add(Directions.Direction.South, null);
@@ -125,13 +130,12 @@ public class MapTile : MonoBehaviour
         m_improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
     }
 
-    public void initTile()
+    public void initTile(GameMap parentMap)
     {
         improvementDirection = Directions.Direction.North;
         movingObjDirection = Directions.Direction.North;
         m_tileObject = null;
-        walls = new Walls();
-        walls.origin = GetComponent<Transform>().position;
+        walls = new Walls(parentMap, GetComponent<Transform>().position);
         m_tileObject = null;
         improvement = TileImprovement.None;
         movingObject = TileImprovement.None;
@@ -189,7 +193,7 @@ public class MapTile : MonoBehaviour
         if (improvement == TileImprovement.None || materialName == string.Empty)
         {
             // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
-            if ((walls.origin.x + walls.origin.z) % 2 == 0)
+            if ((transform.position.x + transform.position.z) % 2 == 0)
             {
                 materialName = "Tile";
             }

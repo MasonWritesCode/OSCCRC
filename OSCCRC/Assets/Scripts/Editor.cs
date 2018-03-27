@@ -325,22 +325,7 @@ public class Editor : MonoBehaviour {
     {
         if (m_placeholderType == ObjectType.Wall)
         {
-            if (m_direction == Directions.Direction.North)
-            {
-                selectedTile.walls.north = !selectedTile.walls.north;
-            }
-            if (m_direction == Directions.Direction.East)
-            {
-                selectedTile.walls.east = !selectedTile.walls.east;
-            }
-            if (m_direction == Directions.Direction.South)
-            {
-                selectedTile.walls.south = !selectedTile.walls.south;
-            }
-            if (m_direction == Directions.Direction.West)
-            {
-                selectedTile.walls.west = !selectedTile.walls.west;
-            }
+            selectedTile.walls[m_direction] = !selectedTile.walls[m_direction];
         }
         else if (m_placeholderType == ObjectType.Improvement)
         {

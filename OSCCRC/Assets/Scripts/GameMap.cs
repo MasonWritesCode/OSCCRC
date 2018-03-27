@@ -17,14 +17,13 @@ public class GameMap : MonoBehaviour
         mapTiles = new MapTile[mapHeight, mapWidth];
 
         tileSize = GameResources.objects["Tile"].localScale.x;
-        MapTile.Walls.map = this;
 
         mapTransform = GetComponent<Transform>();
         for (int j = 0; j < mapHeight; ++j)
         {
             for (int i = 0; i < mapWidth; ++i)
             {
-                mapTiles[j, i] = createTile(i, j);
+                mapTiles[j, i] = createTile(i * tileSize, j * tileSize);
             }
         }
     }
@@ -37,16 +36,16 @@ public class GameMap : MonoBehaviour
     public MapTile createTile(float xPos, float zPos)
     {
         Transform tilePrefab = GameResources.objects["Tile"];
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), tilePrefab.rotation, mapTransform);
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0, zPos), tilePrefab.rotation, mapTransform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
-        newTile.initTile();
+        newTile.initTile(this);
         return newTile;
     }
 
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
         Transform wallPrefab = GameResources.objects["Wall"];
-        Transform newWall = Instantiate(wallPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), wallPrefab.rotation, mapTransform);
+        Transform newWall = Instantiate(wallPrefab, new Vector3(xPos, 0, zPos), wallPrefab.rotation, mapTransform);
 
         if (direction == Directions.Direction.North)
         {
@@ -248,7 +247,7 @@ public class GameMap : MonoBehaviour
     public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
         Transform mousePrefab = GameResources.objects["Mouse"];
-        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), mousePrefab.rotation, mapTransform);
+        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, mapTransform);
         Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
 
@@ -258,7 +257,7 @@ public class GameMap : MonoBehaviour
     public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
     {
         Transform catPrefab = GameResources.objects["Cat"];
-        Transform newCat = Instantiate(catPrefab, new Vector3(xPos * tileSize, 0, zPos * tileSize), catPrefab.rotation, mapTransform);
+        Transform newCat = Instantiate(catPrefab, new Vector3(xPos, 0, zPos), catPrefab.rotation, mapTransform);
         Directions.rotate(ref newCat, direction);
         newCat.GetComponent<GridMovement>().direction = direction;
 
@@ -274,6 +273,12 @@ public class GameMap : MonoBehaviour
         }
         else
         {
+            if (mapTiles != null)
+            {
+                // We already created a map by loading a save elsewhere or something. So don't make a blank one.
+                return;
+            }
+
             // mapHeight and mapWidth are initialized in the Unity editor
             createMap(mapHeight, mapWidth);
 
