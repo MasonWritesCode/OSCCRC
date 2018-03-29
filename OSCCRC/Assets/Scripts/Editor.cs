@@ -9,6 +9,8 @@ public class Editor : MonoBehaviour {
     //           (all inputs are in update function so you only have to look in there)
     //       Allow map saving and loading with input name (needs ui)
     //       Add ability to adjust speed when unpaused (wait for ui?)
+    //       Placed directional tiles aren't supposed to be saved.
+    //          Have to figure out what is supposed to happen with playtesting here.
 
     private enum ObjectType { None, Wall, Improvement }
 
@@ -273,13 +275,7 @@ public class Editor : MonoBehaviour {
                 m_wasUnpaused = true;
 
                 // Don't leave anything selected when unpausing
-                if (m_placeholderObject != null)
-                {
-                    Destroy(m_placeholderObject.gameObject);
-                    m_placeholderObject = null;
-                }
-                m_placeholderType = ObjectType.None;
-                m_selectedImprovement = MapTile.TileImprovement.None;
+                removePlaceholder();
 
                 m_gameMap.saveMap("_editorAuto");
             }
@@ -300,6 +296,7 @@ public class Editor : MonoBehaviour {
         }
         else if (Input.GetKeyDown(KeyCode.F7))
         {
+            removePlaceholder();
             loadSave("dev");
         }
     }
@@ -354,9 +351,7 @@ public class Editor : MonoBehaviour {
 
                     if (m_selectedImprovement == MapTile.TileImprovement.Direction)
                     {
-                        // We will probably change this to have the GameController pull placed direction tiles into available placements
-                        // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
-                        m_gameStage.availablePlacements.AddLast(m_direction);
+                        m_gameStage.placements.remove(m_direction);
                     }
                 }
                 else
@@ -371,9 +366,7 @@ public class Editor : MonoBehaviour {
                     }
                     else
                     {
-                        // We will probably change this to have the GameController pull placed direction tiles into available placements
-                        // instead of saving them here. But I'll leave this here for now, at the very least for testing purposes.
-                        m_gameStage.availablePlacements.Remove(m_direction);
+                        m_gameStage.placements.add(m_direction);
                     }
                 }
             }
@@ -420,5 +413,17 @@ public class Editor : MonoBehaviour {
                 m_movingObjects.Add(map.tileAt(i.transform.position), i.transform);
             }
         }
+    }
+
+
+    private void removePlaceholder()
+    {
+        if (m_placeholderObject != null)
+        {
+            Destroy(m_placeholderObject.gameObject);
+            m_placeholderObject = null;
+        }
+        m_placeholderType = ObjectType.None;
+        m_selectedImprovement = MapTile.TileImprovement.None;
     }
 }

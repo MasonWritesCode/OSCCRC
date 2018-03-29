@@ -6,6 +6,9 @@ public class PuzzleGame : IGameMode {
 
     public void startGame()
     {
+        GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
+
+        placements = new GameStage.availablePlacements(stage.placements);
         return;
     }
 
@@ -16,9 +19,24 @@ public class PuzzleGame : IGameMode {
 
     public void placeDirection(MapTile tile, Directions.Direction dir)
     {
-        // TODO: there is a list of available tiles for puzzle mode.
-        //       either grab it from a stage class member, or traverse map to count up all directional tiles.
-        tile.improvement = MapTile.TileImprovement.Direction;
-        tile.improvementDirection = dir;
+        if (tile.improvement == MapTile.TileImprovement.Direction && tile.improvementDirection == dir)
+        {
+            tile.improvement = MapTile.TileImprovement.None;
+
+            placements.add(dir);
+        }
+        else if (placements.get(dir) > 0)
+        {
+            tile.improvementDirection = dir;
+            tile.improvement = MapTile.TileImprovement.Direction;
+
+            placements.remove(dir);
+        }
+        else
+        {
+            // Play a "No, you can't do this" sound?
+        }
     }
+
+    private GameStage.availablePlacements placements;
 }

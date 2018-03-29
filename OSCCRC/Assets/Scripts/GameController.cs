@@ -18,8 +18,6 @@ public class GameController : MonoBehaviour {
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement, Directions.Direction dir = Directions.Direction.North)
     {
         // This checks if a player is allowed to place the desired improvement, and does so if they can
-        // This is different between game modes, so will have to account for that when other modes are implemented
-        // For now, allow any number of directional arrow placements
         if (isPaused)
         {
             return;

@@ -5,12 +5,62 @@ using UnityEngine;
 
 public class GameStage : MonoBehaviour {
 
-    public LinkedList<Directions.Direction> availablePlacements = new LinkedList<Directions.Direction>();
-    // Not using file name as the stage name gives more flexibility in naming, should we choose to show a map name somewhere
-    public string stageName = "Stage";
-    public string musicTrack = "Default";
-    public string resourcePackName = "Default";
+    public class availablePlacements
+    {
+        public availablePlacements()
+        {
+            counts = new Dictionary<Directions.Direction, int>{
+                { Directions.Direction.North, 0 },
+                { Directions.Direction.East, 0 },
+                { Directions.Direction.South, 0 },
+                { Directions.Direction.West, 0 }
+            };
+        }
 
+        public availablePlacements(availablePlacements other)
+        {
+            counts = new Dictionary<Directions.Direction, int>(other.counts);
+        }
+
+        public void add(Directions.Direction dir)
+        {
+            // Shouldn't have to worry about overflow here
+            ++counts[dir];
+        }
+
+        public void remove(Directions.Direction dir)
+        {
+            if (counts[dir] > 0)
+            {
+                --counts[dir];
+            }
+        }
+
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void set(Directions.Direction dir, int count)
+        {
+            counts[dir] = count;
+        }
+
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int get(Directions.Direction dir)
+        {
+            return counts[dir];
+        }
+
+        private Dictionary<Directions.Direction, int> counts;
+    }
+
+    public availablePlacements placements = new availablePlacements();
+    // Not using file name as the stage name gives more flexibility in naming, should we choose to show a map name somewhere
+    public string stageName { get { return m_stageName; } set { m_stageName = value; } }
+    // Maybe add a game mode? Probably will later just in case it gets used.
+    public string musicTrack { get { return m_musicTrack; } set { m_musicTrack = value; } }
+    public string resourcePackName { get { return m_resourcePack; } set { m_resourcePack = value; } }
+
+    private string m_stageName = "Stage";
+    private string m_musicTrack = "Default";
+    private string m_resourcePack = "Default";
     // Increment this whenever we change map or stage file layout after a release
     private const int m_currentFileVersion = 1;
 
@@ -38,11 +88,10 @@ public class GameStage : MonoBehaviour {
             musicTrack = fin.ReadLine();
             resourcePackName = fin.ReadLine();
             GameResources.loadResources(resourcePackName);
-            int numPlacements = int.Parse(fin.ReadLine());
-            for (int i = 0; i <  numPlacements; ++i)
-            {
-                availablePlacements.AddLast((Directions.Direction)int.Parse(fin.ReadLine()));
-            }
+            placements.set( Directions.Direction.North, int.Parse(fin.ReadLine()) );
+            placements.set( Directions.Direction.East, int.Parse(fin.ReadLine()) );
+            placements.set( Directions.Direction.South, int.Parse(fin.ReadLine()) );
+            placements.set( Directions.Direction.West, int.Parse(fin.ReadLine()) );
 
             // Now load the map itself
             GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
@@ -64,11 +113,10 @@ public class GameStage : MonoBehaviour {
             fout.WriteLine(stageName);
             fout.WriteLine(musicTrack);
             fout.WriteLine(resourcePackName);
-            fout.WriteLine(availablePlacements.Count);
-            foreach (Directions.Direction d in availablePlacements)
-            {
-                fout.WriteLine((int)d);
-            }
+            fout.WriteLine(placements.get(Directions.Direction.North));
+            fout.WriteLine(placements.get(Directions.Direction.East));
+            fout.WriteLine(placements.get(Directions.Direction.South));
+            fout.WriteLine(placements.get(Directions.Direction.West));
 
             // Now save the map itself
             GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
