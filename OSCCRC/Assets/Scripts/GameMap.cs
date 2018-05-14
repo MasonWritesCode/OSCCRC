@@ -6,7 +6,7 @@ public class GameMap : MonoBehaviour
 {
     [Range(1, 255)] public int mapHeight = 9;
     [Range(1, 255)] public int mapWidth = 12;
-    public float tileSize;
+    [HideInInspector] public float tileSize;
 
     private Transform mapTransform;
     private MapTile[,] mapTiles;
@@ -26,6 +26,8 @@ public class GameMap : MonoBehaviour
                 mapTiles[j, i] = createTile(i * tileSize, j * tileSize);
             }
         }
+
+        setCameraView(Camera.main);
     }
 
     public MapTile tileAt(Vector3 point)
@@ -262,6 +264,20 @@ public class GameMap : MonoBehaviour
         newCat.GetComponent<GridMovement>().direction = direction;
 
         return newCat;
+    }
+
+    public void setCameraView(Camera cam)
+    {
+        // We want to have the camera set to be able to view the entire map, for whatever map size and shape we get.
+
+        // There is probably a correct thing to do here, but just do whatever for now since map sizes will probably always be the same.
+        float scaleFactor = 4.25f;
+        float cameraAngle = cam.transform.eulerAngles.x;
+        Debug.Log(Mathf.Sin(cameraAngle * Mathf.Deg2Rad));
+        cam.transform.position = new Vector3((mapWidth * 1.5f) + (mapHeight * 0.5f),
+                                             (mapWidth + mapHeight) * 1.6f + (Mathf.Sin(cameraAngle * Mathf.Deg2Rad) * (scaleFactor / 2)),
+                                             (mapWidth * 0.5f) + (mapHeight * 0.5f) - (Mathf.Sin(cameraAngle * Mathf.Deg2Rad) * (scaleFactor / 2))
+                                            ) / scaleFactor;
     }
 
     void Start()

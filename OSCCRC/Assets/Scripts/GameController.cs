@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour {
     private IGameMode game;
     private bool m_isPaused;
 
-    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement, Directions.Direction dir = Directions.Direction.North)
+    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
         // This checks if a player is allowed to place the desired improvement, and does so if they can
         if (isPaused)

@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour {
 
     [Range(1, 4)] public int playerID;
     public Transform highlighter;
-    public MapTile currentTile = null;
+    [HideInInspector] public MapTile currentTile = null;
 
     private GameController m_gameController;
 
