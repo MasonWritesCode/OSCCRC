@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+// Allows operations relating to cardinal absolute directions.
+
 public static class Directions {
 
     // All Game Objects must be designed so that they face north when not rotated!
@@ -7,6 +9,7 @@ public static class Directions {
 
     public enum Direction { North = 1, East = 2, South = 4, West = 8 };
 
+    // Rotates a transform into the specified cardinal direction
     public static void rotate (ref Transform transform, Direction dir)
     {
         if (transform == null)
@@ -32,6 +35,7 @@ public static class Directions {
         }
     }
 
+    // Gets the cardinal direction opposite of the one specified by "dir"
     public static Direction getOppositeDir(Direction dir)
     {
         int dirNum = (int)dir;
@@ -45,6 +49,7 @@ public static class Directions {
         return (Direction)(newNum);
     }
 
+    // Returns the closest cardinal direction moving clockwise from "dir"
     public static Direction nextClockwiseDir(Direction dir)
     {
         int dirNum = (int)dir;
@@ -54,6 +59,7 @@ public static class Directions {
         return (Direction)(newNum);
     }
 
+    // Returns the closest cardinal direction moving counter-clockwise from "dir"
     public static Direction nextCounterClockwiseDir(Direction dir)
     {
         int dirNum = (int)dir;

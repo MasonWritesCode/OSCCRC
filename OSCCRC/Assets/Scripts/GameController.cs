@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class controls various parts of gameplay and manages the state of the game.
+
 public class GameController : MonoBehaviour {
 
     // isPaused needs to be moved to IGameMode probably
@@ -15,9 +17,10 @@ public class GameController : MonoBehaviour {
     private IGameMode game;
     private bool m_isPaused;
 
+
+    // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
-        // This checks if a player is allowed to place the desired improvement, and does so if they can
         if (isPaused)
         {
             return;
@@ -28,6 +31,7 @@ public class GameController : MonoBehaviour {
             game.placeDirection(tile, dir);
         }
     }
+
 
     void Start () {
         /*
@@ -69,6 +73,7 @@ public class GameController : MonoBehaviour {
         // */
         //
     }
+
 
     // Update is called once per frame
     void Update () {

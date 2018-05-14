@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class allows interfacing with a tile that is located on the game map, usually accessing or changing the improvement placed onto it.
+
 public class MapTile : MonoBehaviour
 {
     // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
     public enum TileImprovement { None, Hole, Goal, Spawner, Direction, Mouse, Cat }
 
+    // Class that holds wall information that will be associated with a tile.
+    // This is within the MapTile class because only a tile should access walls directly.
     public class Walls
     {
         public bool this[Directions.Direction wallID] { get { return m_walls[wallID] != null; } set { changeWall(wallID, value); } }
@@ -122,6 +126,8 @@ public class MapTile : MonoBehaviour
     private Transform m_tileObject;
     private int m_tileDamage;
 
+
+    // This static constructor is used to generate a map used to interface with resource packs
     static MapTile()
     {
         m_improvementTextures.Add(TileImprovement.None, "Tile");
@@ -130,6 +136,9 @@ public class MapTile : MonoBehaviour
         m_improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
     }
 
+
+    // Initializes this tile using data from "parentMap"
+    // If I remember correctly, this is used instead of Start so that parentMap can be passed in
     public void initTile(GameMap parentMap)
     {
         improvementDirection = Directions.Direction.North;
@@ -141,6 +150,8 @@ public class MapTile : MonoBehaviour
         movingObject = TileImprovement.None;
     }
 
+
+    // Damages the improvement placed onto a tile, possibly destroying it
     public void damageTile()
     {
         const int hitsToDestroy = 2;
@@ -158,6 +169,8 @@ public class MapTile : MonoBehaviour
         }
     }
 
+
+    // Places a new improvement onto this tile
     private void setTileImprovement(TileImprovement improvement)
     {
         if (improvement == TileImprovement.Mouse || improvement == TileImprovement.Cat)

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class controls the map building functionality of the game, allowing creation of a new Game Map and play testing it.
+
 public class Editor : MonoBehaviour {
 
     // TODO: Make placeholder creation safe for object pooling
@@ -62,6 +64,7 @@ public class Editor : MonoBehaviour {
 
         // Keys to select which improvement
         // TODO: UI
+        // This is basically a block of UI related stuff until the comment that says it isn't
         if (Input.GetKeyDown(KeyCode.LeftBracket))
         {
             // Wall North
@@ -175,6 +178,7 @@ public class Editor : MonoBehaviour {
                 newImprovement = m_selectedImprovement;
             }
         }
+        // End of UI stuff block
 
 
         if (newType != ObjectType.None)
@@ -290,6 +294,7 @@ public class Editor : MonoBehaviour {
 
         // For now just hotkey a save to "dev" until we have a UI that lets you choose save name
         // TODO: UI
+        // This is a much smaller block of UI stuff
         if (Input.GetKeyDown(KeyCode.F6))
         {
             createSave("dev");
@@ -299,15 +304,18 @@ public class Editor : MonoBehaviour {
             removePlaceholder();
             loadSave("dev");
         }
+        // End of smaller UI block
     }
 
 
+    // Creates a saved file of the stage with a file name of "saveName"
     private void createSave(string saveName)
     {
         m_gameStage.saveStage(saveName);
     }
 
 
+    // Loads the stage file into the editor of name "saveName"
     private void loadSave(string saveName)
     {
         m_gameStage.loadStage(saveName);
@@ -318,6 +326,7 @@ public class Editor : MonoBehaviour {
     }
 
 
+    // Places an tile-object onto the tile specified by "selectedTile"
     private void placeObject(MapTile selectedTile)
     {
         if (m_placeholderType == ObjectType.Wall)
@@ -398,6 +407,9 @@ public class Editor : MonoBehaviour {
     }
 
 
+    // Associates unity game objects that move around with the tile they are currently on
+    // This is needed because the unity game objects aren't children of the tile they are placed on
+    //   and we want to be able to destroy them in the editor based on the tile they are associated with
     private void mapMovingObjToTile(GameMap map)
     {
         m_movingObjects.Clear();
@@ -416,6 +428,7 @@ public class Editor : MonoBehaviour {
     }
 
 
+    // Removes the object under the mouse used to show what is going to be placed
     private void removePlaceholder()
     {
         if (m_placeholderObject != null)

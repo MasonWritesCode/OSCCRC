@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This is an interface between the game controller and the Puzzle game mode.
+
 public class PuzzleGame : IGameMode {
 
+    // Begins a puzzle game
     public void startGame()
     {
         GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
@@ -12,11 +15,13 @@ public class PuzzleGame : IGameMode {
         return;
     }
 
+    // Ends a puzzle game
     public void endGame()
     {
         return;
     }
 
+    // Places a tile if it is in the stage's list of available placements
     public void placeDirection(MapTile tile, Directions.Direction dir)
     {
         if (tile.improvement == MapTile.TileImprovement.Direction && tile.improvementDirection == dir)

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+// This class allows for player input and handles player interaction with the game (but currently not the editor).
+
 public class PlayerController : MonoBehaviour {
 
     // I heard Unity is going to be overhauling its input system soon. It would be nice to subscribe to event callbacks rather than poll every frame.
@@ -67,11 +69,14 @@ public class PlayerController : MonoBehaviour {
         {
             m_gameController.isPaused = !m_gameController.isPaused;
         }
+
         // We don't have a menu yet, so quit the game when menu should be opened just for now
+        // TODO: UI
         if (Input.GetButtonDown("Menu"))
         {
             Application.Quit();
         }
+
         // Toggle framerate display between Basic, Advanced, and Off
         if (Input.GetButtonDown("FramerateToggle"))
         {

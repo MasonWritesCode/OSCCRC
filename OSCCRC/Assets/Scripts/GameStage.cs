@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+// This class is an interface to a game stage, being a combination of the map, music, or other assets that will be loaded and used together at the same time.
+
 public class GameStage : MonoBehaviour {
 
+    // This class handles a list of directional improvement placements that are allowed for a stage
     public class availablePlacements
     {
         public availablePlacements()
@@ -22,12 +25,14 @@ public class GameStage : MonoBehaviour {
             counts = new Dictionary<Directions.Direction, int>(other.counts);
         }
 
+        // Adds an additional count of directional tile of direction "dir" to be placed
         public void add(Directions.Direction dir)
         {
             // Shouldn't have to worry about overflow here
             ++counts[dir];
         }
 
+        // Removes a single count of directional tile of direction "dir" from being an available placement
         public void remove(Directions.Direction dir)
         {
             if (counts[dir] > 0)
@@ -36,12 +41,14 @@ public class GameStage : MonoBehaviour {
             }
         }
 
+        // Sets the number of of available placements of directional tiles of the direction specified by "dir"
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void set(Directions.Direction dir, int count)
         {
             counts[dir] = count;
         }
 
+        // Returns the number of of available placements of directional tiles of the direction specified by "dir"
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int get(Directions.Direction dir)
         {
@@ -50,6 +57,7 @@ public class GameStage : MonoBehaviour {
 
         private Dictionary<Directions.Direction, int> counts;
     }
+
 
     public availablePlacements placements = new availablePlacements();
     // Not using file name as the stage name gives more flexibility in naming, should we choose to show a map name somewhere
@@ -64,6 +72,8 @@ public class GameStage : MonoBehaviour {
     // Increment this whenever we change map or stage file layout after a release
     private const int m_currentFileVersion = 1;
 
+
+    // Loads a stage specified by "fileName" as the current stage
     public void loadStage(string fileName)
     {
         string stagePath = Application.dataPath + "/Maps/" + fileName + ".stage";
@@ -103,6 +113,8 @@ public class GameStage : MonoBehaviour {
         }
     }
 
+
+    // Saves the currently loaded stage under a file specified by "fileName"
     public void saveStage(string fileName)
     {
         string mapPath = Application.dataPath + "/Maps/" + fileName + ".stage";

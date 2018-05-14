@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class allows access to the game's resources that will be used dynamically.
+// It allows for changing resource packs so that different maps can have different assets, or allow users to use custom assets.
+
 public class GameResources : MonoBehaviour {
 
     // Class to potentially allow different texture packs, and make it easier to modify resources with minimal code changes
@@ -14,6 +17,8 @@ public class GameResources : MonoBehaviour {
 
     private static string m_resourcePack = string.Empty;
 
+
+    // Loads the resources into the interface that are under the name specified by "resourcePack"
     public static void loadResources(string resourcePack)
     {
         if (resourcePack == m_resourcePack)
@@ -42,6 +47,8 @@ public class GameResources : MonoBehaviour {
         objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
     }
 
+
+    // Returns a resource located at the specified path or the default equivalent if not found
     static private Object resourceFromDir(string path)
     {
         Object resource = Resources.Load(m_resourcePack + path);
@@ -58,6 +65,7 @@ public class GameResources : MonoBehaviour {
 
         return resource;
     }
+
 
     void Awake()
     {

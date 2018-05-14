@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+// This class allows the game to measure and display performance related information.
+
 public class FramerateDisplay : MonoBehaviour {
 
     public float updateInterval; // number of updates per second

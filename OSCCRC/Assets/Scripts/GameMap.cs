@@ -2,6 +2,9 @@
 using System.IO;
 using UnityEngine;
 
+// This class handles the game map, including the tiles, walls, and moving entities within.
+// It will be used to create new map objects and to access them.
+
 public class GameMap : MonoBehaviour
 {
     [Range(1, 255)] public int mapHeight = 9;
@@ -11,6 +14,7 @@ public class GameMap : MonoBehaviour
     private Transform mapTransform;
     private MapTile[,] mapTiles;
 
+    // Generates a new rectangular map of the specified width and height
     void createMap(int height, int width)
     {
         mapHeight = height; mapWidth = width;
@@ -30,11 +34,13 @@ public class GameMap : MonoBehaviour
         setCameraView(Camera.main);
     }
 
+    // Returns the maptile info of the tile that the current world coordinate is inside of
     public MapTile tileAt(Vector3 point)
     {
         return mapTiles[Mathf.RoundToInt(point.z / tileSize), Mathf.RoundToInt(point.x / tileSize)];
     }
 
+    // Creates a map tile
     public MapTile createTile(float xPos, float zPos)
     {
         Transform tilePrefab = GameResources.objects["Tile"];
@@ -44,6 +50,7 @@ public class GameMap : MonoBehaviour
         return newTile;
     }
 
+    // Creates a wall game object
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
         Transform wallPrefab = GameResources.objects["Wall"];
@@ -70,11 +77,13 @@ public class GameMap : MonoBehaviour
         return newWall;
     }
 
+    // Removes a wall game object with transform "wall"
     public void destroyWall(Transform wall)
     {
         Destroy(wall.gameObject);
     }
 
+    // Imports map data to the current game map from the open stream specified by "fin"
     public bool importMap(StreamReader fin)
     {
         // Delete allocated game objects, since we are creating new ones
@@ -169,6 +178,7 @@ public class GameMap : MonoBehaviour
         return true;
     }
 
+    // Exports map data from the current game map to the open stream specified by "fout"
     public bool exportMap(StreamWriter fout)
     {
         fout.WriteLine(mapHeight);
@@ -219,6 +229,7 @@ public class GameMap : MonoBehaviour
         return true;
     }
 
+    // Loads the map from the file specified by "fileName"
     public void loadMap(string fileName)
     {
         string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
@@ -237,6 +248,7 @@ public class GameMap : MonoBehaviour
         }
     }
 
+    // Saves the current map to the file specified by "fileName"
     public void saveMap(string fileName)
     {
         string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
@@ -246,6 +258,7 @@ public class GameMap : MonoBehaviour
         }
     }
 
+    // Creates a mouse object and returns its transform
     public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
         Transform mousePrefab = GameResources.objects["Mouse"];
@@ -256,6 +269,7 @@ public class GameMap : MonoBehaviour
         return newMouse;
     }
 
+    // Creates a cat object and returns its transform
     public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
     {
         Transform catPrefab = GameResources.objects["Cat"];
@@ -266,14 +280,12 @@ public class GameMap : MonoBehaviour
         return newCat;
     }
 
+    // Sets the position of camera "cam" to be able to see the entire map
     public void setCameraView(Camera cam)
     {
-        // We want to have the camera set to be able to view the entire map, for whatever map size and shape we get.
-
         // There is probably a correct thing to do here, but just do whatever for now since map sizes will probably always be the same.
         float scaleFactor = 4.25f;
         float cameraAngle = cam.transform.eulerAngles.x;
-        Debug.Log(Mathf.Sin(cameraAngle * Mathf.Deg2Rad));
         cam.transform.position = new Vector3((mapWidth * 1.5f) + (mapHeight * 0.5f),
                                              (mapWidth + mapHeight) * 1.6f + (Mathf.Sin(cameraAngle * Mathf.Deg2Rad) * (scaleFactor / 2)),
                                              (mapWidth * 0.5f) + (mapHeight * 0.5f) - (Mathf.Sin(cameraAngle * Mathf.Deg2Rad) * (scaleFactor / 2))

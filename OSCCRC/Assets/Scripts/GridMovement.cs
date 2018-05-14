@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class controls the behavior of moving objects such as Cats and Mice.
+
 public class GridMovement : MonoBehaviour {
 
     [Range(0, 255)] public float speed;
@@ -18,6 +20,7 @@ public class GridMovement : MonoBehaviour {
     private Transform m_transform;
     private Vector3 m_oldPos;
 
+    // Allows the parent object to decide which way to turn based on the tile it is located on, and do so
     void updateDirection()
     {
         //check for goals and holes
