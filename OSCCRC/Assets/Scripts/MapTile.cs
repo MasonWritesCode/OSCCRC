@@ -23,7 +23,7 @@ public class MapTile : MonoBehaviour
         private Vector3 origin;
         private GameMap map;
         private readonly int maxHeightIndex, maxWidthIndex;
-        private Dictionary<Directions.Direction, Transform> m_walls= new Dictionary<Directions.Direction, Transform>(4);
+        private Dictionary<Directions.Direction, Transform> m_walls = new Dictionary<Directions.Direction, Transform>(4);
 
         public Walls(GameMap parentMap, Vector3 originPos)
         {
