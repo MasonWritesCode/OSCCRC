@@ -157,7 +157,7 @@ public class GridMovement : MonoBehaviour {
             }
 
             m_oldPos = m_transform.position;
-            m_transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.deltaTime, Vector3.Distance (destinationPos, m_transform.position)));
+            m_transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.smoothDeltaTime, Vector3.Distance (destinationPos, m_transform.position)));
             if (m_transform.position == m_oldPos)
             {
                 // Our distance to destination is not small enough to match, but not big enough for translate to do anything, so prevent from getting stuck
