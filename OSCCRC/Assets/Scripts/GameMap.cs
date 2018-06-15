@@ -15,7 +15,7 @@ public class GameMap : MonoBehaviour
     private MapTile[,] mapTiles;
 
     // Generates a new rectangular map of the specified width and height
-    void createMap(int height, int width)
+    void generateMap(int height, int width)
     {
         mapHeight = height; mapWidth = width;
         mapTiles = new MapTile[mapHeight, mapWidth];
@@ -119,7 +119,7 @@ public class GameMap : MonoBehaviour
             }
             mapTiles = null;
 
-            createMap(newMapHeight, newMapWidth);
+            generateMap(newMapHeight, newMapWidth);
         }
 
         // Add stuff onto the tiles
@@ -308,7 +308,7 @@ public class GameMap : MonoBehaviour
             }
 
             // mapHeight and mapWidth are initialized in the Unity editor
-            createMap(mapHeight, mapWidth);
+            generateMap(mapHeight, mapWidth);
 
             // Create a wall around edges of map by default
             for (int j = 0; j < mapHeight; ++j)

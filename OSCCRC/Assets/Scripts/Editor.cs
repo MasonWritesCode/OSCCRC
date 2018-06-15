@@ -24,7 +24,7 @@ public class Editor : MonoBehaviour {
     private Vector3 m_positionOffset;
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
-    private byte[] mapSaveData = new byte[0];
+    private byte[] mapSaveData;
     private GameMap m_gameMap;
     private GameStage m_gameStage;
     private PlayerController m_controls;
@@ -447,7 +447,7 @@ public class Editor : MonoBehaviour {
     //   We already had no system in place for loading the autosave file when an abnormal exit was detected,
     //   Disk operations are slow and this must be done synchronously so this prevents possible stutter when switching between editing and playtesting,
     //   I never added the autosave file to gitignore, so it was frequently making commit history messy.
-    //   We can asynchronously move the memory save to disk if we want to handle abnormal exit later and still prevent stutter
+    //   We can asynchronously copy the memory save to disk if we want to handle abnormal exit later and still prevent stutter
     private void saveAutosave()
     {
         //m_gameMap.saveMap("_editorAuto");
