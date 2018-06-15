@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 // This class controls the map building functionality of the game, allowing creation of a new Game Map and play testing it.
@@ -23,6 +24,7 @@ public class Editor : MonoBehaviour {
     private Vector3 m_positionOffset;
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
+    private byte[] mapSaveData = new byte[0];
     private GameMap m_gameMap;
     private GameStage m_gameStage;
     private PlayerController m_controls;
@@ -51,7 +53,7 @@ public class Editor : MonoBehaviour {
         m_positionOffset = Vector3.zero;
         m_wasUnpaused = false;
 
-        m_gameMap.saveMap("_editorAuto");
+        saveAutosave();
     }
 
 	void Update () {
@@ -281,13 +283,13 @@ public class Editor : MonoBehaviour {
                 // Don't leave anything selected when unpausing
                 removePlaceholder();
 
-                m_gameMap.saveMap("_editorAuto");
+                saveAutosave();
             }
         }
         else if (m_wasUnpaused)
         {
             m_wasUnpaused = false;
-            m_gameMap.loadMap("_editorAuto");
+            loadAutosave();
             mapMovingObjToTile(m_gameMap);
         }
 
@@ -322,7 +324,7 @@ public class Editor : MonoBehaviour {
         mapMovingObjToTile(m_gameMap);
 
         // Go ahead and save to the loaded state
-        m_gameMap.saveMap("_editorAuto");
+        saveAutosave();
     }
 
 
@@ -438,5 +440,37 @@ public class Editor : MonoBehaviour {
         }
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
+    }
+
+    // Creates a save of the map that will be loaded when going from playtest back to editor
+    // This will be saved to memory rather than disk, so work on a map can be lost if it isn't normally saved. This was chosen because:
+    //   We already had no system in place for loading the autosave file when an abnormal exit was detected,
+    //   Disk operations are slow and this must be done synchronously so this prevents possible stutter when switching between editing and playtesting,
+    //   I never added the autosave file to gitignore, so it was frequently making commit history messy.
+    //   We can asynchronously move the memory save to disk if we want to handle abnormal exit later and still prevent stutter
+    private void saveAutosave()
+    {
+        //m_gameMap.saveMap("_editorAuto");
+        using (MemoryStream ms = new MemoryStream())
+        {
+            using (StreamWriter sw = new StreamWriter(ms))
+            {
+                m_gameMap.exportMap(sw);
+            }
+            mapSaveData = ms.ToArray();
+        }
+    }
+
+    // Loads a save of the map for when going from playtest back to editor
+    private void loadAutosave()
+    {
+        //m_gameMap.loadMap("_editorAuto");
+        using (MemoryStream ms = new MemoryStream(mapSaveData))
+        {
+            using (StreamReader sr = new StreamReader(ms))
+            {
+                m_gameMap.importMap(sr);
+            }
+        }
     }
 }
