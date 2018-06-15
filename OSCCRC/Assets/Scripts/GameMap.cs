@@ -11,6 +11,9 @@ public class GameMap : MonoBehaviour
     [Range(1, 255)] public int mapWidth = 12;
     [HideInInspector] public float tileSize;
 
+    public delegate void objectEvent(GameObject caller);
+    public static event objectEvent mouseDestroyed;
+
     private Transform mapTransform;
     private MapTile[,] mapTiles;
 
@@ -81,6 +84,22 @@ public class GameMap : MonoBehaviour
     public void destroyWall(Transform wall)
     {
         Destroy(wall.gameObject);
+    }
+
+    // Removes a mouse game object with transform "mouse"
+    public void destroyMouse(Transform mouse)
+    {
+        if (mouseDestroyed != null)
+        {
+            mouseDestroyed(mouse.gameObject);
+        }
+        Destroy(mouse.gameObject);
+    }
+
+    // Removes a cat game object with transform "cat"
+    public void destroyCat(Transform cat)
+    {
+        Destroy(cat.gameObject);
     }
 
     // Imports map data to the current game map from the open stream specified by "fin"

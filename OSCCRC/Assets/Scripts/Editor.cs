@@ -21,7 +21,7 @@ public class Editor : MonoBehaviour {
     private MapTile.TileImprovement m_selectedImprovement;
     private ObjectType m_placeholderType;
     private Directions.Direction m_direction;
-    private Vector3 m_positionOffset;
+    private Vector3 m_positionOffset; // If I remember correctly, this is for walls
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
     private byte[] mapSaveData;

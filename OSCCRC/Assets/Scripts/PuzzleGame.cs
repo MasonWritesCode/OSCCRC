@@ -12,12 +12,17 @@ public class PuzzleGame : IGameMode {
         GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
 
         placements = new GameStage.availablePlacements(stage.placements);
+
+        GameMap.mouseDestroyed += checkGameEnd;
+
         return;
     }
 
     // Ends a puzzle game
     public void endGame()
     {
+        // pause?
+
         return;
     }
 
@@ -40,6 +45,21 @@ public class PuzzleGame : IGameMode {
         else
         {
             // Play a "No, you can't do this" sound?
+        }
+    }
+
+    private void checkGameEnd(GameObject deadMouse)
+    {
+        Debug.Log("Should check if victory or failure and call endGame() if so");
+
+        if (deadMouse.GetComponent<GridMovement>().tile.improvement != MapTile.TileImprovement.Goal)
+        {
+            Debug.Log("A mouse was destroyed. Game Over.");
+            endGame();
+        }
+        else
+        {
+            Debug.Log("A mouse hit a goal. Need to check if it was the last mouse to know if victory.");
         }
     }
 
