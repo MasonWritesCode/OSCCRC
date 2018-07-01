@@ -44,6 +44,7 @@ public class GameMap : MonoBehaviour
     }
 
     // Creates a map tile
+    // The returned object should only be destroyed by calling the destroyTile function
     public MapTile createTile(float xPos, float zPos)
     {
         Transform tilePrefab = GameResources.objects["Tile"];
@@ -54,6 +55,7 @@ public class GameMap : MonoBehaviour
     }
 
     // Creates a wall game object
+    // The returned object should only be destroyed by calling the destroyWall function
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
         Transform wallPrefab = GameResources.objects["Wall"];
@@ -78,6 +80,12 @@ public class GameMap : MonoBehaviour
         Directions.rotate(ref newWall, direction);
 
         return newWall;
+    }
+
+    // Removes a tile game object
+    public void destroyTile(MapTile tile)
+    {
+        Destroy(tile.gameObject);
     }
 
     // Removes a wall game object with transform "wall"
@@ -119,7 +127,14 @@ public class GameMap : MonoBehaviour
         GetComponentsInChildren<GridMovement>(true, deadMeat);
         foreach (GridMovement i in deadMeat)
         {
-            Destroy(i.gameObject);
+            if (i.isCat)
+            {
+                destroyCat(i.transform);
+            }
+            else
+            {
+                destroyMouse(i.transform);
+            }
         }
 
         // Create a new map if necessary
@@ -132,7 +147,7 @@ public class GameMap : MonoBehaviour
             {
                 for (int i = 0; i < mapWidth; ++i)
                 {
-                    Destroy(mapTiles[j, i].gameObject);
+                    destroyTile(mapTiles[j, i]);
                     mapTiles[j, i] = null;
                 }
             }
@@ -278,6 +293,7 @@ public class GameMap : MonoBehaviour
     }
 
     // Creates a mouse object and returns its transform
+    // The returned object should only be destroyed with the destroyMouse function
     public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
         Transform mousePrefab = GameResources.objects["Mouse"];
@@ -289,6 +305,7 @@ public class GameMap : MonoBehaviour
     }
 
     // Creates a cat object and returns its transform
+    // The returned object should only be destroyed with the destroyCat function
     public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
     {
         Transform catPrefab = GameResources.objects["Cat"];

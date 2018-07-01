@@ -117,8 +117,10 @@ public class MapTile : MonoBehaviour
     public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(ref m_tileObject, value); } }
     public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
 
-    private static Dictionary<TileImprovement, string> m_improvementTextures = new Dictionary<TileImprovement, string>();
-    private static Dictionary<TileImprovement, string> m_improvementObjects = new Dictionary<TileImprovement, string>();
+    // This needs to be public so that the editor can see the texture used for an improvement
+    public static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>();
+    public static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>();
+
     private TileImprovement m_improvement;
     private TileImprovement m_movingObject;
     private Directions.Direction m_improvementDir;
@@ -130,10 +132,10 @@ public class MapTile : MonoBehaviour
     // This static constructor is used to generate a map used to interface with resource packs
     static MapTile()
     {
-        m_improvementTextures.Add(TileImprovement.None, "Tile");
-        m_improvementTextures.Add(TileImprovement.Hole, "Hole");
-        m_improvementTextures.Add(TileImprovement.Goal, "Goal");
-        m_improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
+        improvementTextures.Add(TileImprovement.None, "Tile");
+        improvementTextures.Add(TileImprovement.Hole, "Hole");
+        improvementTextures.Add(TileImprovement.Goal, "Goal");
+        improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
     }
 
 
@@ -194,13 +196,13 @@ public class MapTile : MonoBehaviour
         string materialName = string.Empty;
         string objectName = string.Empty;
 
-        if (m_improvementTextures.ContainsKey(improvement))
+        if (improvementTextures.ContainsKey(improvement))
         {
-            materialName = m_improvementTextures[improvement];
+            materialName = improvementTextures[improvement];
         }
-        if (m_improvementObjects.ContainsKey(improvement))
+        if (improvementObjects.ContainsKey(improvement))
         {
-            objectName = m_improvementObjects[improvement];
+            objectName = improvementObjects[improvement];
         }
 
         if (improvement == TileImprovement.None || materialName == string.Empty)

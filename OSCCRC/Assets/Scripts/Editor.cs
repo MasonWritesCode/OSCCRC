@@ -7,13 +7,13 @@ using UnityEngine;
 
 public class Editor : MonoBehaviour {
 
-    // TODO: Make placeholder creation safe for object pooling
-    //       Make controllable via UI instead of arbitrary keys
-    //           (all inputs are in update function so you only have to look in there)
+    // TODO: Make controllable via UI instead of arbitrary keys
+    //           (all inputs are in update function for now so you only have to look in there)
     //       Allow map saving and loading with input name (needs ui)
     //       Add ability to adjust speed when unpaused (wait for ui?)
     //       Placed directional tiles aren't supposed to be saved.
     //          Have to figure out what is supposed to happen with playtesting here.
+    //       There is a lot of cleanup needed in placement drawing once we create our own objects
 
     private enum ObjectType { None, Wall, Improvement }
 
@@ -21,7 +21,7 @@ public class Editor : MonoBehaviour {
     private MapTile.TileImprovement m_selectedImprovement;
     private ObjectType m_placeholderType;
     private Directions.Direction m_direction;
-    private Vector3 m_positionOffset; // If I remember correctly, this is for walls
+    private Vector3 m_positionOffset; // Used for wall facing
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
     private byte[] mapSaveData;
@@ -33,11 +33,7 @@ public class Editor : MonoBehaviour {
     private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 
     void OnDisable() {
-        if (m_placeholderObject != null)
-        {
-            Destroy(m_placeholderObject.gameObject);
-            m_placeholderObject = null;
-        }
+        disablePlaceholder();
     }
 
 	void Start () {
@@ -48,7 +44,8 @@ public class Editor : MonoBehaviour {
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
-        m_placeholderObject = null;
+        m_placeholderObject = Instantiate(GameResources.objects["Placeholder"]);
+        disablePlaceholder();
         m_direction = Directions.Direction.East;
         m_positionOffset = Vector3.zero;
         m_wasUnpaused = false;
@@ -183,72 +180,116 @@ public class Editor : MonoBehaviour {
         // End of UI stuff block
 
 
+        // Draws the placement preview
         if (newType != ObjectType.None)
         {
-            if (m_placeholderObject != null)
-            {
-                Destroy(m_placeholderObject.gameObject);
-                m_placeholderObject = null;
-            }
-
             // If reselecting same object "put it away" instead so that no object is selected for placement
             if (m_placeholderType == newType && m_selectedImprovement == newImprovement && m_direction == newDir)
             {
-                m_placeholderType = ObjectType.None;
-                m_selectedImprovement = MapTile.TileImprovement.None;
+                disablePlaceholder();
             }
             else
             {
+                // Assign our selected properties before using them
                 m_placeholderType = newType;
                 m_selectedImprovement = newImprovement;
                 m_direction = newDir;
                 m_positionOffset = Vector3.zero;
 
-                // Instantiate placeholder and set its material
+                // We need to reset scale since not all prefabs whose mesh we use have same scale
+                // We wouldn't have to do this if we made our own model for walls
+                m_placeholderObject.localScale = Vector3.one;
+
+                // We need to reset rotation since not all prefabs whose mesh we use have same rotation
+                // We wouldn't have to do this if we made our own quad model for tiles
+                m_placeholderObject.rotation = Quaternion.identity;
+
+                // Select the mesh for the selected object
+                Mesh newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
+                Texture newTex = GameResources.materials["Placeholder"].mainTexture;
                 if (m_placeholderType == ObjectType.Wall)
                 {
-                    m_placeholderObject = m_gameMap.createWall(0, 0, m_direction);
-                    m_positionOffset = m_placeholderObject.position;
+                    newMesh = GameResources.objects["Wall"].GetComponent<MeshFilter>().sharedMesh;
+
+                    // Need to set a position offset to show which wall facing is used
+                    // Easiest way is to spawn a wall and then destroy it. This is wasteful, but only done once per object select.
+                    // The point of using a mesh is to avoid spawning objects, so this is also messy and bad. It can be changed later.
+                    Transform temp = m_gameMap.createWall(0, 0, m_direction);
+                    m_positionOffset = temp.position;
+                    m_gameMap.destroyWall(temp);
+
+                    m_placeholderObject.localScale = new Vector3(1.0f, 0.5f, 0.1f);
                 }
                 else if (m_placeholderType == ObjectType.Improvement)
                 {
-                    // TODO: Need to use associated object, and tile if there isn't an associated object
                     if (m_selectedImprovement == MapTile.TileImprovement.Mouse)
                     {
-                        m_placeholderObject = Instantiate(GameResources.objects["Mouse"]);
-                        m_placeholderObject.GetComponent<GridMovement>().enabled = false;
-                        Directions.rotate(ref m_placeholderObject, m_direction);
+                        MeshFilter[] meshFilters = GameResources.objects["Mouse"].GetComponentsInChildren<MeshFilter>();
+                        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+                        for (int i = 0; i < meshFilters.Length; ++i)
+                        {
+                            combine[i].mesh = meshFilters[i].sharedMesh;
+                            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+                        }
+                        newMesh = new Mesh();
+                        newMesh.CombineMeshes(combine);
                     }
                     else if (m_selectedImprovement == MapTile.TileImprovement.Cat)
                     {
-                        m_placeholderObject = Instantiate(GameResources.objects["Cat"]);
-                        m_placeholderObject.GetComponent<GridMovement>().enabled = false;
-                        Directions.rotate(ref m_placeholderObject, m_direction);
+                        MeshFilter[] meshFilters = GameResources.objects["Cat"].GetComponentsInChildren<MeshFilter>();
+                        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+                        for (int i = 0; i < meshFilters.Length; ++i)
+                        {
+                            combine[i].mesh = meshFilters[i].sharedMesh;
+                            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+                        }
+                        newMesh = new Mesh();
+                        newMesh.CombineMeshes(combine);
                     }
                     else
                     {
-                        m_placeholderObject = m_gameMap.createTile(0, 0).transform;
-                        m_placeholderObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-                        MapTile placeholderTile = m_placeholderObject.GetComponent<MapTile>();
-                        placeholderTile.improvementDirection = m_direction;
-                        placeholderTile.improvement = m_selectedImprovement;
+                        // Need to show the improvement selected by setting it's texture
+                        if (MapTile.improvementObjects.ContainsKey(m_selectedImprovement))
+                        {
+                            newMesh = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshFilter>().sharedMesh;
+
+                            // Since direction arrow objects are unity quad tiles for now, we have to give them the tile treatment
+                            if (m_selectedImprovement == MapTile.TileImprovement.Direction)
+                            {
+                                // Tiles have a 90 degree rotation since we are using a Unity quad for now
+                                m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
+
+                                newTex = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshRenderer>().sharedMaterial.mainTexture;
+                            }
+                        }
+                        else
+                        {
+                            newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
+                            // Tiles have a 90 degree rotation since we are using a Unity quad for now
+                            m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
+
+                            if (MapTile.improvementTextures.ContainsKey(m_selectedImprovement))
+                            {
+                                newTex = GameResources.materials[MapTile.improvementTextures[m_selectedImprovement]].mainTexture;
+                            }
+                        }
                     }
                 }
 
-                // We want to use a material with transparent render mode, but use the same texture as the object we are creating
-                // This currently doesn't work with mice and cats because they aren't a single mesh and I'm not writing code to recursively check for sub-objects right now
-                MeshRenderer matr = m_placeholderObject.GetComponent<MeshRenderer>();
-                if (matr)
-                {
-                    Texture tex = matr.material.mainTexture;
-                    matr.material = GameResources.materials["Placeholder"];
-                    matr.material.mainTexture = tex;
-                }
+                Directions.rotate(ref m_placeholderObject, m_direction);
+
+                // Assign the new mesh
+                MeshFilter phMesh = m_placeholderObject.GetComponent<MeshFilter>();
+                phMesh.mesh = newMesh;
+                MeshRenderer phRend = m_placeholderObject.GetComponent<MeshRenderer>();
+                phRend.material.mainTexture = newTex;
+                activatePlaceholder();
             }
         }
 
 
-        if (m_placeholderObject != null)
+        // Moves the placement preview
+        if (m_placeholderObject.gameObject.activeSelf)
         {
             // Follow mouse precisely unless there is a tile to snap to
             if (selectedTile != null)
@@ -274,6 +315,8 @@ public class Editor : MonoBehaviour {
             placeObject(selectedTile);
         }
 
+
+        // Switch between placement and playtest
         if (!m_gameControl.isPaused)
         {
             if (!m_wasUnpaused)
@@ -281,7 +324,7 @@ public class Editor : MonoBehaviour {
                 m_wasUnpaused = true;
 
                 // Don't leave anything selected when unpausing
-                removePlaceholder();
+                disablePlaceholder();
 
                 saveAutosave();
             }
@@ -303,7 +346,7 @@ public class Editor : MonoBehaviour {
         }
         else if (Input.GetKeyDown(KeyCode.F7))
         {
-            removePlaceholder();
+            disablePlaceholder();
             loadSave("dev");
         }
         // End of smaller UI block
@@ -430,17 +473,27 @@ public class Editor : MonoBehaviour {
     }
 
 
-    // Removes the object under the mouse used to show what is going to be placed
-    private void removePlaceholder()
+    // Hides the object under the mouse used to show what is going to be placed
+    private void disablePlaceholder()
     {
-        if (m_placeholderObject != null)
+        if (m_placeholderObject)
         {
-            Destroy(m_placeholderObject.gameObject);
-            m_placeholderObject = null;
+            m_placeholderObject.GetComponent<MeshRenderer>().enabled = false;
         }
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
     }
+
+
+    // Shows the object under the mouse used to show what is going to be placed
+    private void activatePlaceholder()
+    {
+        if (m_placeholderObject)
+        {
+            m_placeholderObject.GetComponent<MeshRenderer>().enabled = true;
+        }
+    }
+
 
     // Creates a save of the map that will be loaded when going from playtest back to editor
     // This will be saved to memory rather than disk, so work on a map can be lost if it isn't normally saved. This was chosen because:
@@ -460,6 +513,7 @@ public class Editor : MonoBehaviour {
             mapSaveData = ms.ToArray();
         }
     }
+
 
     // Loads a save of the map for when going from playtest back to editor
     private void loadAutosave()
