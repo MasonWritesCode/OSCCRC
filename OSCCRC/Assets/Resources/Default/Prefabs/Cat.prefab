@@ -748,6 +748,7 @@ MonoBehaviour:
   map: {fileID: 0}
   direction: 0
   isCat: 1
+  tile: {fileID: 0}
 --- !u!135 &135955852886912508
 SphereCollider:
   m_ObjectHideFlags: 1
