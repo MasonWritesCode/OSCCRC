@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class inherits from IDisposable, make sure to use a using statement or call Dispose
+
 // This class is used to create pools of cloned GameObjects to be reused to prevent performance issues from frequent destruction and instantiation.
 // It also is used to know how many objects of a specific group are still alive.
 // Objects are destroyed when despawned if the number of allocated objects is above the desired minimum and large relative to active objects, or above desired maximum.
 // There is no guarantee whether a spawned object will call it's Start or not when spawned, so be sure to handle any necessary (re)initialization after spawning.
 //   However, if you have to do initialization beyond the arguments to Instantiate/spawn, it probably isn't an object that you should be pooling.
 
-public class ObjectPool {
-
+public class ObjectPool : System.IDisposable
+{
     // The number of active items from the pool
     public int count { get { return m_activeObjects.Count; } }
 
@@ -19,6 +21,8 @@ public class ObjectPool {
     private GameObject m_prefab;
     private List<GameObject> m_activeObjects;
     private List<GameObject> m_inactiveObjects;
+
+    private bool m_disposed = false;
 
     // Creates an object pool using the specified prefab as the object with default bounds
     public ObjectPool(GameObject prefab)
@@ -134,4 +138,43 @@ public class ObjectPool {
         GameObject.Destroy(obj);
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        System.GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (m_disposed)
+        {
+            return;
+        }
+
+        if (m_activeObjects != null)
+        {
+            for (int i = 0; i < m_activeObjects.Count; ++i)
+            {
+                destroyObject(m_activeObjects[i]);
+            }
+            m_activeObjects = null;
+        }
+        if (m_inactiveObjects != null)
+        {
+            for (int i = 0; i < m_inactiveObjects.Count; ++i)
+            {
+                destroyObject(m_inactiveObjects[i]);
+            }
+            m_inactiveObjects = null;
+        }
+
+        m_prefab = null;
+
+        m_disposed = true;
+    }
+
+    ~ObjectPool()
+    {
+        Dispose(false);
+    }
 }
