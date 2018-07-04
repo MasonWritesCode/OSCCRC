@@ -2,48 +2,53 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class allows interfacing with a tile that is located on the game map, usually accessing or changing the improvement placed onto it.
+
 public class MapTile : MonoBehaviour
 {
     // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
-    public enum TileImprovement { None, Hole, Goal, Spawner, Left, Right, Up, Down, Mouse, Cat }
+    public enum TileImprovement { None, Hole, Goal, Spawner, Direction, Mouse, Cat }
 
+    // Class that holds wall information that will be associated with a tile.
+    // This is within the MapTile class because only a tile should access walls directly.
     public class Walls
     {
-        public bool north { get { return m_walls[m_dirToInt[Directions.Direction.North]] != null; } set { changeWall(Directions.Direction.North, value); } }
-        public bool east { get { return m_walls[m_dirToInt[Directions.Direction.East]] != null; } set { changeWall(Directions.Direction.East, value); } }
-        public bool south { get { return m_walls[m_dirToInt[Directions.Direction.South]] != null; } set { changeWall(Directions.Direction.South, value); } }
-        public bool west { get { return m_walls[m_dirToInt[Directions.Direction.West]] != null; } set { changeWall(Directions.Direction.West, value); } }
+        public bool this[Directions.Direction wallID] { get { return m_walls[wallID] != null; } set { changeWall(wallID, value); } }
+        // Probably should use indexer only and make the direction properties deprecated?
+        public bool north { get { return m_walls[Directions.Direction.North] != null; } set { changeWall(Directions.Direction.North, value); } }
+        public bool east { get { return m_walls[Directions.Direction.East] != null; } set { changeWall(Directions.Direction.East, value); } }
+        public bool south { get { return m_walls[Directions.Direction.South] != null; } set { changeWall(Directions.Direction.South, value); } }
+        public bool west { get { return m_walls[Directions.Direction.West] != null; } set { changeWall(Directions.Direction.West, value); } }
 
-        internal Vector3 origin = new Vector3();
+        private Vector3 origin;
+        private GameMap map;
+        private readonly int maxHeightIndex, maxWidthIndex;
+        private Dictionary<Directions.Direction, Transform> m_walls = new Dictionary<Directions.Direction, Transform>(4);
 
-        internal static GameMap map;
-
-        private Transform[] m_walls = new Transform[4];
-        private int maxHeightIndex = map.mapHeight - 1, maxWidthIndex = map.mapWidth - 1;
-        private static Dictionary<Directions.Direction, int> m_dirToInt = new Dictionary<Directions.Direction, int>();
-
-        static Walls()
+        public Walls(GameMap parentMap, Vector3 originPos)
         {
-            // Just in case someone wants to change the enum order, map the directions to an int to avoid possible breakage
-            // This is a lot of extra stuff to do to avoid a problem that probably will never happen, but oh well.
-            m_dirToInt.Add(Directions.Direction.North, 0);
-            m_dirToInt.Add(Directions.Direction.East, 1);
-            m_dirToInt.Add(Directions.Direction.South, 2);
-            m_dirToInt.Add(Directions.Direction.West, 3);
+            map = parentMap;
+            origin = originPos;
+            maxHeightIndex = map.mapHeight - 1;
+            maxWidthIndex = map.mapWidth - 1;
+
+            m_walls.Add(Directions.Direction.North, null);
+            m_walls.Add(Directions.Direction.East, null);
+            m_walls.Add(Directions.Direction.South, null);
+            m_walls.Add(Directions.Direction.West, null);
         }
 
         // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
         private void changeWall(Directions.Direction wallID, bool isCreating)
         {
-            int idNum = m_dirToInt[wallID];
-            if (isCreating && m_walls[idNum] == null)
+            if (isCreating && m_walls[wallID] == null)
             {
-                m_walls[idNum] = map.createWall(origin.x, origin.z, wallID);
+                m_walls[wallID] = map.createWall(origin.x, origin.z, wallID);
             }
-            else if (!isCreating && m_walls[idNum] != null)
+            else if (!isCreating && m_walls[wallID] != null)
             {
-                map.destroyWall(m_walls[idNum]);
-                m_walls[idNum] = null;
+                map.destroyWall(m_walls[wallID]);
+                m_walls[wallID] = null;
             }
             else
             {
@@ -53,7 +58,7 @@ public class MapTile : MonoBehaviour
 
             // Determine where the other wall is if it exists
             float otherTileX = origin.x, otherTileZ = origin.z;
-            if (idNum == 0)
+            if (wallID == Directions.Direction.North)
             {
                 otherTileZ += map.tileSize;
                 if (otherTileZ > (maxHeightIndex * map.tileSize))
@@ -61,7 +66,7 @@ public class MapTile : MonoBehaviour
                     otherTileZ = 0;
                 }
             }
-            else if (idNum == 1)
+            else if (wallID == Directions.Direction.East)
             {
                 otherTileX += map.tileSize;
                 if (otherTileX > (maxWidthIndex * map.tileSize))
@@ -69,7 +74,7 @@ public class MapTile : MonoBehaviour
                     otherTileX = 0;
                 }
             }
-            else if (idNum == 2)
+            else if (wallID == Directions.Direction.South)
             {
                 otherTileZ -= map.tileSize;
                 if (otherTileZ < 0)
@@ -77,7 +82,7 @@ public class MapTile : MonoBehaviour
                     otherTileZ = maxHeightIndex * map.tileSize;
                 }
             }
-            else if (idNum == 3)
+            else if (wallID == Directions.Direction.West)
             {
                 otherTileX -= map.tileSize;
                 if (otherTileX < 0)
@@ -87,7 +92,7 @@ public class MapTile : MonoBehaviour
             }
 
             // The companion wall always has the same existance state
-            if (otherTileZ == (maxHeightIndex * map.tileSize) || otherTileX == (maxWidthIndex * map.tileSize) || otherTileZ == 0 || otherTileX == 0)
+            if (Mathf.Abs(origin.z - otherTileZ) == (maxHeightIndex * map.tileSize) || Mathf.Abs(origin.x - otherTileX) == (maxWidthIndex * map.tileSize))
             {
                 // Walls on edges share state with wrapped around tile, but they don't share the same wall object
                 map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall(Directions.getOppositeDir(wallID), isCreating );
@@ -98,75 +103,112 @@ public class MapTile : MonoBehaviour
                 Transform wallSet = null;
                 if (isCreating)
                 {
-                    wallSet = m_walls[idNum];
+                    wallSet = m_walls[wallID];
                 }
-                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[(idNum + 2) % 4] = wallSet;
+                map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[Directions.getOppositeDir(wallID)] = wallSet;
             }
         }
     }
 
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
+    public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
     public Walls walls;
-    public Directions.Direction direction;
+    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(ref m_tileObject, value); } }
+    public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
 
-    private static Dictionary<TileImprovement, string> m_improvementTextures = new Dictionary<TileImprovement, string>();
-    private static Dictionary<TileImprovement, string> m_improvementObjects = new Dictionary<TileImprovement, string>();
+    // This needs to be public so that the editor can see the texture used for an improvement
+    public static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>();
+    public static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>();
+
     private TileImprovement m_improvement;
+    private TileImprovement m_movingObject;
+    private Directions.Direction m_improvementDir;
+    private Directions.Direction m_movingDir;
     private Transform m_tileObject;
+    private int m_tileDamage;
 
+
+    // This static constructor is used to generate a map used to interface with resource packs
     static MapTile()
     {
-        m_improvementTextures.Add(TileImprovement.None, "Tile");
-        m_improvementTextures.Add(TileImprovement.Hole, "Hole");
-        m_improvementTextures.Add(TileImprovement.Goal, "Goal");
-        m_improvementTextures.Add(TileImprovement.Left, "Left");
-        m_improvementTextures.Add(TileImprovement.Right, "Right");
-        m_improvementTextures.Add(TileImprovement.Up, "Up");
-        m_improvementTextures.Add(TileImprovement.Down, "Down");
+        improvementTextures.Add(TileImprovement.None, "Tile");
+        improvementTextures.Add(TileImprovement.Hole, "Hole");
+        improvementTextures.Add(TileImprovement.Goal, "Goal");
+        improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
     }
 
-    public void initTile()
+
+    // Initializes this tile using data from "parentMap"
+    // If I remember correctly, this is used instead of Start so that parentMap can be passed in
+    public void initTile(GameMap parentMap)
     {
-        direction = Directions.Direction.North;
+        improvementDirection = Directions.Direction.North;
+        movingObjDirection = Directions.Direction.North;
         m_tileObject = null;
-        walls = new Walls();
-        walls.origin = GetComponent<Transform>().position;
+        walls = new Walls(parentMap, GetComponent<Transform>().position);
         m_tileObject = null;
-        // workaround of ignoring attempts to set same tile improvement again, because prefab doesn't alternate the none tile
-        m_improvement = TileImprovement.Hole;
         improvement = TileImprovement.None;
+        movingObject = TileImprovement.None;
     }
 
+
+    // Damages the improvement placed onto a tile, possibly destroying it
+    public void damageTile()
+    {
+        const int hitsToDestroy = 2;
+
+        ++m_tileDamage;
+
+        if (m_tileDamage < hitsToDestroy)
+        {
+            float newScale = ((hitsToDestroy - (m_tileDamage * 0.5f)) / (float)hitsToDestroy);
+            m_tileObject.transform.localScale = new Vector3(newScale, newScale, 1);
+        }
+        else
+        {
+            improvement = TileImprovement.None;
+        }
+    }
+
+
+    // Places a new improvement onto this tile
     private void setTileImprovement(TileImprovement improvement)
     {
         if (improvement == TileImprovement.Mouse || improvement == TileImprovement.Cat)
         {
             // A tile only owns a mouse/cat in the context of saving and loading maps.
-            // improvement = m_improvement;
-            m_improvement = improvement;
+            Debug.LogWarning("setTileImprovement function should not be used for placing Moving Objects.");
+            m_movingObject = improvement;
             return;
         }
+        // We don't actually want to do an early return when the improvement is the same as current
+        // This is because we might load a different resource pack, and want to re-apply the improvements to get the new version
+        /*
         if (improvement == m_improvement)
         {
             return;
         }
+        */
+
+        m_tileDamage = 0;
 
         string materialName = string.Empty;
         string objectName = string.Empty;
 
-        if (m_improvementTextures.ContainsKey(improvement))
+        if (improvementTextures.ContainsKey(improvement))
         {
-            materialName = m_improvementTextures[improvement];
+            materialName = improvementTextures[improvement];
         }
-        if (m_improvementObjects.ContainsKey(improvement))
+        if (improvementObjects.ContainsKey(improvement))
         {
-            objectName = m_improvementObjects[improvement];
+            objectName = improvementObjects[improvement];
         }
-        if (improvement == TileImprovement.None)
+
+        if (improvement == TileImprovement.None || materialName == string.Empty)
         {
             // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
-            if ((walls.origin.x + walls.origin.z) % 2 == 0)
+            if ((transform.position.x + transform.position.z) % 2 == 0)
             {
                 materialName = "Tile";
             }
@@ -175,7 +217,7 @@ public class MapTile : MonoBehaviour
                 materialName = "TileAlt";
             }
         }
-			
+
 		if (materialName != string.Empty)
         {
             if (GameResources.materials.ContainsKey(materialName))
@@ -198,7 +240,7 @@ public class MapTile : MonoBehaviour
             if (GameResources.objects.ContainsKey(objectName))
             {
                 m_tileObject = Instantiate(GameResources.objects[objectName], GetComponent<Transform>());
-                Directions.rotate(ref m_tileObject, direction);
+                Directions.rotate(ref m_tileObject, m_improvementDir);
             }
             else
             {

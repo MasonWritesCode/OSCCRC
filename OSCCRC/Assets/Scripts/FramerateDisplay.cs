@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+// This class allows the game to measure and display performance related information.
+
 public class FramerateDisplay : MonoBehaviour {
 
     public float updateInterval; // number of updates per second
@@ -14,21 +16,33 @@ public class FramerateDisplay : MonoBehaviour {
     private float m_timeRemaining = 0.0f;
     private float m_averageFramerate = 0.0f;
     private float m_minFramerate = -1.0f;
+    private bool m_ignoreUpdates = true;
 
-	void Start () {
+    private void OnEnable()
+    {
+        // We don't want to show an very old frame's info (especially when isAdvanced doesn't match)
+        textDisplay.text = "FPS: ";
+    }
+
+    void Start () {
         textDisplay.text = "FPS: ";
 	}
 	
-	void Update () {
+	void LateUpdate () {
         m_timeRemaining -= Time.unscaledDeltaTime;
         m_timeAccum += Time.unscaledDeltaTime;
         ++m_frameAccum;
 
         if (m_timeRemaining <= 0.0f)
         {
-            if (Time.timeSinceLevelLoad < 3.0f)
+            // Ignore the first few seconds where framerate will be unstable
+            if (m_ignoreUpdates)
             {
-                // Ignore the first few seconds where framerate will be unstable
+                if (Time.timeSinceLevelLoad > 3.0f)
+                {
+                    m_ignoreUpdates = false;
+                }
+
                 m_frameAccum = 0;
                 m_timeAccum = 0;
                 return;
@@ -62,8 +76,11 @@ public class FramerateDisplay : MonoBehaviour {
                 textDisplay.text = "FPS: " + currentFramerate.ToString("F" + precision) + " / " + m_averageFramerate.ToString("F" + precision) + " / " + m_minFramerate.ToString("F" + precision);
             }
             // We will use current FPS for entire text color for now.
-            // We will target 60 fps as green, 30 fps as yellow, and 0 as red, and try to set the color to have a smooth gradient between them
-            textDisplay.color = new Color(Mathf.Max((60.0f-currentFramerate) / 60.0f, 0.0f), Mathf.Min(currentFramerate / 60.0f, 1.0f), 0.0f);
+            // We will target 60 fps as green, 30 fps as yellow, 0 as red, and 240 as white and try to set the color to have a smooth gradient between them
+            float blue = Mathf.Clamp01( (currentFramerate - 60.0f) / (240.0f - 60.0f) );
+            float green = Mathf.Clamp01( currentFramerate / 60.0f );
+            float red = Mathf.Clamp01( ((60.0f - currentFramerate) / 60.0f) + blue );
+            textDisplay.color = new Color(red, green, blue);
 
             m_frameAccum = 0;
             m_timeAccum = 0;

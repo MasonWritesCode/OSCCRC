@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 
+// This class allows for player input and handles player interaction with the game (but currently not the editor).
+
 public class PlayerController : MonoBehaviour {
 
     // I heard Unity is going to be overhauling its input system soon. It would be nice to subscribe to event callbacks rather than poll every frame.
 
-    public int playerID;
+    [Range(1, 4)] public int playerID;
     public Transform highlighter;
-    public MapTile currentTile = null;
+    [HideInInspector] public MapTile currentTile = null;
 
     private GameController m_gameController;
 
@@ -46,19 +48,19 @@ public class PlayerController : MonoBehaviour {
         {
             if (Input.GetButtonDown("Up"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Up);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North);
             }
             else if (Input.GetButtonDown("Right"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Right);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East);
             }
             else if (Input.GetButtonDown("Down"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Down);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South);
             }
             else if (Input.GetButtonDown("Left"))
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Left);
+                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West);
             }
         }
 
@@ -67,15 +69,18 @@ public class PlayerController : MonoBehaviour {
         {
             m_gameController.isPaused = !m_gameController.isPaused;
         }
+
         // We don't have a menu yet, so quit the game when menu should be opened just for now
+        // TODO: UI
         if (Input.GetButtonDown("Menu"))
         {
             Application.Quit();
         }
+
         // Toggle framerate display between Basic, Advanced, and Off
         if (Input.GetButtonDown("FramerateToggle"))
         {
-            FramerateDisplay fpsScript = GameObject.Find("GameController").GetComponent<FramerateDisplay>();
+            FramerateDisplay fpsScript = m_gameController.GetComponent<FramerateDisplay>();
             Canvas fpsDisplay = GameObject.Find("FPSDisplay").GetComponent<Canvas>();
 
             if (!fpsScript.enabled)

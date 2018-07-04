@@ -2,53 +2,64 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class controls various parts of gameplay and manages the state of the game.
+
 public class GameController : MonoBehaviour {
 
+    // isPaused needs to be moved to IGameMode probably
 	public bool isPaused { get { return m_isPaused; } set { if(mode != GameMode.Multiplayer) { m_isPaused = value; } } }
 
-    public enum GameMode { Editor, Puzzle, Multiplayer };
+    public enum GameMode { None, Editor, Puzzle, Multiplayer };
 
     //public static readonly GameMode mode = GameMode.Puzzle;
     public static readonly GameMode mode = GameMode.Editor;
 
+    private IGameMode game;
     private bool m_isPaused;
 
-    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement)
+
+    // Checks if a player is allowed to place the desired improvement, and does so if they can
+    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
-        // This checks if a player is allowed to place the desired improvement, and does so if they can
-        // This is different between game modes, so will have to account for that when other modes are implemented
-        // For now, allow any number of directional arrow placements, editor will handle its own placement
-        if (mode == GameMode.Editor)
+        if (isPaused)
         {
             return;
         }
 
-        if (   improvement == MapTile.TileImprovement.Left
-                 || improvement == MapTile.TileImprovement.Right
-                 || improvement == MapTile.TileImprovement.Up
-                 || improvement == MapTile.TileImprovement.Down
-                )
+        if (improvement == MapTile.TileImprovement.Direction)
         {
-            tile.improvement = improvement;
+            game.placeDirection(tile, dir);
         }
     }
 
-    // Use this for initialization
+
     void Start () {
-		isPaused = false; // temporary
+        /*
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
+        */
 
-        if (mode == GameMode.Editor)
+		m_isPaused = true;
+
+        if (mode == GameMode.Editor || mode == GameMode.Puzzle)
         {
-            isPaused = true;
+            game = new PuzzleGame();
 
-            GetComponent<Editor>().enabled = true;
+            if (mode == GameMode.Editor)
+            {
+                Editor editor = GetComponent<Editor>();
+                if (editor && !editor.enabled)
+                {
+                    editor.enabled = true;
+                }
+            }
         }
 
         //added for testing purposes. To be removed
         GameMap map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
         if (mode == GameMode.Puzzle)
         {
-            map.importMap("dev");
+            map.loadMap("dev");
         }
         /*
         map.placeMouse(3, 2, Directions.Direction.North);
@@ -62,6 +73,7 @@ public class GameController : MonoBehaviour {
         // */
         //
     }
+
 
     // Update is called once per frame
     void Update () {

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class allows access to the game's resources that will be used dynamically.
+// It allows for changing resource packs so that different maps can have different assets, or allow users to use custom assets.
+
 public class GameResources : MonoBehaviour {
 
     // Class to potentially allow different texture packs, and make it easier to modify resources with minimal code changes
@@ -10,11 +13,19 @@ public class GameResources : MonoBehaviour {
 
     public static Dictionary<string, Material> materials;
     public static Dictionary<string, Transform> objects;
+    public static string resourcePack { get { return m_resourcePack; } set { loadResources(value); } }
 
-    private string m_resourcePack = string.Empty;
+    private static string m_resourcePack = string.Empty;
 
-    void loadResources(string resourcePack)
+
+    // Loads the resources into the interface that are under the name specified by "resourcePack"
+    public static void loadResources(string resourcePack)
     {
+        if (resourcePack == m_resourcePack)
+        {
+            return;
+        }
+
         materials = new Dictionary<string, Material>();
         objects = new Dictionary<string, Transform>();
 
@@ -26,20 +37,20 @@ public class GameResources : MonoBehaviour {
         materials.Add("TileAlt", resourceFromDir(currentDir + "TileAlt") as Material);
         materials.Add("Hole", resourceFromDir(currentDir + "Hole") as Material);
         materials.Add("Goal", resourceFromDir(currentDir + "Goal") as Material);
-        materials.Add("Left", resourceFromDir(currentDir + "Left") as Material);
-        materials.Add("Right", resourceFromDir(currentDir + "Right") as Material);
-        materials.Add("Up", resourceFromDir(currentDir + "Up") as Material);
-        materials.Add("Down", resourceFromDir(currentDir + "Down") as Material);
         materials.Add("Placeholder", resourceFromDir(currentDir + "ObjectPlace") as Material);
 
         currentDir = "/Prefabs/";
         objects.Add("Tile", (resourceFromDir(currentDir + "TilePrefab") as GameObject).transform);
+        objects.Add("DirectionArrow", (resourceFromDir(currentDir + "DirectionArrow") as GameObject).transform);
         objects.Add("Wall", (resourceFromDir(currentDir + "WallPrefab") as GameObject).transform);
         objects.Add("Mouse", (resourceFromDir(currentDir + "Mouse") as GameObject).transform);
         objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
+        objects.Add("Placeholder", (resourceFromDir(currentDir + "Placeholder") as GameObject).transform);
     }
 
-    private Object resourceFromDir(string path)
+
+    // Returns a resource located at the specified path or the default equivalent if not found
+    static private Object resourceFromDir(string path)
     {
         Object resource = Resources.Load(m_resourcePack + path);
 
@@ -56,7 +67,9 @@ public class GameResources : MonoBehaviour {
         return resource;
     }
 
-    void Awake () {
+
+    void Awake()
+    {
         loadResources("Default");
     }
 }
