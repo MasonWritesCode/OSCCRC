@@ -1,11 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 
-public class Menu_Custom : MonoBehaviour, IPointerClickHandler
-{
+public class Menu_MapEntry : MonoBehaviour, IPointerClickHandler {
+
+    public int entryID;
+	
+	public void setThumbnail(string fileName)
+    {
+        //
+    }
+
+    public void setName(string name)
+    {
+        Text t = transform.Find("LevelName").GetComponent<Text>();
+        t.text = name;
+    }
+
+    public void setCompleted(bool completed)
+    {
+        //
+    }
 
     //Detect if a click occurs
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -22,19 +39,8 @@ public class Menu_Custom : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log(name + " Game Object Left Clicked!");
 
-            GlobalData.folder = Menu_Panel.Folder.Custom;
-            GlobalData.curPage = 1;
+            transform.parent.GetComponent<Menu_Panel>().load(entryID);
 
-            GameObject typeSelect = transform.parent.gameObject;
-            GameObject levelSelect = GameObject.FindWithTag("Menu").transform.Find("LevelFolder").gameObject;
-
-            typeSelect.SetActive(false);
-            levelSelect.SetActive(true);
-
-            // Show page 0 to start with
-            Menu_Panel panelScript = levelSelect.transform.Find("MapsList").GetComponent<Menu_Panel>();
-            panelScript.getFiles();
-            panelScript.showPage(0);
         }
     }
 }

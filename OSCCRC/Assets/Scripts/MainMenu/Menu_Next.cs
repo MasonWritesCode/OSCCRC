@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-public class Menu_Custom : MonoBehaviour, IPointerClickHandler
+public class Menu_Next : MonoBehaviour, IPointerClickHandler
 {
 
     //Detect if a click occurs
@@ -22,19 +22,11 @@ public class Menu_Custom : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log(name + " Game Object Left Clicked!");
 
-            GlobalData.folder = Menu_Panel.Folder.Custom;
-            GlobalData.curPage = 1;
+            Menu_Panel mapList = transform.parent.Find("MapsList").GetComponent<Menu_Panel>();
 
-            GameObject typeSelect = transform.parent.gameObject;
-            GameObject levelSelect = GameObject.FindWithTag("Menu").transform.Find("LevelFolder").gameObject;
+            GlobalData.curPage++;
 
-            typeSelect.SetActive(false);
-            levelSelect.SetActive(true);
-
-            // Show page 0 to start with
-            Menu_Panel panelScript = levelSelect.transform.Find("MapsList").GetComponent<Menu_Panel>();
-            panelScript.getFiles();
-            panelScript.showPage(0);
+            mapList.showPage(GlobalData.curPage);
         }
     }
 }

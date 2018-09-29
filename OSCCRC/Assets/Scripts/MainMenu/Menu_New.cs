@@ -22,11 +22,19 @@ public class Menu_New : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log(name + " Game Object Left Clicked!");
 
+            GlobalData.folder = Menu_Panel.Folder.New;
+            GlobalData.curPage = 1;
+
             GameObject typeSelect = transform.parent.gameObject;
             GameObject levelSelect = GameObject.FindWithTag("Menu").transform.Find("LevelFolder").gameObject;
 
             typeSelect.SetActive(false);
             levelSelect.SetActive(true);
+
+            // Show page 0 to start with
+            Menu_Panel panelScript = levelSelect.transform.Find("MapsList").GetComponent<Menu_Panel>();
+            panelScript.getFiles();
+            panelScript.showPage(0);
         }
     }
 }

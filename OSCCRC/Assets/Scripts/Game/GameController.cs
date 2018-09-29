@@ -39,6 +39,13 @@ public class GameController : MonoBehaviour {
         Application.targetFrameRate = 60;
         */
 
+        string currentStage = GlobalData.currentStageFile;
+        if (currentStage != null)
+        {
+            GameStage stage = GetComponent<GameStage>();
+            stage.loadStage(currentStage);
+        }
+
 		m_isPaused = true;
 
         if (mode == GameMode.Editor || mode == GameMode.Puzzle)
@@ -55,24 +62,6 @@ public class GameController : MonoBehaviour {
             }
         }
         game.startGame();
-
-        //added for testing purposes. To be removed
-        GameMap map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-        if (mode == GameMode.Puzzle)
-        {
-            map.loadMap("dev");
-        }
-        /*
-        map.placeMouse(3, 2, Directions.Direction.North);
-        map.placeMouse(3, 2, Directions.Direction.East);
-        map.placeMouse(4, 5, Directions.Direction.South);
-        map.placeMouse(6, 2, Directions.Direction.West);
-        map.tileAt(new Vector3(5, 0, 8)).walls.east = true;
-        map.tileAt(new Vector3(5, 0, 8)).walls.south = true;
-        map.tileAt(new Vector3(4, 0, 0)).walls.south = false;
-        map.tileAt(new Vector3(0, 0, 5)).walls.west = false;
-        // */
-        //
     }
 
 
