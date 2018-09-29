@@ -39,6 +39,11 @@ public class PuzzleGame : IGameMode {
         return;
     }
 
+    public void pauseGame()
+    {
+        //
+    }
+
     // Places a tile if it is in the stage's list of available placements
     public void placeDirection(MapTile tile, Directions.Direction dir)
     {

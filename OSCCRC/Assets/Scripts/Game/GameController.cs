@@ -7,7 +7,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
 
     // isPaused needs to be moved to IGameMode probably
-	public bool isPaused { get { return m_isPaused; } set { if(mode != GameMode.Multiplayer) { m_isPaused = value; } } }
+	public bool isPaused { get { return m_isPaused; } set { game.pauseGame();  m_isPaused = value; } }
 
     public enum GameMode { None, Editor, Puzzle, Multiplayer };
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-public class Menu_Puzzle : MonoBehaviour, IPointerClickHandler
+public class Menu_New : MonoBehaviour, IPointerClickHandler
 {
 
     //Detect if a click occurs
@@ -22,6 +22,11 @@ public class Menu_Puzzle : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log(name + " Game Object Left Clicked!");
 
+            GameObject typeSelect = transform.parent.gameObject;
+            GameObject levelSelect = GameObject.FindWithTag("Menu").transform.Find("LevelFolder").gameObject;
+
+            typeSelect.SetActive(false);
+            levelSelect.SetActive(true);
         }
     }
 }

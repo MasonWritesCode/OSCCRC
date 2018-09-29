@@ -17,6 +17,9 @@ public interface IGameMode {
     // Multiplayer might want to display who wins, while puzzle might want to allow easy access to next level
     void endGame();
 
+    // Pauses the game
+    void pauseGame();
+
     // Places a directional tile
     // Puzzle mode allows a limited set of tiles, wheras multiplayer keeps the most recent three
     void placeDirection(MapTile tile, Directions.Direction dir);

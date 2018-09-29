@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
     [Range(1, 4)] public int playerID;
     public Transform highlighter;
     [HideInInspector] public MapTile currentTile = null;
+    [HideInInspector] public bool menuPaused = false;
 
     private GameController m_gameController;
 
@@ -74,7 +75,22 @@ public class PlayerController : MonoBehaviour {
         // TODO: UI
         if (Input.GetButtonDown("Menu"))
         {
-            Application.Quit();
+            Canvas pauseDisplay = GameObject.Find("PauseMenu").GetComponent<Canvas>();
+
+            if (!pauseDisplay.enabled)
+            {
+                pauseDisplay.enabled = true;
+                m_gameController.isPaused = true;
+                if (!m_gameController.isPaused) menuPaused = true;
+            }
+            else
+            {
+                pauseDisplay.enabled = false;
+                if (menuPaused) {
+                    m_gameController.isPaused = false;
+                    menuPaused = false;
+                }
+            }
         }
 
         // Toggle framerate display between Basic, Advanced, and Off
