@@ -346,7 +346,6 @@ public class Editor : MonoBehaviour {
         }
         else if (Input.GetKeyDown(KeyCode.F7))
         {
-            disablePlaceholder();
             loadSave("dev");
         }
         // End of smaller UI block
@@ -354,15 +353,16 @@ public class Editor : MonoBehaviour {
 
 
     // Creates a saved file of the stage with a file name of "saveName"
-    private void createSave(string saveName)
+    public void createSave(string saveName)
     {
         m_gameStage.saveStage(saveName);
     }
 
 
     // Loads the stage file into the editor of name "saveName"
-    private void loadSave(string saveName)
+    public void loadSave(string saveName)
     {
+        disablePlaceholder();
         m_gameStage.loadStage(saveName);
         mapMovingObjToTile(m_gameMap);
 

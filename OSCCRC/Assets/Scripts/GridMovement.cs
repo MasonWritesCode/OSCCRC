@@ -89,7 +89,7 @@ public class GridMovement : MonoBehaviour {
             // TODO: additional handling of goals
             if (isCat)
             {
-                direction = Directions.getOppositeDir(direction);
+                map.destroyCat(transform);
             }
             else
             {

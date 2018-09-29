@@ -54,6 +54,7 @@ public class GameController : MonoBehaviour {
                 }
             }
         }
+        game.startGame();
 
         //added for testing purposes. To be removed
         GameMap map = GameObject.FindWithTag("Map").GetComponent<GameMap>();

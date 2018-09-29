@@ -14,6 +14,10 @@ public class PuzzleGame : IGameMode {
         placements = new GameStage.availablePlacements(stage.placements);
 
         GameMap.mouseDestroyed += checkGameEnd;
+        GameMap.catDestroyed += checkGameEnd;
+        GameMap.mousePlaced += registerMouse;
+
+        numMice = 0;
 
         return;
     }
@@ -22,6 +26,15 @@ public class PuzzleGame : IGameMode {
     public void endGame()
     {
         // pause?
+
+        return;
+    }
+
+    public void endGame(bool victory)
+    {
+        // pause?
+
+        // UI WIN / LOSE screen thing
 
         return;
     }
@@ -48,20 +61,38 @@ public class PuzzleGame : IGameMode {
         }
     }
 
-    private void checkGameEnd(GameObject deadMouse)
+    private void checkGameEnd(GameObject deadMeat)
     {
-        Debug.Log("Should check if victory or failure and call endGame() if so");
+        --numMice;
 
-        if (deadMouse.GetComponent<GridMovement>().tile.improvement != MapTile.TileImprovement.Goal)
+        GridMovement gm = deadMeat.GetComponent<GridMovement>();
+        if (!gm || !gm.tile)
+        {
+            return;
+        }
+
+        if (!gm.isCat && gm.tile.improvement != MapTile.TileImprovement.Goal)
         {
             Debug.Log("A mouse was destroyed. Game Over.");
-            endGame();
+            endGame(false);
         }
-        else
+        else if (!gm.isCat && numMice <= 0)
         {
-            Debug.Log("A mouse hit a goal. Need to check if it was the last mouse to know if victory.");
+            Debug.Log("The last mouse hit a goal, you won.");
+            endGame(false);
+        }
+        else if (gm.isCat && gm.tile.improvement == MapTile.TileImprovement.Goal)
+        {
+            Debug.Log("Cat hit goal, you lose.");
+            endGame(false);
         }
     }
 
+    private void registerMouse(GameObject mouse)
+    {
+        ++numMice;
+    }
+
+    private int numMice = 0;
     private GameStage.availablePlacements placements;
 }

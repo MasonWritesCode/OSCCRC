@@ -13,6 +13,8 @@ public class GameMap : MonoBehaviour
 
     public delegate void objectEvent(GameObject caller);
     public static event objectEvent mouseDestroyed;
+    public static event objectEvent mousePlaced;
+    public static event objectEvent catDestroyed;
 
     private Transform mapTransform;
     private MapTile[,] mapTiles;
@@ -107,6 +109,10 @@ public class GameMap : MonoBehaviour
     // Removes a cat game object with transform "cat"
     public void destroyCat(Transform cat)
     {
+        if (catDestroyed != null)
+        {
+            catDestroyed(cat.gameObject);
+        }
         Destroy(cat.gameObject);
     }
 
@@ -300,6 +306,11 @@ public class GameMap : MonoBehaviour
         Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, mapTransform);
         Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
+
+        if (mousePlaced != null)
+        {
+            mousePlaced(newMouse.gameObject);
+        }
 
         return newMouse;
     }
