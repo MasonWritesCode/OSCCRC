@@ -21,7 +21,7 @@ public class GameController : MonoBehaviour {
     // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
-        if (isPaused)
+        if (!isPaused)
         {
             return;
         }

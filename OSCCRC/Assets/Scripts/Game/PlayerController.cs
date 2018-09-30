@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour {
         // We ignore game input while a text field is focused
         if (EventSystem.current.currentSelectedGameObject)
         {
-            return;
+            //return;
         }
 
         // The mouse hovers over a tile to select it as the one where improvements will be placed

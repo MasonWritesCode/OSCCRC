@@ -10,8 +10,10 @@ public class EditorGame : IGameMode
     // Begins a puzzle game
     public void startGame()
     {
-        GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
+        m_saveMenu  = GameObject.Find("EditorMenu");
+        m_saveMenu.GetComponent<Canvas>().enabled = true;
 
+        GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
         placements = new GameStage.availablePlacements(stage.placements);
 
         GameMap.mouseDestroyed += checkGameEnd;
@@ -101,4 +103,5 @@ public class EditorGame : IGameMode
 
     private int numMice = 0;
     private GameStage.availablePlacements placements;
+    private GameObject m_saveMenu;
 }

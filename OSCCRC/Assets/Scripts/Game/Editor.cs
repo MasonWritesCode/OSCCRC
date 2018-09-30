@@ -24,6 +24,7 @@ public class Editor : MonoBehaviour {
     private Vector3 m_positionOffset; // Used for wall facing
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
+    private List<MapTile> arrowTiles = new List<MapTile>();
     private byte[] mapSaveData;
     private GameMap m_gameMap;
     private GameStage m_gameStage;
@@ -357,7 +358,15 @@ public class Editor : MonoBehaviour {
     // Creates a saved file of the stage with a file name of "saveName"
     public void createSave(string saveName)
     {
+        // purge arrow tiles, since we store the arrows as available placements
+        for (int i = 0; i < arrowTiles.Count; ++i)
+        {
+            arrowTiles[i].improvement = MapTile.TileImprovement.None;
+        }
+
         m_gameStage.saveStage(saveName);
+
+        // restore them for the editor at some point?
     }
 
 
@@ -408,6 +417,7 @@ public class Editor : MonoBehaviour {
                     if (m_selectedImprovement == MapTile.TileImprovement.Direction)
                     {
                         m_gameStage.placements.remove(m_direction);
+                        arrowTiles.Remove(selectedTile);
                     }
                 }
                 else
@@ -423,6 +433,7 @@ public class Editor : MonoBehaviour {
                     else
                     {
                         m_gameStage.placements.add(m_direction);
+                        arrowTiles.Add(selectedTile);
                     }
                 }
             }
