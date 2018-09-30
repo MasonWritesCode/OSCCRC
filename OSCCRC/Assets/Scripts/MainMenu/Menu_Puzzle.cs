@@ -21,6 +21,7 @@ public class Menu_Puzzle : MonoBehaviour, IPointerClickHandler
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
             Debug.Log(name + " Game Object Left Clicked!");
+            GlobalData.mode = GameController.GameMode.Puzzle;
 
             GameObject main = transform.parent.gameObject;
             GameObject typeSelect = GameObject.FindWithTag("Menu").transform.Find("TypeFolder").gameObject;

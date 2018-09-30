@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour {
     public enum GameMode { None, Editor, Puzzle, Multiplayer };
 
     //public static readonly GameMode mode = GameMode.Puzzle;
-    public static readonly GameMode mode = GameMode.Editor;
+    public static GameMode mode = GameMode.None;
 
     private IGameMode game;
     private bool m_isPaused;
@@ -32,6 +32,41 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    public void runGame(GameMode mode)
+    {
+        if (game != null)
+        {
+            game.endGame();
+        }
+
+        if (mode == GameMode.Puzzle)
+        {
+            game = new PuzzleGame();
+        }
+        else if (mode == GameMode.Editor)
+        {
+            game = new EditorGame();
+        }
+
+        Editor editor = GetComponent<Editor>();
+        if (editor)
+        {
+            if (mode == GameMode.Editor && !editor.enabled)
+            {
+                editor.enabled = true;
+            }
+            else if (mode != GameMode.Editor && editor.enabled)
+            {
+                editor.enabled = false;
+            }
+        }
+
+        if (mode != GameMode.None)
+        {
+            game.startGame();
+        }
+    }
+
 
     void Start () {
         /*
@@ -46,22 +81,9 @@ public class GameController : MonoBehaviour {
             stage.loadStage(currentStage);
         }
 
-		m_isPaused = true;
+        m_isPaused = true;
 
-        if (mode == GameMode.Editor || mode == GameMode.Puzzle)
-        {
-            game = new PuzzleGame();
-
-            if (mode == GameMode.Editor)
-            {
-                Editor editor = GetComponent<Editor>();
-                if (editor && !editor.enabled)
-                {
-                    editor.enabled = true;
-                }
-            }
-        }
-        game.startGame();
+        runGame(GlobalData.mode);
     }
 
 
