@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 // This class allows for player input and handles player interaction with the game (but currently not the editor).
 
@@ -22,6 +24,12 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	void Update () {
+        // We ignore game input while a text field is focused
+        if (EventSystem.current.currentSelectedGameObject)
+        {
+            return;
+        }
+
         // The mouse hovers over a tile to select it as the one where improvements will be placed
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
         {

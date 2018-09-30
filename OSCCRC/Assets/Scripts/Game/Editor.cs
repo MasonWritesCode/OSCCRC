@@ -340,6 +340,7 @@ public class Editor : MonoBehaviour {
         // For now just hotkey a save to "dev" until we have a UI that lets you choose save name
         // TODO: UI
         // This is a much smaller block of UI stuff
+        /*
         if (Input.GetKeyDown(KeyCode.F6))
         {
             createSave("dev");
@@ -348,6 +349,7 @@ public class Editor : MonoBehaviour {
         {
             loadSave("dev");
         }
+        */
         // End of smaller UI block
     }
 

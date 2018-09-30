@@ -8,9 +8,11 @@ using UnityEngine.SceneManagement;
 public class Editor_LoadButton : MonoBehaviour, IPointerClickHandler
 {
     Editor editor;
+    GameStage gameStage;
     void Start()
     {
         editor = GameObject.FindWithTag("GameController").GetComponent<Editor>();
+        gameStage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
     }
 
     //Detect if a click occurs
@@ -28,9 +30,11 @@ public class Editor_LoadButton : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log(name + " Game Object Left Clicked!");
             string loadPath = transform.parent.GetComponentInChildren<Text>().text;
-            Debug.Log(loadPath);
+
             editor.loadSave(loadPath);
 
+            InputField field = transform.parent.Find("Stage").GetComponent<InputField>();
+            field.text = gameStage.stageName;
         }
     }
 }

@@ -8,9 +8,11 @@ using UnityEngine.SceneManagement;
 public class Editor_SaveButton : MonoBehaviour, IPointerClickHandler
 {
     Editor editor;
+    GameStage gameStage;
     void Start()
     {
         editor = GameObject.FindWithTag("GameController").GetComponent<Editor>();
+        gameStage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
     }
 
     //Detect if a click occurs
@@ -28,7 +30,10 @@ public class Editor_SaveButton : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log(name + " Game Object Left Clicked!");
             string savePath = transform.parent.GetComponentInChildren<Text>().text;
+            string stageName = transform.parent.Find("Stage").GetComponentInChildren<Text>().text;
             Debug.Log(savePath);
+            Debug.Log(stageName);
+            gameStage.stageName = stageName;
             editor.createSave(savePath);
 
         }
