@@ -2,16 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Editor_LoadButton : MonoBehaviour, IPointerClickHandler
+public class Pause_No : MonoBehaviour, IPointerClickHandler
 {
-    Editor editor;
-    void Start()
-    {
-        editor = GameObject.FindWithTag("GameController").GetComponent<Editor>();
-    }
 
     //Detect if a click occurs
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -27,9 +21,17 @@ public class Editor_LoadButton : MonoBehaviour, IPointerClickHandler
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
             Debug.Log(name + " Game Object Left Clicked!");
-            string loadPath = transform.parent.GetComponentInChildren<Text>().text;
-            Debug.Log(loadPath);
-            editor.loadSave(loadPath);
+
+            Canvas pauseDisplay = GameObject.Find("PauseMenu").GetComponent<Canvas>();
+            GameController m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+            PlayerController player1 = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
+
+            pauseDisplay.enabled = false;
+            if (player1.menuPaused)
+            {
+                m_gameController.isPaused = false;
+                player1.menuPaused = false;
+            }
 
         }
     }

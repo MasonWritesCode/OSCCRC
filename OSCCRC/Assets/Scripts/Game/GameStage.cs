@@ -73,6 +73,32 @@ public class GameStage : MonoBehaviour {
     private const int m_currentFileVersion = 1;
 
 
+    // Get information of a stage without actually loading it.
+    public void loadStageMetadata(string fileName)
+    {
+        string stagePath = Application.dataPath + "/Maps/" + fileName + ".stage";
+        if (!File.Exists(stagePath))
+        {
+            Debug.LogWarning("Tried to load a stage but it wasn't found! " + stagePath);
+            return;
+        }
+        using (StreamReader fin = new StreamReader(stagePath))
+        {
+            int versionNumber;
+            bool recognizedVers = int.TryParse(fin.ReadLine(), out versionNumber);
+
+            // For now, assume if this is good, everything else is good too
+            if (!recognizedVers || versionNumber != m_currentFileVersion)
+            {
+                Debug.LogWarning("Failed to read stage file " + fileName);
+                return;
+            }
+
+            stageName = fin.ReadLine();
+            musicTrack = fin.ReadLine();
+            resourcePackName = fin.ReadLine();
+        }
+    }
     // Loads a stage specified by "fileName" as the current stage
     public void loadStage(string fileName)
     {

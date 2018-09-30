@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 // This class allows for player input and handles player interaction with the game (but currently not the editor).
 
@@ -9,6 +11,7 @@ public class PlayerController : MonoBehaviour {
     [Range(1, 4)] public int playerID;
     public Transform highlighter;
     [HideInInspector] public MapTile currentTile = null;
+    [HideInInspector] public bool menuPaused = false;
 
     private GameController m_gameController;
 
@@ -21,6 +24,12 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	void Update () {
+        // We ignore game input while a text field is focused
+        if (EventSystem.current.currentSelectedGameObject)
+        {
+            //return;
+        }
+
         // The mouse hovers over a tile to select it as the one where improvements will be placed
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
         {
@@ -74,7 +83,22 @@ public class PlayerController : MonoBehaviour {
         // TODO: UI
         if (Input.GetButtonDown("Menu"))
         {
-            Application.Quit();
+            Canvas pauseDisplay = GameObject.Find("PauseMenu").GetComponent<Canvas>();
+
+            if (!pauseDisplay.enabled)
+            {
+                pauseDisplay.enabled = true;
+                m_gameController.isPaused = true;
+                if (!m_gameController.isPaused) menuPaused = true;
+            }
+            else
+            {
+                pauseDisplay.enabled = false;
+                if (menuPaused) {
+                    m_gameController.isPaused = false;
+                    menuPaused = false;
+                }
+            }
         }
 
         // Toggle framerate display between Basic, Advanced, and Off
