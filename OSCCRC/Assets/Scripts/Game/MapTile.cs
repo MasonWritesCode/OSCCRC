@@ -127,6 +127,7 @@ public class MapTile : MonoBehaviour
     private Directions.Direction m_movingDir;
     private Transform m_tileObject;
     private int m_tileDamage;
+    private MeshRenderer m_rendererRef;
 
 
     // This static constructor is used to generate a map used to interface with resource packs
@@ -150,6 +151,8 @@ public class MapTile : MonoBehaviour
         m_tileObject = null;
         improvement = TileImprovement.None;
         movingObject = TileImprovement.None;
+
+        m_rendererRef = GetComponent<MeshRenderer>();
     }
 
 
@@ -205,28 +208,60 @@ public class MapTile : MonoBehaviour
             objectName = improvementObjects[improvement];
         }
 
-        if (improvement == TileImprovement.None || materialName == string.Empty)
+        if (GlobalData.x_useBigTile)
         {
-            // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
-            if ((transform.position.x + transform.position.z) % 2 == 0)
+            if (improvement == TileImprovement.None || materialName == string.Empty)
             {
-                materialName = "Tile";
+                // We disable the renderer here instead of setting to Blank tile material
+                // See GameMap for more info
+
+                if (m_rendererRef)
+                {
+                    m_rendererRef.enabled = false;
+                }
             }
             else
             {
-                materialName = "TileAlt";
+                if (!m_rendererRef.enabled)
+                {
+                    m_rendererRef.enabled = true;
+                }
+
+                if (GameResources.materials.ContainsKey(materialName))
+                {
+                    m_rendererRef.material = GameResources.materials[materialName];
+                }
+                else
+                {
+                    Debug.LogWarning("Material " + materialName + " was not found!");
+                }
             }
         }
-
-		if (materialName != string.Empty)
+        else
         {
-            if (GameResources.materials.ContainsKey(materialName))
+            if (improvement == TileImprovement.None || materialName == string.Empty)
             {
-                GetComponent<MeshRenderer>().material = GameResources.materials[materialName];
+                // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
+                if ((transform.position.x + transform.position.z) % 2 == 0)
+                {
+                    materialName = "Tile";
+                }
+                else
+                {
+                    materialName = "TileAlt";
+                }
             }
-            else
+
+            if (materialName != string.Empty)
             {
-                Debug.LogWarning("Material " + materialName + " was not found!");
+                if (GameResources.materials.ContainsKey(materialName))
+                {
+                    GetComponent<MeshRenderer>().material = GameResources.materials[materialName];
+                }
+                else
+                {
+                    Debug.LogWarning("Material " + materialName + " was not found!");
+                }
             }
         }
 

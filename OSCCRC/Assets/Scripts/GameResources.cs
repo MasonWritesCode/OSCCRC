@@ -35,6 +35,7 @@ public class GameResources : MonoBehaviour {
         currentDir = "/Materials/";
         materials.Add("Tile", resourceFromDir(currentDir + "Tile") as Material);
         materials.Add("TileAlt", resourceFromDir(currentDir + "TileAlt") as Material);
+        materials.Add("TileTiledColor", resourceFromDir(currentDir + "TileTiledColor") as Material);
         materials.Add("Hole", resourceFromDir(currentDir + "Hole") as Material);
         materials.Add("Goal", resourceFromDir(currentDir + "Goal") as Material);
         materials.Add("Placeholder", resourceFromDir(currentDir + "ObjectPlace") as Material);

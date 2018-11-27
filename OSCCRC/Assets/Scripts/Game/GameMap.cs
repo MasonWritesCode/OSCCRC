@@ -18,6 +18,7 @@ public class GameMap : MonoBehaviour
 
     private Transform mapTransform;
     private MapTile[,] mapTiles;
+    private Transform m_bigTile;
 
     // Generates a new rectangular map of the specified width and height
     void generateMap(int height, int width)
@@ -36,6 +37,25 @@ public class GameMap : MonoBehaviour
             }
         }
 
+        if (GlobalData.x_useBigTile)
+        {
+            // Here we set a single stretched tile that represents all blank tiles
+            // Since most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
+            Transform tilePrefab = GameResources.objects["Tile"];
+            m_bigTile = Instantiate(tilePrefab, Vector3.zero, tilePrefab.rotation, mapTransform);
+            MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
+            bigTileRend.material = GameResources.materials["TileTiledColor"];
+
+            // We need to set the scale to mapsize
+            // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
+            // Material tiling has to be set to (mapsize / 2)
+            m_bigTile.transform.localScale = new Vector3(mapWidth, mapHeight, 1.0f);
+            m_bigTile.transform.position = new Vector3((mapWidth - 1.0f) / 2.0f, 0.0f, (mapHeight - 1.0f) / 2.0f);
+            bigTileRend.material.mainTextureScale = new Vector2(mapWidth / 2.0f, mapHeight / 2.0f);
+
+            bigTileRend.enabled = true;
+        }
+
         setCameraView(Camera.main);
     }
 
@@ -50,7 +70,7 @@ public class GameMap : MonoBehaviour
     public MapTile createTile(float xPos, float zPos)
     {
         Transform tilePrefab = GameResources.objects["Tile"];
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0, zPos), tilePrefab.rotation, mapTransform);
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.0f, zPos), tilePrefab.rotation, mapTransform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile(this);
         return newTile;

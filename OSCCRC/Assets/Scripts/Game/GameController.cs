@@ -69,10 +69,11 @@ public class GameController : MonoBehaviour {
 
 
     void Start () {
-        /*
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 60;
-        */
+        if (GlobalData.d_uncapFrames)
+        {
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = -1;
+        }
 
         string currentStage = GlobalData.currentStageFile;
         if (currentStage != null)
