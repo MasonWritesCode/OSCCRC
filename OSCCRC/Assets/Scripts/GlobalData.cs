@@ -15,9 +15,9 @@ public static class GlobalData {
     // Development Related Values:
 
     // Disables vsync so that performance can properly be measured
-    public static bool d_uncapFrames = true;
+    public static bool d_uncapFrames = false;
 
     // Performance related experiment, code exists in GameMap and MapTile
     // Added TileTiledColor material, which is included in Resource Pack
-    public static bool x_useBigTile = false;
+    public static bool x_useBigTile = true;
 }

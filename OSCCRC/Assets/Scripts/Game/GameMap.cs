@@ -169,6 +169,7 @@ public class GameMap : MonoBehaviour
 
         if (newMapHeight != mapHeight && newMapWidth != mapWidth)
         {
+            Destroy(m_bigTile);
             for (int j = 0; j < mapHeight; ++j)
             {
                 for (int i = 0; i < mapWidth; ++i)
