@@ -153,6 +153,10 @@ public class MapTile : MonoBehaviour
         movingObject = TileImprovement.None;
 
         m_rendererRef = GetComponent<MeshRenderer>();
+        if (m_rendererRef)
+        {
+            m_rendererRef.enabled = !GlobalData.x_useBigTile;
+        }
     }
 
 
@@ -275,6 +279,12 @@ public class MapTile : MonoBehaviour
             if (GameResources.objects.ContainsKey(objectName))
             {
                 m_tileObject = Instantiate(GameResources.objects[objectName], GetComponent<Transform>());
+                if (improvement == TileImprovement.Direction)
+                {
+                    // Directional arrows are objects that are implemented as tile objects themselves, which can cause z-fighting.
+                    // We avoid z-fighting issues for directional tile objects by placing slightly above
+                    m_tileObject.localPosition = new Vector3(0.0f, 0.0f, -0.01f);
+                }
                 Directions.rotate(ref m_tileObject, m_improvementDir);
             }
             else
