@@ -35,46 +35,46 @@ public class GridMovement : MonoBehaviour {
 
 	void FixedUpdate() {
 		if (!m_gameController.isPaused) {
-            tile = map.tileAt (m_transform.position);
+            tile = map.tileAt (m_transform.localPosition);
 
 			//TODO: check for other types of tiles: pits, goals, etc.
 
-			if (m_transform.position == tile.transform.position) { // we hit our destination, so get a new tile
+			if (m_transform.localPosition == tile.transform.localPosition) { // we hit our destination, so get a new tile
                 updateDirection();
             }
 
-            m_oldPos = m_transform.position;
-            m_transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.smoothDeltaTime, Vector3.Distance (m_destinationPos, m_transform.position)));
-            if (m_transform.position == m_oldPos)
+            m_oldPos = m_transform.localPosition;
+            m_transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.smoothDeltaTime, Vector3.Distance (m_destinationPos, m_transform.localPosition)));
+            if (m_transform.localPosition == m_oldPos)
             {
                 // Our distance to destination is not small enough to match, but not big enough for translate to do anything, so prevent from getting stuck
-                m_transform.position = tile.transform.position;
+                m_transform.localPosition = tile.transform.localPosition;
             }
 
             // Wrap around to opposite side of map if necessary
-            Vector3 pos = m_transform.position;
+            Vector3 pos = m_transform.localPosition;
             if (pos.x <= -(map.tileSize / 2))
             {
                 pos.x = map.mapWidth - (map.tileSize / 2) - 0.1f;
-                m_transform.position = pos;
+                m_transform.localPosition = pos;
                 updateDirection();
             }
             else if ( pos.x >= (map.mapWidth - (map.tileSize / 2)) )
             {
                 pos.x = 0;
-                m_transform.position = pos;
+                m_transform.localPosition = pos;
                 updateDirection();
             }
             if (pos.z <= -(map.tileSize / 2))
             {
                 pos.z = map.mapHeight - (map.tileSize / 2) - 0.1f;
-                m_transform.position = pos;
+                m_transform.localPosition = pos;
                 updateDirection();
             }
             else if ( pos.z >= (map.mapHeight - (map.tileSize / 2)) )
             {
                 pos.z = 0;
-                m_transform.position = pos;
+                m_transform.localPosition = pos;
                 updateDirection();
             }
         }
@@ -201,7 +201,7 @@ public class GridMovement : MonoBehaviour {
 
         Directions.rotate(ref m_transform, direction);
 
-        m_destinationPos = m_transform.position + m_transform.forward * map.tileSize; // after rotating, so facing the desired direction
+        m_destinationPos = m_transform.localPosition + m_transform.forward * map.tileSize; // after rotating, so facing the desired direction
     }
 
     void OnTriggerEnter(Collider other)

@@ -216,7 +216,7 @@ public class Editor : MonoBehaviour {
                     // Easiest way is to spawn a wall and then destroy it. This is wasteful, but only done once per object select.
                     // The point of using a mesh is to avoid spawning objects, so this is also messy and bad. It can be changed later.
                     Transform temp = m_gameMap.createWall(0, 0, m_direction);
-                    m_positionOffset = temp.position;
+                    m_positionOffset = temp.localPosition;
                     m_gameMap.destroyWall(temp);
 
                     m_placeholderObject.localScale = new Vector3(1.0f, 0.5f, 0.1f);
@@ -453,11 +453,11 @@ public class Editor : MonoBehaviour {
                 Transform newMovingObj = null;
                 if (selectedTile.movingObject == MapTile.TileImprovement.Mouse)
                 {
-                    newMovingObj = m_gameMap.placeMouse(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
+                    newMovingObj = m_gameMap.placeMouse(selectedTile.transform.localPosition.x, selectedTile.transform.localPosition.z, m_direction);
                 }
                 else if (selectedTile.movingObject == MapTile.TileImprovement.Cat)
                 {
-                    newMovingObj = m_gameMap.placeCat(selectedTile.transform.position.x, selectedTile.transform.position.z, m_direction);
+                    newMovingObj = m_gameMap.placeCat(selectedTile.transform.localPosition.x, selectedTile.transform.localPosition.z, m_direction);
                 }
                 m_movingObjects.Add(selectedTile, newMovingObj);
             }
@@ -480,7 +480,7 @@ public class Editor : MonoBehaviour {
             // Checking if isActiveAndEnabled seems to work. 
             if (i.isActiveAndEnabled)
             {
-                m_movingObjects.Add(map.tileAt(i.transform.position), i.transform);
+                m_movingObjects.Add(map.tileAt(i.transform.localPosition), i.transform);
             }
         }
     }

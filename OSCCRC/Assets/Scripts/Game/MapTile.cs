@@ -147,7 +147,7 @@ public class MapTile : MonoBehaviour
         improvementDirection = Directions.Direction.North;
         movingObjDirection = Directions.Direction.North;
         m_tileObject = null;
-        walls = new Walls(parentMap, GetComponent<Transform>().position);
+        walls = new Walls(parentMap, GetComponent<Transform>().localPosition);
         m_tileObject = null;
         improvement = TileImprovement.None;
         movingObject = TileImprovement.None;
@@ -242,7 +242,7 @@ public class MapTile : MonoBehaviour
             if (improvement == TileImprovement.None || materialName == string.Empty)
             {
                 // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
-                if ((transform.position.x + transform.position.z) % 2 == 0)
+                if ((transform.localPosition.x + transform.localPosition.z) % 2 == 0)
                 {
                     materialName = "Tile";
                 }
