@@ -191,8 +191,8 @@ public class Editor : MonoBehaviour {
                 m_placeholderType = newType;
                 m_selectedImprovement = newImprovement;
                 m_direction = newDir;
-                // We have a default offset of 0.02 vertically to prevent z-buffer issues for placeholders that are a tile
-                m_positionOffset = new Vector3(0.0f, 0.02f, 0.0f);
+                // We have a default offset of 0.003 vertically to prevent z-buffer issues for placeholders that are a tile
+                m_positionOffset = new Vector3(0.0f, 0.003f, 0.0f);
 
                 // We need to reset scale since not all prefabs whose mesh we use have same scale
                 // We wouldn't have to do this if we made our own model for walls

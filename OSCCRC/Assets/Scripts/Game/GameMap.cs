@@ -70,7 +70,7 @@ public class GameMap : MonoBehaviour
     public MapTile createTile(float xPos, float zPos)
     {
         Transform tilePrefab = GameResources.objects["Tile"];
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.0f, zPos), tilePrefab.rotation, mapTransform);
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.001f, zPos), tilePrefab.rotation, mapTransform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile(this);
         return newTile;
