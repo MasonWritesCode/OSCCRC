@@ -7,7 +7,25 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
 
     // isPaused needs to be moved to IGameMode probably
-	public bool isPaused { get { return m_isPaused; } set { game.pauseGame();  m_isPaused = value; } }
+	public bool isPaused
+    {
+        get
+        {
+            return m_isPaused;
+        }
+        set
+        {
+            m_isPaused = value;
+            if (value)
+            {
+                game.pauseGame();
+            }
+            else
+            {
+                game.unpauseGame();
+            }
+        }
+    }
 
     public enum GameMode { None, Editor, Puzzle, Multiplayer };
 
@@ -34,10 +52,12 @@ public class GameController : MonoBehaviour {
 
     public void runGame(GameMode mode)
     {
+        /*
         if (game != null)
         {
             game.endGame();
         }
+        */
 
         if (mode == GameMode.Puzzle)
         {

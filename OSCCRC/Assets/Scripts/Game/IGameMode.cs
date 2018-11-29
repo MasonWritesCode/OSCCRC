@@ -20,6 +20,9 @@ public interface IGameMode {
     // Pauses the game
     void pauseGame();
 
+    // Unpauses the game
+    void unpauseGame();
+
     // Places a directional tile
     // Puzzle mode allows a limited set of tiles, wheras multiplayer keeps the most recent three
     void placeDirection(MapTile tile, Directions.Direction dir);
