@@ -12,7 +12,7 @@ public class GridMovement : MonoBehaviour {
     public bool isCat;
 	public MapTile tile;
 
-	private Vector3 m_destinationPos;
+    private float m_remainingDistance;
 	private GameController m_gameController;
     private Transform m_transform; // We have to store transform in a variable to pass it out as ref
     private Vector3 m_oldPos;
@@ -37,19 +37,18 @@ public class GridMovement : MonoBehaviour {
 		if (!m_gameController.isPaused) {
             tile = map.tileAt (m_transform.localPosition);
 
-			//TODO: check for other types of tiles: pits, goals, etc.
-
-			if (m_transform.localPosition == tile.transform.localPosition) { // we hit our destination, so get a new tile
+            float distance = speed * Time.smoothDeltaTime;
+            if (distance >= m_remainingDistance)
+            {
+                // We will reach our tile. So re-center, get new remaining movement distance, and get new heading
+                m_transform.localPosition = tile.transform.localPosition;
+                distance -= m_remainingDistance;
                 updateDirection();
             }
 
-            m_oldPos = m_transform.localPosition;
-            m_transform.Translate (Vector3.ClampMagnitude (Vector3.forward * speed * Time.smoothDeltaTime, Vector3.Distance (m_destinationPos, m_transform.localPosition)));
-            if (m_transform.localPosition == m_oldPos)
-            {
-                // Our distance to destination is not small enough to match, but not big enough for translate to do anything, so prevent from getting stuck
-                m_transform.localPosition = tile.transform.localPosition;
-            }
+            // Now move the distance we need to move
+            m_transform.Translate(Vector3.forward * distance);
+            m_remainingDistance -= distance;
 
             // Wrap around to opposite side of map if necessary
             Vector3 pos = m_transform.localPosition;
@@ -201,7 +200,7 @@ public class GridMovement : MonoBehaviour {
 
         Directions.rotate(ref m_transform, direction);
 
-        m_destinationPos = m_transform.localPosition + m_transform.forward * map.tileSize; // after rotating, so facing the desired direction
+        m_remainingDistance = map.tileSize; // after rotating, so facing the desired direction
     }
 
     void OnTriggerEnter(Collider other)
