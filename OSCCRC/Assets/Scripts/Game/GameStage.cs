@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 // This class is an interface to a game stage, being a combination of the map, music, or other assets that will be loaded and used together at the same time.
@@ -82,7 +83,7 @@ public class GameStage : MonoBehaviour {
             Debug.LogWarning("Tried to load a stage but it wasn't found! " + stagePath);
             return;
         }
-        using (StreamReader fin = new StreamReader(stagePath))
+        using (StreamReader fin = new StreamReader(stagePath, Encoding.ASCII))
         {
             int versionNumber;
             bool recognizedVers = int.TryParse(fin.ReadLine(), out versionNumber);
@@ -108,7 +109,7 @@ public class GameStage : MonoBehaviour {
             Debug.LogWarning("Tried to load a stage but it wasn't found! " + stagePath);
             return;
         }
-        using (StreamReader fin = new StreamReader(stagePath))
+        using (StreamReader fin = new StreamReader(stagePath, Encoding.ASCII))
         {
             int versionNumber;
             bool recognizedVers = int.TryParse(fin.ReadLine(), out versionNumber);
@@ -144,7 +145,7 @@ public class GameStage : MonoBehaviour {
     public void saveStage(string fileName)
     {
         string mapPath = Application.dataPath + "/Maps/" + fileName + ".stage";
-        using (StreamWriter fout = new StreamWriter(mapPath, false))
+        using (StreamWriter fout = new StreamWriter(mapPath, false, Encoding.ASCII))
         {
             fout.WriteLine(m_currentFileVersion);
 

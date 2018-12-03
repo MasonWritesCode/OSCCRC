@@ -140,14 +140,8 @@ public class GameMap : MonoBehaviour
     public bool importMap(StreamReader fin)
     {
         // Delete allocated game objects, since we are creating new ones
-        for (int j = 0; j < mapHeight; ++j)
-        {
-            for (int i = 0; i < mapWidth; ++i)
-            {
-                // North and east walls will be removed by changing the south and west of it's partner tiles
-                mapTiles[j, i].walls.south = mapTiles[j, i].walls.west = false;
-            }
-        }
+        // Removing walls will be handled at the same point in code where they are placed
+
         // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
         List<GridMovement> deadMeat = new List<GridMovement>();
         GetComponentsInChildren<GridMovement>(true, deadMeat);
@@ -183,55 +177,49 @@ public class GameMap : MonoBehaviour
             generateMap(newMapHeight, newMapWidth);
         }
 
-        // Add stuff onto the tiles
+        // Old objects are gone, so now Add stuff onto the tiles
         for (int j = 0; j < mapHeight; ++j)
         {
             for (int i = 0; i < mapWidth; ++i)
             {
-                MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
-                if (tileImprovement != MapTile.TileImprovement.None)
+                // An underscore indicates there is no improvement
+                if (fin.Peek() != '_')
                 {
-                    mapTiles[j, i].improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
-                }
-                MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
-                if (movingObj != MapTile.TileImprovement.None)
-                {
-                    mapTiles[j, i].movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+                    MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
+                    if (tileImprovement != MapTile.TileImprovement.None)
+                    {
+                        mapTiles[j, i].improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+                    }
+                    MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
+                    if (movingObj != MapTile.TileImprovement.None)
+                    {
+                        mapTiles[j, i].movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
 
-                    if (movingObj == MapTile.TileImprovement.Mouse)
-                    {
-                        placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                        if (movingObj == MapTile.TileImprovement.Mouse)
+                        {
+                            placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                        }
+                        else if (movingObj == MapTile.TileImprovement.Cat)
+                        {
+                            placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                        }
                     }
-                    else if (movingObj == MapTile.TileImprovement.Cat)
-                    {
-                        placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
-                    }
+                    mapTiles[j, i].improvement = tileImprovement;
+                    mapTiles[j, i].movingObject = movingObj;
                 }
-                mapTiles[j, i].improvement = tileImprovement;
-                mapTiles[j, i].movingObject = movingObj;
+                else
+                {
+                    // Pass by the underscore
+                    fin.ReadLine();
+                }
 
                 if (i == 0 || j == 0 || (i + j) % 2 == 0)
                 {
                     int wallsValue = int.Parse(fin.ReadLine());
-                    if (wallsValue != 0)
-                    {
-                        if ((wallsValue >> 0 & 1) == 1)
-                        {
-                            mapTiles[j, i].walls.north = true;
-                        }
-                        if ((wallsValue >> 1 & 1) == 1)
-                        {
-                            mapTiles[j, i].walls.east = true;
-                        }
-                        if ((wallsValue >> 2 & 1) == 1)
-                        {
-                            mapTiles[j, i].walls.south = true;
-                        }
-                        if ((wallsValue >> 3 & 1) == 1)
-                        {
-                            mapTiles[j, i].walls.west = true;
-                        }
-                    }
+                    mapTiles[j, i].walls.north = (wallsValue >> 0 & 1) == 1;
+                    mapTiles[j, i].walls.east = (wallsValue >> 1 & 1) == 1;
+                    mapTiles[j, i].walls.south = (wallsValue >> 2 & 1) == 1;
+                    mapTiles[j, i].walls.west = (wallsValue >> 3 & 1) == 1;
                 }
             }
         }
@@ -251,16 +239,26 @@ public class GameMap : MonoBehaviour
             {
                 MapTile tile = mapTiles[j, i];
 
-                fout.WriteLine((int)tile.improvement);
-                if (tile.improvement != MapTile.TileImprovement.None)
+                // We can combine these two into a single character if they are the same. Thus a completely blank default tile will be indicated simply by only an underscore
+                // This actually only saves two characters in this sistuation though, as a blank tile before was two single digit numbers (each with a new line)
+                // 2 characters per tile is actually pretty significant relatively though
+                if (tile.improvement == MapTile.TileImprovement.None && tile.movingObject == MapTile.TileImprovement.None)
                 {
-                    fout.WriteLine((int)tile.improvementDirection);
+                    fout.WriteLine('_');
                 }
-
-                fout.WriteLine((int)tile.movingObject);
-                if (tile.movingObject != MapTile.TileImprovement.None)
+                else
                 {
-                    fout.WriteLine((int)tile.movingObjDirection);
+                    fout.WriteLine((int)tile.improvement);
+                    if (tile.improvement != MapTile.TileImprovement.None)
+                    {
+                        fout.WriteLine((int)tile.improvementDirection);
+                    }
+
+                    fout.WriteLine((int)tile.movingObject);
+                    if (tile.movingObject != MapTile.TileImprovement.None)
+                    {
+                        fout.WriteLine((int)tile.movingObjDirection);
+                    }
                 }
 
                 if (i == 0 || j == 0 || (i + j) % 2 == 0)
