@@ -350,11 +350,23 @@ public class GameMap : MonoBehaviour
     public void setCameraView(Camera cam)
     {
         // There is probably a correct thing to do here, but just do whatever for now since map sizes will probably always be the same.
-        float scaleFactor = 4.25f;
-        float cameraAngle = cam.transform.eulerAngles.x;
+
+        const float scaleFactor = 4.25f;
+        float cameraAngleAdjust = Mathf.Sin(cam.transform.eulerAngles.x * Mathf.Deg2Rad) * (scaleFactor / 2);
+
+        // Because maps are currently always 12x9, don't bother doing extra calculations for for that case (this is probably worth the cost of the if statement)
+        if (mapHeight == 9 && mapWidth == 12)
+        {
+            cam.transform.position = new Vector3(22.5f,
+                                                 33.6f + cameraAngleAdjust,
+                                                 10.5f - cameraAngleAdjust
+                                                ) / scaleFactor; 
+            return;
+        }
+
         cam.transform.position = new Vector3((mapWidth * 1.5f) + (mapHeight * 0.5f),
-                                             (mapWidth + mapHeight) * 1.6f + (Mathf.Sin(cameraAngle * Mathf.Deg2Rad) * (scaleFactor / 2)),
-                                             (mapWidth * 0.5f) + (mapHeight * 0.5f) - (Mathf.Sin(cameraAngle * Mathf.Deg2Rad) * (scaleFactor / 2))
+                                             (mapWidth + mapHeight) * 1.6f + cameraAngleAdjust,
+                                             (mapWidth * 0.5f) + (mapHeight * 0.5f) - cameraAngleAdjust
                                             ) / scaleFactor;
     }
 
