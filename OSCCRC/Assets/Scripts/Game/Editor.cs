@@ -58,123 +58,126 @@ public class Editor : MonoBehaviour {
         MapTile.TileImprovement newImprovement = MapTile.TileImprovement.None;
         Directions.Direction newDir = m_direction;
 
-        // Keys to select which improvement
-        // TODO: UI
-        // This is basically a block of UI related stuff until the comment that says it isn't
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        if (m_gameControl.isPaused)
         {
-            // Wall North
-            newType = ObjectType.Wall;
-            newDir = Directions.Direction.North;
-        }
-        if (Input.GetKeyDown(KeyCode.Period))
-        {
-            // Wall East
-            newType = ObjectType.Wall;
-            newDir = Directions.Direction.East;
-        }
-        if (Input.GetKeyDown(KeyCode.RightBracket))
-        {
-            // Wall South
-            newType = ObjectType.Wall;
-            newDir = Directions.Direction.South;
-        }
-        if (Input.GetKeyDown(KeyCode.Comma))
-        {
-            // Wall West
-            newType = ObjectType.Wall;
-            newDir = Directions.Direction.West;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
-        {
-            // Hole
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Hole;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
-        {
-            // Goal
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Goal;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
-        {
-            // Spawner
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Spawner;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
-        {
-            // Left
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Direction;
-            newDir = Directions.Direction.West;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5) || Input.GetKeyDown(KeyCode.Keypad5))
-        {
-            // Right
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Direction;
-            newDir = Directions.Direction.East;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha6) || Input.GetKeyDown(KeyCode.Keypad6))
-        {
-            // Up
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Direction;
-            newDir = Directions.Direction.North;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha7) || Input.GetKeyDown(KeyCode.Keypad7))
-        {
-            // Down
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Direction;
-            newDir = Directions.Direction.South;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha8) || Input.GetKeyDown(KeyCode.Keypad8))
-        {
-            // Mouse
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Mouse;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha9) || Input.GetKeyDown(KeyCode.Keypad9))
-        {
-            // Cat
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.Cat;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0))
-        {
-            // Blank tile
-            newType = ObjectType.Improvement;
-            newImprovement = MapTile.TileImprovement.None;
-        }
+            // Keys to select which improvement
+            // TODO: UI
+            // This is basically a block of UI related stuff until the comment that says it isn't
+            if (Input.GetKeyDown(KeyCode.LeftBracket))
+            {
+                // Wall North
+                newType = ObjectType.Wall;
+                newDir = Directions.Direction.North;
+            }
+            if (Input.GetKeyDown(KeyCode.Period))
+            {
+                // Wall East
+                newType = ObjectType.Wall;
+                newDir = Directions.Direction.East;
+            }
+            if (Input.GetKeyDown(KeyCode.RightBracket))
+            {
+                // Wall South
+                newType = ObjectType.Wall;
+                newDir = Directions.Direction.South;
+            }
+            if (Input.GetKeyDown(KeyCode.Comma))
+            {
+                // Wall West
+                newType = ObjectType.Wall;
+                newDir = Directions.Direction.West;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                // Hole
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Hole;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                // Goal
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Goal;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                // Spawner
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Spawner;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
+            {
+                // Left
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Direction;
+                newDir = Directions.Direction.West;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha5) || Input.GetKeyDown(KeyCode.Keypad5))
+            {
+                // Right
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Direction;
+                newDir = Directions.Direction.East;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha6) || Input.GetKeyDown(KeyCode.Keypad6))
+            {
+                // Up
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Direction;
+                newDir = Directions.Direction.North;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha7) || Input.GetKeyDown(KeyCode.Keypad7))
+            {
+                // Down
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Direction;
+                newDir = Directions.Direction.South;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha8) || Input.GetKeyDown(KeyCode.Keypad8))
+            {
+                // Mouse
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Mouse;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha9) || Input.GetKeyDown(KeyCode.Keypad9))
+            {
+                // Cat
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.Cat;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0))
+            {
+                // Blank tile
+                newType = ObjectType.Improvement;
+                newImprovement = MapTile.TileImprovement.None;
+            }
 
-        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
-        {
-            newDir = Directions.nextClockwiseDir(m_direction);
-            if (newType == ObjectType.None)
+            if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
             {
-                newType = m_placeholderType;
+                newDir = Directions.nextClockwiseDir(m_direction);
+                if (newType == ObjectType.None)
+                {
+                    newType = m_placeholderType;
+                }
+                if (newImprovement == MapTile.TileImprovement.None)
+                {
+                    newImprovement = m_selectedImprovement;
+                }
             }
-            if (newImprovement == MapTile.TileImprovement.None)
+            else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
             {
-                newImprovement = m_selectedImprovement;
+                newDir = Directions.nextCounterClockwiseDir(m_direction);
+                if (newType == ObjectType.None)
+                {
+                    newType = m_placeholderType;
+                }
+                if (newImprovement == MapTile.TileImprovement.None)
+                {
+                    newImprovement = m_selectedImprovement;
+                }
             }
+            // End of UI stuff block
         }
-        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
-        {
-            newDir = Directions.nextCounterClockwiseDir(m_direction);
-            if (newType == ObjectType.None)
-            {
-                newType = m_placeholderType;
-            }
-            if (newImprovement == MapTile.TileImprovement.None)
-            {
-                newImprovement = m_selectedImprovement;
-            }
-        }
-        // End of UI stuff block
 
 
         // Draws the placement preview
