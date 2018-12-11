@@ -14,9 +14,11 @@ public class PlayerController : MonoBehaviour {
     [HideInInspector] public bool menuPaused = false;
 
     private GameController m_gameController;
+    private Camera m_mainCamera;
 
 	void Start () {
         m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        m_mainCamera = Camera.main;
 
         // We will need to differentiate the inputs of players if we add multiplayer.
         // I don't know how that will work yet, but just assign a playerID of 1 to the player controls for now
@@ -33,7 +35,7 @@ public class PlayerController : MonoBehaviour {
         // The mouse hovers over a tile to select it as the one where improvements will be placed
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
         {
-            Ray tileSelector = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray tileSelector = m_mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hitObject;
             if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Player Selectable")))
             {
