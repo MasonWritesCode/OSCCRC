@@ -17,7 +17,7 @@ public class EditorGame : IGameMode
         m_saveMenu.GetComponent<Canvas>().enabled = true;
 
         GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
-        placements = new GameStage.availablePlacements(stage.placements);
+        placements = new AvailablePlacements(stage.placements);
 
         GameMap.mouseDestroyed += checkGameEnd;
         GameMap.catDestroyed += checkGameEnd;
@@ -168,7 +168,7 @@ public class EditorGame : IGameMode
 
 
     private int numMice = 0;
-    private GameStage.availablePlacements placements;
+    private AvailablePlacements placements;
     private GameObject m_saveMenu;
     private bool m_paused;
     private byte[] mapSaveData;
