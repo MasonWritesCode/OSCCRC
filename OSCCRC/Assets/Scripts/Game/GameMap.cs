@@ -70,7 +70,8 @@ public class GameMap : MonoBehaviour
     public MapTile createTile(float xPos, float zPos)
     {
         Transform tilePrefab = GameResources.objects["Tile"];
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.001f, zPos), tilePrefab.rotation, mapTransform);
+        // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.00001f, zPos), tilePrefab.rotation, mapTransform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile(this);
         return newTile;
