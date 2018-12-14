@@ -28,6 +28,7 @@ public class Editor : MonoBehaviour {
     private GameStage m_gameStage;
     private PlayerController m_controls;
     private GameController m_gameControl;
+    private Camera m_mainCamera;
     private bool m_wasUnpaused;
     private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 
@@ -40,6 +41,7 @@ public class Editor : MonoBehaviour {
         m_gameStage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
         m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
         m_gameControl = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        m_mainCamera = Camera.main;
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
@@ -297,9 +299,9 @@ public class Editor : MonoBehaviour {
             {
                 m_placeholderObject.position = selectedTile.transform.position + m_positionOffset;
             }
-            else
+            else if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
             {
-                Ray posRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Ray posRay = m_mainCamera.ScreenPointToRay(Input.mousePosition);
                 float distance;
                 if (m_floorPlane.Raycast(posRay, out distance))
                 {
@@ -488,7 +490,7 @@ public class Editor : MonoBehaviour {
     {
         if (m_placeholderObject)
         {
-            m_placeholderObject.GetComponent<MeshRenderer>().enabled = false;
+            m_placeholderObject.gameObject.SetActive(false);
         }
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
@@ -500,7 +502,7 @@ public class Editor : MonoBehaviour {
     {
         if (m_placeholderObject)
         {
-            m_placeholderObject.GetComponent<MeshRenderer>().enabled = true;
+            m_placeholderObject.gameObject.SetActive(true);
         }
     }
 }
