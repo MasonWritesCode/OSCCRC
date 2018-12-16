@@ -7,8 +7,8 @@ using UnityEngine;
 
 public class GameMap : MonoBehaviour
 {
-    [Range(1, 255)] public int mapHeight = 9;
-    [Range(1, 255)] public int mapWidth = 12;
+    [HideInInspector] public int mapHeight = 0;
+    [HideInInspector] public int mapWidth = 0;
     [HideInInspector] public float tileSize;
 
     public delegate void objectEvent(GameObject caller);
@@ -164,16 +164,19 @@ public class GameMap : MonoBehaviour
 
         if (newMapHeight != mapHeight && newMapWidth != mapWidth)
         {
-            Destroy(m_bigTile);
-            for (int j = 0; j < mapHeight; ++j)
+            if (mapTiles != null)
             {
-                for (int i = 0; i < mapWidth; ++i)
+                Destroy(m_bigTile);
+                for (int j = 0; j < mapHeight; ++j)
                 {
-                    destroyTile(mapTiles[j, i]);
-                    mapTiles[j, i] = null;
+                    for (int i = 0; i < mapWidth; ++i)
+                    {
+                        destroyTile(mapTiles[j, i]);
+                        mapTiles[j, i] = null;
+                    }
                 }
+                mapTiles = null;
             }
-            mapTiles = null;
 
             generateMap(newMapHeight, newMapWidth);
         }
@@ -231,6 +234,13 @@ public class GameMap : MonoBehaviour
     // Exports map data from the current game map to the open stream specified by "fout"
     public bool exportMap(StreamWriter fout)
     {
+        if (mapTiles == null)
+        {
+            // There is currently no map to export
+            Debug.LogWarning("Tried to export map while none exists.");
+            return false;
+        }
+
         fout.WriteLine(mapHeight);
         fout.WriteLine(mapWidth);
 
@@ -369,49 +379,5 @@ public class GameMap : MonoBehaviour
                                              (mapWidth + mapHeight) * 1.6f + cameraAngleAdjust,
                                              (mapWidth * 0.5f) + (mapHeight * 0.5f) - cameraAngleAdjust
                                             ) / scaleFactor;
-    }
-
-    void Start()
-    {
-        bool useImportedMap = false;
-        if (useImportedMap)
-        {
-            loadMap("Dev");
-        }
-        else
-        {
-            if (mapTiles != null)
-            {
-                // We already created a map by loading a save elsewhere or something. So don't make a blank one.
-                return;
-            }
-
-            // mapHeight and mapWidth are initialized in the Unity editor
-            generateMap(mapHeight, mapWidth);
-
-            // Create a wall around edges of map by default
-            for (int j = 0; j < mapHeight; ++j)
-            {
-                for (int i = 0; i < mapWidth; ++i)
-                {
-                    if (j == 0)
-                    {
-                        mapTiles[j, i].walls.south = true;
-                    }
-                    else if (j == mapHeight - 1)
-                    {
-                        mapTiles[j, i].walls.north = true;
-                    }
-                    if (i == 0)
-                    {
-                        mapTiles[j, i].walls.west = true;
-                    }
-                    else if (i == mapWidth - 1)
-                    {
-                        mapTiles[j, i].walls.east = true;
-                    }
-                }
-            }
-        }
     }
 }

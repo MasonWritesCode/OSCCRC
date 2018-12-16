@@ -95,11 +95,15 @@ public class GameController : MonoBehaviour {
             Application.targetFrameRate = -1;
         }
 
+        GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStageFile;
         if (currentStage != null)
         {
-            GameStage stage = GetComponent<GameStage>();
             stage.loadStage(currentStage);
+        }
+        else
+        {
+            stage.loadStage("Internal/default");
         }
 
         m_isPaused = true;

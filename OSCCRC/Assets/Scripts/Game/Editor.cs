@@ -342,11 +342,11 @@ public class Editor : MonoBehaviour {
         /*
         if (Input.GetKeyDown(KeyCode.F6))
         {
-            createSave("dev");
+            createSave("Internal/dev");
         }
         else if (Input.GetKeyDown(KeyCode.F7))
         {
-            loadSave("dev");
+            loadSave("Internal/dev");
         }
         */
         // End of smaller UI block

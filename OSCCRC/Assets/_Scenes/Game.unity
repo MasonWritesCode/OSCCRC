@@ -1695,8 +1695,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7b4938d41c88e94284bd65c640b2e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapHeight: 9
-  mapWidth: 12
+  mapHeight: 1
+  mapWidth: 1
   tileSize: 0
 --- !u!1 &1196397977
 GameObject:
