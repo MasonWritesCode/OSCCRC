@@ -20,6 +20,7 @@ public class Menu_StageCreator : MonoBehaviour, IPointerClickHandler {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
             Debug.Log(name + " Game Object Left Clicked!");
+            GlobalData.currentStageFile = "Internal/default";
             GlobalData.mode = GameController.GameMode.Editor;
 
             SceneManager.LoadScene("Game", LoadSceneMode.Single);
