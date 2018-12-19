@@ -23,7 +23,6 @@ public class Editor : MonoBehaviour {
     private Vector3 m_positionOffset; // Used for wall facing
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
-    private List<MapTile> arrowTiles = new List<MapTile>();
     private GameMap m_gameMap;
     private GameStage m_gameStage;
     private PlayerController m_controls;
@@ -356,15 +355,7 @@ public class Editor : MonoBehaviour {
     // Creates a saved file of the stage with a file name of "saveName"
     public void createSave(string saveName)
     {
-        // purge arrow tiles, since we store the arrows as available placements
-        for (int i = 0; i < arrowTiles.Count; ++i)
-        {
-            arrowTiles[i].improvement = MapTile.TileImprovement.None;
-        }
-
         m_gameStage.saveStage(saveName);
-
-        // restore them for the editor at some point?
     }
 
 
@@ -375,7 +366,7 @@ public class Editor : MonoBehaviour {
         m_gameStage.loadStage(saveName);
         mapMovingObjToTile(m_gameMap);
 
-        // We need to re-start the game after loading a new map
+        // We need to re-start the game after loading a new map I think
         // We probably should get rid of this loadSave function and force people to load a map through the main menu
         m_gameControl.runGame(GameController.GameMode.Editor);
     }
@@ -412,12 +403,6 @@ public class Editor : MonoBehaviour {
                 if (selectedTile.improvement == m_selectedImprovement && selectedTile.improvementDirection == m_direction)
                 {
                     selectedTile.improvement = MapTile.TileImprovement.None;
-
-                    if (m_selectedImprovement == MapTile.TileImprovement.Direction)
-                    {
-                        m_gameStage.placements.remove(m_direction);
-                        arrowTiles.Remove(selectedTile);
-                    }
                 }
                 else
                 {
@@ -428,11 +413,6 @@ public class Editor : MonoBehaviour {
                     {
                         // We can only have a mouse or cat in addition to direction tiles
                         selectedTile.movingObject = MapTile.TileImprovement.None;
-                    }
-                    else
-                    {
-                        m_gameStage.placements.add(m_direction);
-                        arrowTiles.Add(selectedTile);
                     }
                 }
             }

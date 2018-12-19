@@ -59,10 +59,16 @@ public class GameMap : MonoBehaviour
         setCameraView(Camera.main);
     }
 
-    // Returns the maptile info of the tile that the current world coordinate is inside of
+    // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(Vector3 point)
     {
         return mapTiles[Mathf.RoundToInt(point.z / tileSize), Mathf.RoundToInt(point.x / tileSize)];
+    }
+
+    // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
+    public MapTile tileAt(float y, float x)
+    {
+        return mapTiles[Mathf.RoundToInt(y / tileSize), Mathf.RoundToInt(x / tileSize)];
     }
 
     // Creates a map tile

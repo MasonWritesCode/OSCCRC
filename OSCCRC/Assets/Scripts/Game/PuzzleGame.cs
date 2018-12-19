@@ -16,8 +16,21 @@ public class PuzzleGame : IGameMode {
         m_placementsDisplay = GameObject.Find("PlacementsDisplay");
         m_placementsDisplay.GetComponent<Canvas>().enabled = true;
 
-        GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
-        placements = new AvailablePlacements(stage.placements);
+        // We need to remove all direction tiles, and count them up into a placements object
+        placements = new AvailablePlacements();
+        float tileSize = m_gameMap.tileSize;
+        for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
+        {
+            for (int h = m_gameMap.mapHeight - 1; h >= 0; --h)
+            {
+                MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
+                if (tile.improvement == MapTile.TileImprovement.Direction)
+                {
+                    placements.add(tile.improvementDirection);
+                    tile.improvement = MapTile.TileImprovement.None;
+                }
+            }
+        }
 
         GameMap.mouseDestroyed += checkGameEnd;
         GameMap.catDestroyed += checkGameEnd;

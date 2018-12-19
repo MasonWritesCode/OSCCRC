@@ -16,9 +16,6 @@ public class EditorGame : IGameMode
         m_saveMenu  = GameObject.Find("EditorMenu");
         m_saveMenu.GetComponent<Canvas>().enabled = true;
 
-        GameStage stage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
-        placements = new AvailablePlacements(stage.placements);
-
         GameMap.mouseDestroyed += checkGameEnd;
         GameMap.catDestroyed += checkGameEnd;
         GameMap.mousePlaced += registerMouse;
@@ -79,23 +76,8 @@ public class EditorGame : IGameMode
     // Places a tile if it is in the stage's list of available placements
     public void placeDirection(MapTile tile, Directions.Direction dir)
     {
-        if (tile.improvement == MapTile.TileImprovement.Direction && tile.improvementDirection == dir)
-        {
-            tile.improvement = MapTile.TileImprovement.None;
-
-            placements.add(dir);
-        }
-        else if (placements.get(dir) > 0)
-        {
-            tile.improvementDirection = dir;
-            tile.improvement = MapTile.TileImprovement.Direction;
-
-            placements.remove(dir);
-        }
-        else
-        {
-            // Play a "No, you can't do this" sound?
-        }
+        // We only place tiles in edit mode, not during play
+        return;
     }
 
 
@@ -168,7 +150,6 @@ public class EditorGame : IGameMode
 
 
     private int numMice = 0;
-    private AvailablePlacements placements;
     private GameObject m_saveMenu;
     private bool m_paused;
     private byte[] mapSaveData;

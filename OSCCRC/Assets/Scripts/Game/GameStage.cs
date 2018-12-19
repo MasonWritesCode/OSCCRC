@@ -8,7 +8,6 @@ using UnityEngine;
 
 public class GameStage : MonoBehaviour {
 
-    public AvailablePlacements placements = new AvailablePlacements();
     // Not using file name as the stage name gives more flexibility in naming, should we choose to show a map name somewhere
     public string stageName { get { return m_stageName; } set { m_stageName = value; } }
     // Maybe add a game mode? Probably will later just in case it gets used.
@@ -73,10 +72,6 @@ public class GameStage : MonoBehaviour {
             musicTrack = fin.ReadLine();
             resourcePackName = fin.ReadLine();
             GameResources.loadResources(resourcePackName);
-            placements.set( Directions.Direction.North, int.Parse(fin.ReadLine()) );
-            placements.set( Directions.Direction.East, int.Parse(fin.ReadLine()) );
-            placements.set( Directions.Direction.South, int.Parse(fin.ReadLine()) );
-            placements.set( Directions.Direction.West, int.Parse(fin.ReadLine()) );
 
             // Now load the map itself
             GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
@@ -100,10 +95,6 @@ public class GameStage : MonoBehaviour {
             fout.WriteLine(stageName);
             fout.WriteLine(musicTrack);
             fout.WriteLine(resourcePackName);
-            fout.WriteLine(placements.get(Directions.Direction.North));
-            fout.WriteLine(placements.get(Directions.Direction.East));
-            fout.WriteLine(placements.get(Directions.Direction.South));
-            fout.WriteLine(placements.get(Directions.Direction.West));
 
             // Now save the map itself
             GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
