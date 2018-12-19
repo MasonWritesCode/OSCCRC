@@ -311,7 +311,7 @@ public class GameMap : MonoBehaviour
     // Loads the map from the file specified by "fileName"
     public void loadMap(string fileName)
     {
-        string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
+        string mapPath = Application.streamingAssetsPath + "/Maps/" + fileName + ".map";
         if (!File.Exists(mapPath))
         {
             Debug.LogWarning("Tried to load a map but it wasn't found! " + mapPath);
@@ -330,7 +330,7 @@ public class GameMap : MonoBehaviour
     // Saves the current map to the file specified by "fileName"
     public void saveMap(string fileName)
     {
-        string mapPath = Application.dataPath + "/Maps/" + fileName + ".map";
+        string mapPath = Application.streamingAssetsPath + "/Maps/" + fileName + ".map";
         using (StreamWriter fout = new StreamWriter(mapPath, false))
         {
             exportMap(fout);

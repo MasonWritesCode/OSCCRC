@@ -24,7 +24,7 @@ public class GameStage : MonoBehaviour {
     // Get information of a stage without actually loading it.
     public void loadStageMetadata(string fileName)
     {
-        string stagePath = Application.dataPath + "/Maps/" + fileName + ".stage";
+        string stagePath = Application.streamingAssetsPath + "/Maps/" + fileName + ".stage";
         if (!File.Exists(stagePath))
         {
             Debug.LogWarning("Tried to load a stage but it wasn't found! " + stagePath);
@@ -50,7 +50,7 @@ public class GameStage : MonoBehaviour {
     // Loads a stage specified by "fileName" as the current stage
     public void loadStage(string fileName)
     {
-        string stagePath = Application.dataPath + "/Maps/" + fileName + ".stage";
+        string stagePath = Application.streamingAssetsPath + "/Maps/" + fileName + ".stage";
         if (!File.Exists(stagePath))
         {
             Debug.LogWarning("Tried to load a stage but it wasn't found! " + stagePath);
@@ -87,7 +87,7 @@ public class GameStage : MonoBehaviour {
     // Saves the currently loaded stage under a file specified by "fileName"
     public void saveStage(string fileName)
     {
-        string mapPath = Application.dataPath + "/Maps/" + fileName + ".stage";
+        string mapPath = Application.streamingAssetsPath + "/Maps/" + fileName + ".stage";
         using (StreamWriter fout = new StreamWriter(mapPath, false, Encoding.ASCII))
         {
             fout.WriteLine(m_currentFileVersion);

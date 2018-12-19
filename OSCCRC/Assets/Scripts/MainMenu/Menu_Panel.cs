@@ -29,7 +29,7 @@ public class Menu_Panel : MonoBehaviour {
     // Retrieves file list for the globally selected folder
     public void getFiles()
     {
-        DirectoryInfo di = new DirectoryInfo("Assets/Maps/" + m_folderNames[GlobalData.folder]);
+        DirectoryInfo di = new DirectoryInfo(Application.streamingAssetsPath + "/Maps/" + m_folderNames[GlobalData.folder]);
         m_fileList = di.GetFiles("*.stage");
     }
 
