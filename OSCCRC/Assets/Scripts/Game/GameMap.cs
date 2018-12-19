@@ -219,6 +219,9 @@ public class GameMap : MonoBehaviour
                 }
                 else
                 {
+                    mapTiles[j, i].improvement = MapTile.TileImprovement.None;
+                    mapTiles[j, i].movingObject = MapTile.TileImprovement.None;
+
                     // Pass by the underscore
                     fin.ReadLine();
                 }
