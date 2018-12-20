@@ -72,9 +72,9 @@ public class PuzzleGame : IGameMode {
             return;
         }
 
-        loadAutosave();
-
         m_paused = true;
+
+        loadAutosave();
     }
 
 
@@ -85,9 +85,9 @@ public class PuzzleGame : IGameMode {
             return;
         }
 
-        saveAutosave();
-
         m_paused = false;
+
+        saveAutosave();
     }
 
 
@@ -119,6 +119,12 @@ public class PuzzleGame : IGameMode {
     private void checkGameEnd(GameObject deadMeat)
     {
         --numMice;
+
+        // Mice can only die when paused when loading to reset, in which case we don't need to gameover
+        if (m_paused)
+        {
+            return;
+        }
 
         GridMovement gm = deadMeat.GetComponent<GridMovement>();
         if (!gm || !gm.tile)
@@ -167,7 +173,6 @@ public class PuzzleGame : IGameMode {
     //   We can asynchronously copy the memory save to disk if we want to handle abnormal exit later and still prevent stutter
     private void saveAutosave()
     {
-        //m_gameMap.saveMap("_editorAuto");
         using (MemoryStream ms = new MemoryStream())
         {
             using (StreamWriter sw = new StreamWriter(ms))
@@ -179,10 +184,9 @@ public class PuzzleGame : IGameMode {
     }
 
 
-    // Loads a save of the map for when going from playtest back to editor
+    // Loads a save of the map for reseting the puzzle
     private void loadAutosave()
     {
-        //m_gameMap.loadMap("_editorAuto");
         using (MemoryStream ms = new MemoryStream(mapSaveData))
         {
             using (StreamReader sr = new StreamReader(ms))
