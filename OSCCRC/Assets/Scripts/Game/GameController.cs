@@ -46,7 +46,10 @@ public class GameController : MonoBehaviour {
 
         if (improvement == MapTile.TileImprovement.Direction)
         {
-            game.placeDirection(tile, dir);
+            if (tile.improvement == MapTile.TileImprovement.None || tile.improvement == MapTile.TileImprovement.Direction)
+            {
+                game.placeDirection(tile, dir);
+            }
         }
     }
 
