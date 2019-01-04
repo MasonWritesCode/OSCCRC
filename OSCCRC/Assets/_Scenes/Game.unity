@@ -2692,6 +2692,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerID: 0
   highlighter: {fileID: 1406404670}
+  pauseDisplay: {fileID: 1519803097}
+  fpsDisplay: {fileID: 996980960}
   currentTile: {fileID: 0}
   menuPaused: 0
 --- !u!1 &1583046052

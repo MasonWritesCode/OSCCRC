@@ -10,14 +10,18 @@ public class PlayerController : MonoBehaviour {
 
     [Range(1, 4)] public int playerID;
     public Transform highlighter;
+    public Canvas pauseDisplay;
+    public Canvas fpsDisplay;
     [HideInInspector] public MapTile currentTile = null;
     [HideInInspector] public bool menuPaused = false;
 
     private GameController m_gameController;
+    private FramerateDisplay m_fpsScript;
     private Camera m_mainCamera;
 
 	void Start () {
         m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        m_fpsScript = m_gameController.GetComponent<FramerateDisplay>();
         m_mainCamera = Camera.main;
 
         // We will need to differentiate the inputs of players if we add multiplayer.
@@ -85,8 +89,6 @@ public class PlayerController : MonoBehaviour {
         // TODO: UI
         if (Input.GetButtonDown("Menu"))
         {
-            Canvas pauseDisplay = GameObject.Find("PauseMenu").GetComponent<Canvas>();
-
             if (!pauseDisplay.enabled)
             {
                 pauseDisplay.enabled = true;
@@ -106,22 +108,19 @@ public class PlayerController : MonoBehaviour {
         // Toggle framerate display between Basic, Advanced, and Off
         if (Input.GetButtonDown("FramerateToggle"))
         {
-            FramerateDisplay fpsScript = m_gameController.GetComponent<FramerateDisplay>();
-            Canvas fpsDisplay = GameObject.Find("FPSDisplay").GetComponent<Canvas>();
-
-            if (!fpsScript.enabled)
+            if (!m_fpsScript.enabled)
             {
                 fpsDisplay.enabled = true;
-                fpsScript.enabled = true;
-                fpsScript.isAdvanced = false;
+                m_fpsScript.enabled = true;
+                m_fpsScript.isAdvanced = false;
             }
-            else if (!fpsScript.isAdvanced)
+            else if (!m_fpsScript.isAdvanced)
             {
-                fpsScript.isAdvanced = true;
+                m_fpsScript.isAdvanced = true;
             }
             else
             {
-                fpsScript.enabled = false;
+                m_fpsScript.enabled = false;
                 fpsDisplay.enabled = false;
             }
         }
