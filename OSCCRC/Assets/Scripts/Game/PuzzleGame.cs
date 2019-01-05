@@ -16,7 +16,10 @@ public class PuzzleGame : IGameMode {
         m_placementsDisplay = GameObject.Find("PlacementsDisplay");
         m_placementsDisplay.GetComponent<Canvas>().enabled = true;
 
+        numMice = 0;
+
         // We need to remove all direction tiles, and count them up into a placements object
+        // We also need to count up the number of mice at the same time, as the map has already been loaded before startGame is called
         placements = new AvailablePlacements();
         float tileSize = m_gameMap.tileSize;
         for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
@@ -29,14 +32,16 @@ public class PuzzleGame : IGameMode {
                     placements.add(tile.improvementDirection);
                     tile.improvement = MapTile.TileImprovement.None;
                 }
+                if (tile.movingObject == MapTile.TileImprovement.Mouse)
+                {
+                    ++numMice;
+                }
             }
         }
 
         GameMap.mouseDestroyed += checkGameEnd;
         GameMap.catDestroyed += checkGameEnd;
         GameMap.mousePlaced += registerMouse;
-
-        numMice = 0;
 
         m_paused = true;
 

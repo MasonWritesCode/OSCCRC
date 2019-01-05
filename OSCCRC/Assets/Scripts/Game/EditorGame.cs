@@ -22,6 +22,20 @@ public class EditorGame : IGameMode
 
         numMice = 0;
 
+        // We need to count the number of mice so that we know if a puzzle has been solved
+        float tileSize = m_gameMap.tileSize;
+        for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
+        {
+            for (int h = m_gameMap.mapHeight - 1; h >= 0; --h)
+            {
+                MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
+                if (tile.movingObject == MapTile.TileImprovement.Mouse)
+                {
+                    ++numMice;
+                }
+            }
+        }
+
         m_paused = true;
 
         saveAutosave();
