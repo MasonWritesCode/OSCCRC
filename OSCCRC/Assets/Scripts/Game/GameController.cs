@@ -115,6 +115,23 @@ public class GameController : MonoBehaviour {
     }
 
 
+    void FixedUpdate()
+    {
+        // Here we manually simulate physics, so that we can avoid physics processing while paused (or possibly other scenarios)
+        if (Physics.autoSimulation)
+        {
+            return;
+        }
+        // One scenario we could consider adding is to disable physics when there are no cats to collide with.
+        if (isPaused)
+        {
+            return;
+        }
+
+        Physics.Simulate(Time.fixedDeltaTime);
+    }
+
+
     // Update is called once per frame
     void Update () {
 
