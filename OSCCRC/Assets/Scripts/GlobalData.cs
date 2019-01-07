@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class defines values that persist between scenes, so that a scene knows how to initialize itself.
+
 public static class GlobalData {
 
     // Global Data:

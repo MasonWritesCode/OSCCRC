@@ -6,14 +6,6 @@ using UnityEngine;
 
 public class Editor : MonoBehaviour {
 
-    // TODO: Make controllable via UI instead of arbitrary keys
-    //           (all inputs are in update function for now so you only have to look in there)
-    //       Allow map saving and loading with input name (needs ui)
-    //       Add ability to adjust speed when unpaused (wait for ui?)
-    //       Placed directional tiles aren't supposed to be saved.
-    //          Have to figure out what is supposed to happen with playtesting here.
-    //       There is a lot of cleanup needed in placement drawing once we create our own objects
-
     private enum ObjectType { None, Wall, Improvement }
 
     private Transform m_placeholderObject;
@@ -181,7 +173,7 @@ public class Editor : MonoBehaviour {
         }
 
 
-        // Draws the placement preview
+        // Modifies the placement preview if it changes
         if (newType != ObjectType.None)
         {
             // If reselecting same object "put it away" instead so that no object is selected for placement
@@ -198,93 +190,7 @@ public class Editor : MonoBehaviour {
                 // We set this slightly above to make sure it never has z-fighting issues with anything of the other "floor level" tiles
                 m_positionOffset = new Vector3(0.0f, 0.00002f, 0.0f);
 
-                // We need to reset scale since not all prefabs whose mesh we use have same scale
-                // We wouldn't have to do this if we made our own model for walls
-                m_placeholderObject.localScale = Vector3.one;
-
-                // We need to reset rotation since not all prefabs whose mesh we use have same rotation
-                // We wouldn't have to do this if we made our own quad model for tiles (quads stand vertically by default)
-                m_placeholderObject.rotation = Quaternion.identity;
-
-                // Select the mesh for the selected object
-                Mesh newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
-                Texture newTex = GameResources.materials["Placeholder"].mainTexture;
-                if (m_placeholderType == ObjectType.Wall)
-                {
-                    newMesh = GameResources.objects["Wall"].GetComponent<MeshFilter>().sharedMesh;
-
-                    // Need to set a position offset to show which wall facing is used
-                    // Easiest way is to spawn a wall and then destroy it. This is wasteful, but only done once per object select.
-                    // The point of using a mesh is to avoid spawning objects, so this is also messy and bad. It can be changed later.
-                    Transform temp = m_gameMap.createWall(0, 0, m_direction);
-                    m_positionOffset = temp.localPosition;
-                    m_gameMap.destroyWall(temp);
-
-                    m_placeholderObject.localScale = new Vector3(1.0f, 0.5f, 0.1f);
-                }
-                else if (m_placeholderType == ObjectType.Improvement)
-                {
-                    if (m_selectedImprovement == MapTile.TileImprovement.Mouse)
-                    {
-                        MeshFilter[] meshFilters = GameResources.objects["Mouse"].GetComponentsInChildren<MeshFilter>();
-                        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
-                        for (int i = 0; i < meshFilters.Length; ++i)
-                        {
-                            combine[i].mesh = meshFilters[i].sharedMesh;
-                            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-                        }
-                        newMesh = new Mesh();
-                        newMesh.CombineMeshes(combine);
-                    }
-                    else if (m_selectedImprovement == MapTile.TileImprovement.Cat)
-                    {
-                        MeshFilter[] meshFilters = GameResources.objects["Cat"].GetComponentsInChildren<MeshFilter>();
-                        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
-                        for (int i = 0; i < meshFilters.Length; ++i)
-                        {
-                            combine[i].mesh = meshFilters[i].sharedMesh;
-                            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-                        }
-                        newMesh = new Mesh();
-                        newMesh.CombineMeshes(combine);
-                    }
-                    else
-                    {
-                        // Need to show the improvement selected by setting it's texture
-                        if (MapTile.improvementObjects.ContainsKey(m_selectedImprovement))
-                        {
-                            newMesh = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshFilter>().sharedMesh;
-
-                            // Since direction arrow objects are unity quad tiles for now, we have to give them the tile treatment
-                            if (m_selectedImprovement == MapTile.TileImprovement.Direction)
-                            {
-                                // Tiles have a 90 degree rotation since we are using a Unity quad for now
-                                m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
-
-                                newTex = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshRenderer>().sharedMaterial.mainTexture;
-                            }
-                        }
-                        else
-                        {
-                            newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
-                            // Tiles have a 90 degree rotation since we are using a Unity quad for now
-                            m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
-
-                            if (MapTile.improvementTextures.ContainsKey(m_selectedImprovement))
-                            {
-                                newTex = GameResources.materials[MapTile.improvementTextures[m_selectedImprovement]].mainTexture;
-                            }
-                        }
-                    }
-                }
-
-                Directions.rotate(ref m_placeholderObject, m_direction);
-
-                // Assign the new mesh
-                MeshFilter phMesh = m_placeholderObject.GetComponent<MeshFilter>();
-                phMesh.mesh = newMesh;
-                MeshRenderer phRend = m_placeholderObject.GetComponent<MeshRenderer>();
-                phRend.material.mainTexture = newTex;
+                drawPlaceholder();
                 activatePlaceholder();
             }
         }
@@ -334,10 +240,6 @@ public class Editor : MonoBehaviour {
             mapMovingObjToTile(m_gameMap);
         }
 
-
-        // For now just hotkey a save to "dev" until we have a UI that lets you choose save name
-        // TODO: UI
-        // This is a much smaller block of UI stuff
         /*
         if (Input.GetKeyDown(KeyCode.F6))
         {
@@ -348,7 +250,6 @@ public class Editor : MonoBehaviour {
             loadSave("Internal/dev");
         }
         */
-        // End of smaller UI block
     }
 
 
@@ -484,5 +385,99 @@ public class Editor : MonoBehaviour {
         {
             m_placeholderObject.gameObject.SetActive(true);
         }
+    }
+
+
+    // Creates and assigns a new mesh to the placeholder for the current stored placeholder data
+    private void drawPlaceholder()
+    {
+        // We need to reset scale since not all prefabs whose mesh we use have same scale
+        // We wouldn't have to do this if we made our own model for walls
+        m_placeholderObject.localScale = Vector3.one;
+
+        // We need to reset rotation since not all prefabs whose mesh we use have same rotation
+        // We wouldn't have to do this if we made our own quad model for tiles (quads stand vertically by default)
+        m_placeholderObject.rotation = Quaternion.identity;
+
+        // Select the mesh for the selected object
+        Mesh newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
+        Texture newTex = GameResources.materials["Placeholder"].mainTexture;
+        if (m_placeholderType == ObjectType.Wall)
+        {
+            newMesh = GameResources.objects["Wall"].GetComponent<MeshFilter>().sharedMesh;
+
+            // Need to set a position offset to show which wall facing is used
+            // Easiest way is to spawn a wall and then destroy it. This is wasteful, but only done once per object select.
+            // The point of using a mesh is to avoid spawning objects, so this is also messy and bad. It can be changed later.
+            Transform temp = m_gameMap.createWall(0, 0, m_direction);
+            m_positionOffset = temp.localPosition;
+            m_gameMap.destroyWall(temp);
+
+            m_placeholderObject.localScale = new Vector3(1.0f, 0.5f, 0.1f);
+        }
+        else if (m_placeholderType == ObjectType.Improvement)
+        {
+            // Mice and cats are currently built from multile game objects, so we have to loop over those objects to create a combined mesh
+            if (m_selectedImprovement == MapTile.TileImprovement.Mouse)
+            {
+                MeshFilter[] meshFilters = GameResources.objects["Mouse"].GetComponentsInChildren<MeshFilter>();
+                CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+                for (int i = 0; i < meshFilters.Length; ++i)
+                {
+                    combine[i].mesh = meshFilters[i].sharedMesh;
+                    combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+                }
+                newMesh = new Mesh();
+                newMesh.CombineMeshes(combine);
+            }
+            else if (m_selectedImprovement == MapTile.TileImprovement.Cat)
+            {
+                MeshFilter[] meshFilters = GameResources.objects["Cat"].GetComponentsInChildren<MeshFilter>();
+                CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+                for (int i = 0; i < meshFilters.Length; ++i)
+                {
+                    combine[i].mesh = meshFilters[i].sharedMesh;
+                    combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+                }
+                newMesh = new Mesh();
+                newMesh.CombineMeshes(combine);
+            }
+            else
+            {
+                // Here we either spawn the improvement object, or a tile with the improvement texture if there isn't one
+                if (MapTile.improvementObjects.ContainsKey(m_selectedImprovement))
+                {
+                    newMesh = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshFilter>().sharedMesh;
+
+                    // Since direction arrow objects are unity quad tiles for now, we have to give them the tile treatment
+                    if (m_selectedImprovement == MapTile.TileImprovement.Direction)
+                    {
+                        // Tiles have a 90 degree rotation since we are using a Unity quad for now
+                        m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
+
+                        newTex = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshRenderer>().sharedMaterial.mainTexture;
+                    }
+                }
+                else
+                {
+                    newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
+                    // Tiles have a 90 degree rotation since we are using a Unity quad for now
+                    m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
+
+                    if (MapTile.improvementTextures.ContainsKey(m_selectedImprovement))
+                    {
+                        newTex = GameResources.materials[MapTile.improvementTextures[m_selectedImprovement]].mainTexture;
+                    }
+                }
+            }
+        }
+
+        Directions.rotate(ref m_placeholderObject, m_direction);
+
+        // Assign the new mesh
+        MeshFilter phMesh = m_placeholderObject.GetComponent<MeshFilter>();
+        phMesh.mesh = newMesh;
+        MeshRenderer phRend = m_placeholderObject.GetComponent<MeshRenderer>();
+        phRend.material.mainTexture = newTex;
     }
 }
