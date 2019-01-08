@@ -184,11 +184,13 @@ public class MapTile : MonoBehaviour
     {
         if (improvement == TileImprovement.Mouse || improvement == TileImprovement.Cat)
         {
-            // A tile only owns a mouse/cat in the context of saving and loading maps.
             Debug.LogWarning("setTileImprovement function should not be used for placing Moving Objects.");
             m_movingObject = improvement;
             return;
         }
+
+        m_tileDamage = 0;
+
         // We don't actually want to do an early return when the improvement is the same as current
         // This is because we might load a different resource pack, and want to re-apply the improvements to get the new version
         /*
@@ -198,10 +200,8 @@ public class MapTile : MonoBehaviour
         }
         */
 
-        m_tileDamage = 0;
-
-        string materialName = string.Empty;
-        string objectName = string.Empty;
+        string materialName = null;
+        string objectName = null;
 
         if (improvementTextures.ContainsKey(improvement))
         {
@@ -212,9 +212,10 @@ public class MapTile : MonoBehaviour
             objectName = improvementObjects[improvement];
         }
 
+        // Set associated tile texture
         if (GlobalData.x_useBigTile)
         {
-            if (improvement == TileImprovement.None || materialName == string.Empty)
+            if (improvement == TileImprovement.None || materialName == null)
             {
                 // We disable the renderer here instead of setting to Blank tile material
                 // See GameMap for more info
@@ -226,14 +227,14 @@ public class MapTile : MonoBehaviour
             }
             else
             {
-                if (!m_rendererRef.enabled)
-                {
-                    m_rendererRef.enabled = true;
-                }
-
                 if (GameResources.materials.ContainsKey(materialName))
                 {
                     m_rendererRef.material = GameResources.materials[materialName];
+
+                    if (!m_rendererRef.enabled)
+                    {
+                        m_rendererRef.enabled = true;
+                    }
                 }
                 else
                 {
@@ -243,7 +244,7 @@ public class MapTile : MonoBehaviour
         }
         else
         {
-            if (improvement == TileImprovement.None || materialName == string.Empty)
+            if (improvement == TileImprovement.None || materialName == null)
             {
                 // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
                 if ((transform.localPosition.x + transform.localPosition.z) % 2 == 0)
@@ -256,7 +257,7 @@ public class MapTile : MonoBehaviour
                 }
             }
 
-            if (materialName != string.Empty)
+            if (materialName != null)
             {
                 if (GameResources.materials.ContainsKey(materialName))
                 {
@@ -269,12 +270,13 @@ public class MapTile : MonoBehaviour
             }
         }
 
+        // Spawn an object if there is one associated with the improvement
         if (m_tileObject != null)
         {
             Destroy(m_tileObject.gameObject);
             m_tileObject = null;
         }
-        if (objectName != string.Empty)
+        if (objectName != null)
         {
             if (GameResources.objects.ContainsKey(objectName))
             {
