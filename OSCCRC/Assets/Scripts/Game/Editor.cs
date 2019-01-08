@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 // This class controls the map building functionality of the game, allowing creation of a new Game Map and play testing it.
 
@@ -21,6 +23,7 @@ public class Editor : MonoBehaviour {
     private GameController m_gameControl;
     private Camera m_mainCamera;
     private bool m_wasUnpaused;
+    private EventSystem m_eventSystem;
     private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 
     void OnDisable() {
@@ -33,6 +36,7 @@ public class Editor : MonoBehaviour {
         m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
         m_gameControl = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         m_mainCamera = Camera.main;
+        m_eventSystem = EventSystem.current;
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
@@ -51,7 +55,19 @@ public class Editor : MonoBehaviour {
         MapTile.TileImprovement newImprovement = MapTile.TileImprovement.None;
         Directions.Direction newDir = m_direction;
 
-        if (m_gameControl.isPaused)
+        // We ignore game input while an input field is focused
+        bool allowInput = m_gameControl.isPaused;
+        if (m_eventSystem.currentSelectedGameObject)
+        {
+            InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
+            if (field != null && field.isFocused)
+            {
+                allowInput = false;
+                disablePlaceholder();
+            }
+        }
+
+        if (allowInput)
         {
             // Keys to select which improvement
             // TODO: UI
@@ -218,7 +234,7 @@ public class Editor : MonoBehaviour {
 
         // Place object if paused. We currently toggle the selected type between choice and false/none
         // We can change it to have right click remove and left click place, but I don't know if that is better.
-        if (Input.GetButtonDown("Select") && selectedTile != null && m_gameControl.isPaused)
+        if (Input.GetButtonDown("Select") && selectedTile != null && allowInput && m_gameControl.isPaused)
         {
             placeObject(selectedTile);
         }

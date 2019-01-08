@@ -18,11 +18,13 @@ public class PlayerController : MonoBehaviour {
     private GameController m_gameController;
     private FramerateDisplay m_fpsScript;
     private Camera m_mainCamera;
+    private EventSystem m_eventSystem;
 
 	void Start () {
         m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         m_fpsScript = m_gameController.GetComponent<FramerateDisplay>();
         m_mainCamera = Camera.main;
+        m_eventSystem = EventSystem.current;
 
         // We will need to differentiate the inputs of players if we add multiplayer.
         // I don't know how that will work yet, but just assign a playerID of 1 to the player controls for now
@@ -30,10 +32,14 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	void Update () {
-        // We ignore game input while a text field is focused
-        if (EventSystem.current.currentSelectedGameObject)
+        // We ignore game input while an input field is focused
+        if (m_eventSystem.currentSelectedGameObject)
         {
-            //return;
+            InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
+            if (field != null && field.isFocused)
+            {
+                return;
+            }
         }
 
         // The mouse hovers over a tile to select it as the one where improvements will be placed
