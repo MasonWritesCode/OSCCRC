@@ -144,13 +144,12 @@ public class MapTile : MonoBehaviour
     // If I remember correctly, this is used instead of Start so that parentMap can be passed in
     public void initTile(GameMap parentMap)
     {
-        improvementDirection = Directions.Direction.North;
-        movingObjDirection = Directions.Direction.North;
-        m_tileObject = null;
-        walls = new Walls(parentMap, GetComponent<Transform>().localPosition);
-        m_tileObject = null;
         improvement = TileImprovement.None;
         movingObject = TileImprovement.None;
+        improvementDirection = Directions.Direction.North;
+        movingObjDirection = Directions.Direction.North;
+        walls = new Walls(parentMap, GetComponent<Transform>().localPosition);
+        m_tileObject = null;
 
         m_rendererRef = GetComponent<MeshRenderer>();
         if (m_rendererRef)

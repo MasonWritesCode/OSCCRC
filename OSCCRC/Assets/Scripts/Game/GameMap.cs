@@ -16,9 +16,8 @@ public class GameMap : MonoBehaviour
     public static event objectEvent mousePlaced;
     public static event objectEvent catDestroyed;
 
-    private Transform mapTransform;
     private MapTile[,] mapTiles;
-    private Transform m_bigTile;
+    private Transform m_bigTile = null;
 
     // Generates a new rectangular map of the specified width and height
     void generateMap(int height, int width)
@@ -28,7 +27,6 @@ public class GameMap : MonoBehaviour
 
         tileSize = GameResources.objects["Tile"].localScale.x;
 
-        mapTransform = GetComponent<Transform>();
         for (int j = 0; j < mapHeight; ++j)
         {
             for (int i = 0; i < mapWidth; ++i)
@@ -41,16 +39,19 @@ public class GameMap : MonoBehaviour
         {
             // Here we set a single stretched tile that represents all blank tiles
             // Since most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
-            Transform tilePrefab = GameResources.objects["Tile"];
-            m_bigTile = Instantiate(tilePrefab, Vector3.zero, tilePrefab.rotation, mapTransform);
-            MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
-            bigTileRend.material = GameResources.materials["TileTiledColor"];
+            if (m_bigTile == null)
+            {
+                Transform tilePrefab = GameResources.objects["Tile"];
+                m_bigTile = Instantiate(tilePrefab, Vector3.zero, tilePrefab.rotation, transform);
+            }
 
             // We need to set the scale to mapsize
             // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
             // Material tiling has to be set to (mapsize / 2)
             m_bigTile.transform.localScale = new Vector3(mapWidth, mapHeight, 1.0f);
             m_bigTile.transform.position = new Vector3((mapWidth - 1.0f) / 2.0f, 0.0f, (mapHeight - 1.0f) / 2.0f);
+            MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
+            bigTileRend.material = GameResources.materials["TileTiledColor"];
             bigTileRend.material.mainTextureScale = new Vector2(mapWidth / 2.0f, mapHeight / 2.0f);
 
             bigTileRend.enabled = true;
@@ -77,7 +78,7 @@ public class GameMap : MonoBehaviour
     {
         Transform tilePrefab = GameResources.objects["Tile"];
         // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.00001f, zPos), tilePrefab.rotation, mapTransform);
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.00001f, zPos), tilePrefab.rotation, transform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile(this);
         return newTile;
@@ -88,7 +89,7 @@ public class GameMap : MonoBehaviour
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
         Transform wallPrefab = GameResources.objects["Wall"];
-        Transform newWall = Instantiate(wallPrefab, new Vector3(xPos, 0, zPos), wallPrefab.rotation, mapTransform);
+        Transform newWall = Instantiate(wallPrefab, new Vector3(xPos, 0, zPos), wallPrefab.rotation, transform);
 
         if (direction == Directions.Direction.North)
         {
@@ -150,8 +151,7 @@ public class GameMap : MonoBehaviour
         // Removing walls will be handled at the same point in code where they are placed
 
         // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
-        List<GridMovement> deadMeat = new List<GridMovement>();
-        GetComponentsInChildren<GridMovement>(true, deadMeat);
+        GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>(true);
         foreach (GridMovement i in deadMeat)
         {
             if (i.isCat)
@@ -172,7 +172,6 @@ public class GameMap : MonoBehaviour
         {
             if (mapTiles != null)
             {
-                Destroy(m_bigTile);
                 for (int j = 0; j < mapHeight; ++j)
                 {
                     for (int i = 0; i < mapWidth; ++i)
@@ -192,35 +191,37 @@ public class GameMap : MonoBehaviour
         {
             for (int i = 0; i < mapWidth; ++i)
             {
+                MapTile tile = mapTiles[j, i];
+
                 // An underscore indicates there is no improvement
                 if (fin.Peek() != '_')
                 {
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
                     if (tileImprovement != MapTile.TileImprovement.None)
                     {
-                        mapTiles[j, i].improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+                        tile.improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
                     }
                     MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
                     if (movingObj != MapTile.TileImprovement.None)
                     {
-                        mapTiles[j, i].movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+                        tile.movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
 
                         if (movingObj == MapTile.TileImprovement.Mouse)
                         {
-                            placeMouse(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                            placeMouse(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
                         }
                         else if (movingObj == MapTile.TileImprovement.Cat)
                         {
-                            placeCat(mapTiles[j, i].transform.position.x, mapTiles[j, i].transform.position.z, mapTiles[j, i].movingObjDirection);
+                            placeCat(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
                         }
                     }
-                    mapTiles[j, i].improvement = tileImprovement;
-                    mapTiles[j, i].movingObject = movingObj;
+                    tile.improvement = tileImprovement;
+                    tile.movingObject = movingObj;
                 }
                 else
                 {
-                    mapTiles[j, i].improvement = MapTile.TileImprovement.None;
-                    mapTiles[j, i].movingObject = MapTile.TileImprovement.None;
+                    tile.improvement = MapTile.TileImprovement.None;
+                    tile.movingObject = MapTile.TileImprovement.None;
 
                     // Pass by the underscore
                     fin.ReadLine();
@@ -229,10 +230,10 @@ public class GameMap : MonoBehaviour
                 if (i == 0 || j == 0 || (i + j) % 2 == 0)
                 {
                     int wallsValue = int.Parse(fin.ReadLine());
-                    mapTiles[j, i].walls.north = (wallsValue >> 0 & 1) == 1;
-                    mapTiles[j, i].walls.east = (wallsValue >> 1 & 1) == 1;
-                    mapTiles[j, i].walls.south = (wallsValue >> 2 & 1) == 1;
-                    mapTiles[j, i].walls.west = (wallsValue >> 3 & 1) == 1;
+                    tile.walls.north = (wallsValue >> 0 & 1) == 1;
+                    tile.walls.east = (wallsValue >> 1 & 1) == 1;
+                    tile.walls.south = (wallsValue >> 2 & 1) == 1;
+                    tile.walls.west = (wallsValue >> 3 & 1) == 1;
                 }
             }
         }
@@ -342,7 +343,7 @@ public class GameMap : MonoBehaviour
     public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
         Transform mousePrefab = GameResources.objects["Mouse"];
-        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, mapTransform);
+        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, transform);
         Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
 
@@ -359,7 +360,7 @@ public class GameMap : MonoBehaviour
     public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
     {
         Transform catPrefab = GameResources.objects["Cat"];
-        Transform newCat = Instantiate(catPrefab, new Vector3(xPos, 0, zPos), catPrefab.rotation, mapTransform);
+        Transform newCat = Instantiate(catPrefab, new Vector3(xPos, 0, zPos), catPrefab.rotation, transform);
         Directions.rotate(ref newCat, direction);
         newCat.GetComponent<GridMovement>().direction = direction;
 
