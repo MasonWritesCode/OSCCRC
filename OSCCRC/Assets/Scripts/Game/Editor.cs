@@ -195,7 +195,14 @@ public class Editor : MonoBehaviour {
             // If reselecting same object "put it away" instead so that no object is selected for placement
             if (m_placeholderType == newType && m_selectedImprovement == newImprovement && m_direction == newDir)
             {
-                disablePlaceholder();
+                if (m_placeholderObject.gameObject.activeSelf)
+                {
+                    disablePlaceholder();
+                }
+                else
+                {
+                    activatePlaceholder();
+                }
             }
             else
             {
@@ -368,8 +375,7 @@ public class Editor : MonoBehaviour {
     {
         m_movingObjects.Clear();
 
-        List<GridMovement> movingObjs = new List<GridMovement>();
-        map.GetComponentsInChildren<GridMovement>(true, movingObjs);
+        GridMovement[] movingObjs = map.GetComponentsInChildren<GridMovement>(true);
         foreach (GridMovement i in movingObjs)
         {
             // Should be destroyed by map import, but seems to still be around?
@@ -389,8 +395,6 @@ public class Editor : MonoBehaviour {
         {
             m_placeholderObject.gameObject.SetActive(false);
         }
-        m_placeholderType = ObjectType.None;
-        m_selectedImprovement = MapTile.TileImprovement.None;
     }
 
 
