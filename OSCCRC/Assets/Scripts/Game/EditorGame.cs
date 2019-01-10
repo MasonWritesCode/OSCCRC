@@ -105,20 +105,26 @@ public class EditorGame : IGameMode
             return;
         }
 
-        if (!gm.isCat && gm.tile.improvement != MapTile.TileImprovement.Goal)
+        if (gm.isCat)
         {
-            Debug.Log("A mouse was destroyed. Game Over.");
-            endGame(false);
+            if (gm.tile.improvement == MapTile.TileImprovement.Goal)
+            {
+                Debug.Log("Cat hit goal, you lose.");
+                endGame(false);
+            }
         }
-        else if (!gm.isCat && numMice <= 0)
+        else
         {
-            Debug.Log("The last mouse hit a goal, you won.");
-            endGame(false);
-        }
-        else if (gm.isCat && gm.tile.improvement == MapTile.TileImprovement.Goal)
-        {
-            Debug.Log("Cat hit goal, you lose.");
-            endGame(false);
+            if (gm.tile.improvement != MapTile.TileImprovement.Goal)
+            {
+                Debug.Log("A mouse was destroyed. Game Over.");
+                endGame(false);
+            }
+            else if (numMice <= 0)
+            {
+                Debug.Log("The last mouse hit a goal, you won.");
+                endGame(true);
+            }
         }
     }
 
