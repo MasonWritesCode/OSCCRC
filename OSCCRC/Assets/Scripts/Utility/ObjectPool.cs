@@ -15,6 +15,9 @@ public class ObjectPool : System.IDisposable
     // The number of active items from the pool
     public int count { get { return m_activeObjects.Count; } }
 
+    // Creates and returns a list of references to spawned gameobjects
+    public GameObject[] spawnedObjects { get { return m_activeObjects.ToArray(); } }
+
     // Creates an object pool using the specified prefab as the object with default bounds
     public ObjectPool(GameObject prefab)
         : this(prefab, 16, 256) {}
