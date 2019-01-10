@@ -15,21 +15,14 @@ public class ObjectPool : System.IDisposable
     // The number of active items from the pool
     public int count { get { return m_activeObjects.Count; } }
 
-    private int m_maxDesiredSize;           // # of objects at highest desired quantity to be allocated; 256 if unspecified
-    private int m_minDesiredSize;           // # of allocated objects at minimum; 16 if unspecified
-    private float m_percentToAlloc = 0.05f; // percent of allocated that are active when there are few enough active that memory should be deallocated
-    private GameObject m_prefab;
-    private List<GameObject> m_activeObjects;
-    private List<GameObject> m_inactiveObjects;
-
-    private bool m_disposed = false;
-
     // Creates an object pool using the specified prefab as the object with default bounds
     public ObjectPool(GameObject prefab)
         : this(prefab, 16, 256) {}
 
+
     public ObjectPool(GameObject prefab, int minDesiredSize, int maxDesiredSize)
         : this(prefab, minDesiredSize, minDesiredSize, maxDesiredSize) {}
+
 
     // Creates an object pool using the specified prefab as the object, allowing control over how much memory should be available in the pool
     public ObjectPool(GameObject prefab, int initialSize, int minDesiredSize, int maxDesiredSize)
@@ -51,6 +44,7 @@ public class ObjectPool : System.IDisposable
         }
     }
 
+
     // Spawns a new instance of object for use out of this pool
     public GameObject spawn()
     {
@@ -71,6 +65,7 @@ public class ObjectPool : System.IDisposable
 
         return obj;
     }
+
 
     // Spawns a new instance of object for use out of this pool, with arguments you would give to instantiate
     public GameObject spawn(Vector3 position, Quaternion rotation, Transform parent)
@@ -96,6 +91,7 @@ public class ObjectPool : System.IDisposable
         return obj;
     }
 
+
     // Removes an instance of object from this pool from use
     public void despawn(GameObject obj)
     {
@@ -116,6 +112,36 @@ public class ObjectPool : System.IDisposable
         }
     }
 
+
+    // Removes all instances of objects from this pool from use
+    public void despawnAll()
+    {
+        // Destroy instead of disable if over max, or active is less than m_percentToAlloc of allocated while over min
+        int allocatedObjects = m_activeObjects.Count + m_inactiveObjects.Count;
+        int numToDeallocate = Mathf.Max(allocatedObjects - m_maxDesiredSize, Mathf.FloorToInt((allocatedObjects * m_percentToAlloc) - m_minDesiredSize));
+        numToDeallocate = Mathf.Min(Mathf.Max(0, numToDeallocate), m_activeObjects.Count);
+        if (numToDeallocate > 0)
+        {
+            for (int i = 0; i < numToDeallocate; ++i)
+            {
+                destroyObject(m_activeObjects[i]);
+            }
+            m_activeObjects.RemoveRange(0, numToDeallocate);
+        }
+
+        // For the rest, we just move to inactive
+        for (int i = 0; i < m_activeObjects.Count; ++i)
+        {
+            m_activeObjects[i].SetActive(false);
+        }
+        m_inactiveObjects.AddRange(m_activeObjects);
+        m_activeObjects.Clear();
+    }
+
+
+    // ---
+
+
     // Instantiates a new inactive object, but does not place it in a pool
     private GameObject createObject()
     {
@@ -123,6 +149,7 @@ public class ObjectPool : System.IDisposable
         obj.SetActive(false);
         return obj;
     }
+
 
     // Instantiates a new inactive object, passing parameters to instantiate, but does not place in a pool
     private GameObject createObject(Vector3 position, Quaternion rotation, Transform parent)
@@ -132,17 +159,20 @@ public class ObjectPool : System.IDisposable
         return obj;
     }
 
+
     // Destroys an Instantiated object
     private void destroyObject(GameObject obj)
     {
         GameObject.Destroy(obj);
     }
 
+
     public void Dispose()
     {
         Dispose(true);
         System.GC.SuppressFinalize(this);
     }
+
 
     protected virtual void Dispose(bool disposing)
     {
@@ -173,8 +203,18 @@ public class ObjectPool : System.IDisposable
         m_disposed = true;
     }
 
+
     ~ObjectPool()
     {
         Dispose(false);
     }
+
+    private int m_maxDesiredSize;           // # of objects at highest desired quantity to be allocated; 256 if unspecified
+    private int m_minDesiredSize;           // # of allocated objects at minimum; 16 if unspecified
+    private float m_percentToAlloc = 0.05f; // percent of allocated that are active when there are few enough active that deallocation should happen to save memory
+    private GameObject m_prefab;
+    private List<GameObject> m_activeObjects;
+    private List<GameObject> m_inactiveObjects;
+
+    private bool m_disposed = false;
 }
