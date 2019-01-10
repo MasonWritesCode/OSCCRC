@@ -22,7 +22,6 @@ public class Editor : MonoBehaviour {
     private PlayerController m_controls;
     private GameController m_gameControl;
     private Camera m_mainCamera;
-    private bool m_wasUnpaused;
     private EventSystem m_eventSystem;
     private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 
@@ -44,7 +43,9 @@ public class Editor : MonoBehaviour {
         disablePlaceholder();
         m_direction = Directions.Direction.East;
         m_positionOffset = Vector3.zero;
-        m_wasUnpaused = false;
+
+        // Switch between placement and playtest
+        GameController.gamePauseChange += onPauseChange;
     }
 
 	void Update () {
@@ -244,23 +245,6 @@ public class Editor : MonoBehaviour {
         if (Input.GetButtonDown("Select") && selectedTile != null && allowInput && m_gameControl.isPaused)
         {
             placeObject(selectedTile);
-        }
-
-
-        // Switch between placement and playtest
-        if (!m_gameControl.isPaused)
-        {
-            if (!m_wasUnpaused)
-            {
-                m_wasUnpaused = true;
-                // Don't leave anything selected when unpausing
-                disablePlaceholder();
-            }
-        }
-        else if (m_wasUnpaused)
-        {
-            m_wasUnpaused = false;
-            mapMovingObjToTile(m_gameMap);
         }
 
         /*
@@ -499,5 +483,18 @@ public class Editor : MonoBehaviour {
         phMesh.mesh = newMesh;
         MeshRenderer phRend = m_placeholderObject.GetComponent<MeshRenderer>();
         phRend.material.mainTexture = newTex;
+    }
+
+    private void onPauseChange(bool paused)
+    {
+        if (!paused)
+        {
+            // Don't leave anything selected when unpausing
+            disablePlaceholder();
+        }
+        else
+        {
+            mapMovingObjToTile(m_gameMap);
+        }
     }
 }

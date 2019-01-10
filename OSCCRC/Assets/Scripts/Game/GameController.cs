@@ -6,8 +6,11 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
-    // isPaused needs to be moved to IGameMode probably
-	public bool isPaused
+    public delegate void toggleEvent(bool value);
+    public static event toggleEvent gamePauseChange;
+
+    // Sets and returns the game pause state, and throws an event if it changes
+    public bool isPaused
     {
         get
         {
@@ -15,14 +18,10 @@ public class GameController : MonoBehaviour {
         }
         set
         {
-            m_isPaused = value;
-            if (value)
+            game.isPaused = m_isPaused = value;
+            if (gamePauseChange != null)
             {
-                game.pauseGame();
-            }
-            else
-            {
-                game.unpauseGame();
+                gamePauseChange(value);
             }
         }
     }
@@ -135,6 +134,11 @@ public class GameController : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
-        //
+        // Unfortunately we have this messy poll for pause state change initiated by the game mode.
+        // This is because we don't want the game mode to talk to the game controller; communication should be one way only.
+        if (m_isPaused != game.isPaused)
+        {
+            isPaused = game.isPaused;
+        }
 	}
 }

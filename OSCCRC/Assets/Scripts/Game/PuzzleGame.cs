@@ -70,29 +70,24 @@ public class PuzzleGame : IGameMode {
     }
 
 
-    public void pauseGame()
+    public bool isPaused
     {
-        if (m_paused)
+        get
         {
-            return;
+            return m_paused;
         }
-
-        m_paused = true;
-
-        loadAutosave();
-    }
-
-
-    public void unpauseGame()
-    {
-        if (!m_paused)
+        set
         {
-            return;
+            m_paused = value;
+            if (value)
+            {
+                loadAutosave();
+            }
+            else
+            {
+                saveAutosave();
+            }
         }
-
-        m_paused = false;
-
-        saveAutosave();
     }
 
 
