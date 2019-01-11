@@ -6,16 +6,16 @@ using UnityEngine.UI;
 public class FramerateDisplay : MonoBehaviour {
 
     public float updateInterval; // number of updates per second
-    public int precision; // number of decimal places to use
+    public int precision; // number of decimal places to display
     public bool isAdvanced = false; // Whether to include more information than just current framerate
     public Text textDisplay;
 
     private int m_updateNumber = 0;
     private int m_frameAccum = 0;
-    private float m_timeAccum = 0.0f;
-    private float m_timeRemaining = 0.0f;
-    private float m_averageFramerate = 0.0f;
-    private float m_minFramerate = -1.0f;
+    private double m_timeAccum = 0.0;
+    private double m_timeRemaining = 0.0;
+    private double m_averageFramerate = 0.0;
+    private double m_minFramerate = -1.0;
     private bool m_ignoreUpdates = true;
 
     private void OnEnable()
@@ -33,7 +33,7 @@ public class FramerateDisplay : MonoBehaviour {
         m_timeAccum += Time.unscaledDeltaTime;
         ++m_frameAccum;
 
-        if (m_timeRemaining <= 0.0f)
+        if (m_timeRemaining <= 0.0)
         {
             // Ignore the first few seconds where framerate will be unstable
             if (m_ignoreUpdates)
@@ -44,7 +44,7 @@ public class FramerateDisplay : MonoBehaviour {
                 }
 
                 m_frameAccum = 0;
-                m_timeAccum = 0;
+                m_timeAccum = 0.0;
                 return;
             }
 
@@ -53,13 +53,13 @@ public class FramerateDisplay : MonoBehaviour {
             {
                 // overflow happened (is it reasonable this would ever happen? If so, make it a long), so reset the average framerate counter
                 Debug.LogWarning("Framerate counter had an overflow!");
-                m_averageFramerate = 0.0f;
+                m_averageFramerate = 0.0;
                 m_updateNumber = 1;
             }
-            m_timeRemaining += 1.0f / updateInterval;
+            m_timeRemaining += 1.0 / updateInterval;
 
-            float currentFramerate = m_frameAccum / m_timeAccum;
-            m_averageFramerate = (m_averageFramerate * ((m_updateNumber - 1) / (float)m_updateNumber)) + (currentFramerate / m_updateNumber);
+            double currentFramerate = m_frameAccum / m_timeAccum;
+            m_averageFramerate = (m_averageFramerate * ((m_updateNumber - 1) / (double)m_updateNumber)) + (currentFramerate / m_updateNumber);
             if (currentFramerate < m_minFramerate || m_minFramerate < 0)
             {
                 m_minFramerate = currentFramerate;
@@ -77,13 +77,13 @@ public class FramerateDisplay : MonoBehaviour {
             }
             // We will use current FPS for entire text color for now.
             // We will target 60 fps as green, 30 fps as yellow, 0 as red, and 240 as white and try to set the color to have a smooth gradient between them
-            float blue = Mathf.Clamp01( (currentFramerate - 60.0f) / (240.0f - 60.0f) );
-            float green = Mathf.Clamp01( currentFramerate / 60.0f );
-            float red = Mathf.Clamp01( ((60.0f - currentFramerate) / 60.0f) + blue );
+            float blue = Mathf.Clamp01( ((float)(currentFramerate) - 60.0f) / (240.0f - 60.0f) );
+            float green = Mathf.Clamp01((float)(currentFramerate) / 60.0f );
+            float red = Mathf.Clamp01( ((60.0f - (float)(currentFramerate)) / 60.0f) + blue );
             textDisplay.color = new Color(red, green, blue);
 
             m_frameAccum = 0;
-            m_timeAccum = 0;
+            m_timeAccum = 0.0;
         }
     }
 }
