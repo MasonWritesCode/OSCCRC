@@ -220,9 +220,9 @@ public class Editor : MonoBehaviour {
         }
 
 
-        // Moves the placement preview
         if (m_placeholderObject.gameObject.activeSelf)
         {
+            // Moves the placement preview
             // Follow mouse precisely unless there is a tile to snap to
             if (selectedTile != null)
             {
@@ -237,15 +237,15 @@ public class Editor : MonoBehaviour {
                     m_placeholderObject.position = posRay.GetPoint(distance) + m_positionOffset;
                 }
             }
-        }
 
-
-        // Place object if paused. We currently toggle the selected type between choice and false/none
-        // We can change it to have right click remove and left click place, but I don't know if that is better.
-        if (Input.GetButtonDown("Select") && selectedTile != null && allowInput && m_gameControl.isPaused)
-        {
-            placeObject(selectedTile);
+            // Place object if paused. We currently toggle the selected type between choice and false/none
+            // We can change it to have right click remove and left click place, but I don't know if that is better.
+            if (Input.GetButtonDown("Select") && selectedTile != null && allowInput && m_gameControl.isPaused)
+            {
+                placeObject(selectedTile);
+            }
         }
+        
 
         /*
         if (Input.GetKeyDown(KeyCode.F6))
