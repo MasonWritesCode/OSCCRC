@@ -280,7 +280,7 @@ public class Editor : MonoBehaviour {
     }
 
 
-    // Places an tile-object onto the tile specified by "selectedTile"
+    // Places a tile-object onto the tile specified by "selectedTile"
     private void placeObject(MapTile selectedTile)
     {
         if (m_placeholderType == ObjectType.Wall)
@@ -289,6 +289,10 @@ public class Editor : MonoBehaviour {
         }
         else if (m_placeholderType == ObjectType.Improvement)
         {
+            // We have to do special actions to handle movingObject gameobjects, since MapTiles do not keep track of attached moving objects
+            // To do this cleanly, we have to do this last, after determining if we need to
+            bool isCreatingMovingObj = false;
+
             if (m_selectedImprovement == MapTile.TileImprovement.Mouse || m_selectedImprovement == MapTile.TileImprovement.Cat)
             {
                 if (selectedTile.movingObject == m_selectedImprovement && selectedTile.movingObjDirection == m_direction)
@@ -300,13 +304,15 @@ public class Editor : MonoBehaviour {
                     selectedTile.movingObjDirection = m_direction;
                     selectedTile.movingObject = m_selectedImprovement;
 
+                    isCreatingMovingObj = true;
+
                     if (selectedTile.improvement != MapTile.TileImprovement.Direction)
                     {
                         selectedTile.improvement = MapTile.TileImprovement.None;
                     }
                 }
             }
-            else
+            else // Not a moving obj
             {
                 if (selectedTile.improvement == m_selectedImprovement && selectedTile.improvementDirection == m_direction)
                 {
@@ -325,17 +331,28 @@ public class Editor : MonoBehaviour {
                 }
             }
 
-            // If a mouse or cat was placed, we have to do special actions to remove it
-            if (m_movingObjects.ContainsKey(selectedTile))
+            // We need to destroy a moving object if removed or replaced
+            if (selectedTile.movingObject == MapTile.TileImprovement.None || isCreatingMovingObj)
             {
-                if (m_movingObjects[selectedTile] != null)
+                if (m_movingObjects.ContainsKey(selectedTile))
                 {
-                    Destroy(m_movingObjects[selectedTile].gameObject);
+                    if (m_movingObjects[selectedTile] != null)
+                    {
+                        GridMovement gm = m_movingObjects[selectedTile].GetComponent<GridMovement>();
+                        if (gm && !gm.isCat)
+                        {
+                            m_gameMap.destroyMouse(m_movingObjects[selectedTile].transform);
+                        }
+                        else if (gm && gm.isCat)
+                        {
+                            m_gameMap.destroyCat(m_movingObjects[selectedTile].transform);
+                        }
+                    }
+                    m_movingObjects.Remove(selectedTile);
                 }
-                m_movingObjects.Remove(selectedTile);
             }
 
-            if (selectedTile.movingObject == MapTile.TileImprovement.Mouse || selectedTile.movingObject == MapTile.TileImprovement.Cat)
+            if (isCreatingMovingObj)
             {
                 Transform newMovingObj = null;
                 if (selectedTile.movingObject == MapTile.TileImprovement.Mouse)
