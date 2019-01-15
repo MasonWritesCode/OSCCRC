@@ -300,7 +300,7 @@ public class Editor : MonoBehaviour {
                     selectedTile.movingObjDirection = m_direction;
                     selectedTile.movingObject = m_selectedImprovement;
 
-                    if (selectedTile.improvement != MapTile.TileImprovement.None)
+                    if (selectedTile.improvement != MapTile.TileImprovement.Direction)
                     {
                         selectedTile.improvement = MapTile.TileImprovement.None;
                     }
