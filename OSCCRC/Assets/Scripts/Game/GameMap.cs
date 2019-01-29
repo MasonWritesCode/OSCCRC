@@ -176,6 +176,8 @@ public class GameMap : MonoBehaviour
                 {
                     for (int i = 0; i < mapWidth; ++i)
                     {
+                        MapTile tile = mapTiles[j, i];
+                        tile.walls.north = tile.walls.south = tile.walls.east = tile.walls.west = false;
                         destroyTile(mapTiles[j, i]);
                         mapTiles[j, i] = null;
                     }
