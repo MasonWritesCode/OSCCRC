@@ -38,6 +38,16 @@ public class MapTile : MonoBehaviour
             m_walls.Add(Directions.Direction.West, null);
         }
 
+        // Removes all four walls if they exist
+        public void clear()
+        {
+            foreach (Directions.Direction key in m_walls.Keys)
+            {
+                map.destroyWall(m_walls[key]);
+                m_walls[key] = null;
+            }
+        }
+
         // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
         private void changeWall(Directions.Direction wallID, bool isCreating)
         {
@@ -91,7 +101,7 @@ public class MapTile : MonoBehaviour
                 }
             }
 
-            // The companion wall always has the same existance state
+            // The companion wall always has the same existence state
             if (Mathf.Abs(origin.z - otherTileZ) == (maxHeightIndex * map.tileSize) || Mathf.Abs(origin.x - otherTileX) == (maxWidthIndex * map.tileSize))
             {
                 // Walls on edges share state with wrapped around tile, but they don't share the same wall object
