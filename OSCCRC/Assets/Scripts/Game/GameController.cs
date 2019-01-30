@@ -6,44 +6,14 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
-    public delegate void toggleEvent(bool value);
-    public static event toggleEvent gamePauseChange;
-
     public enum GameMode { None, Editor, Puzzle, Multiplayer };
     public GameMode mode = GameMode.None;
 
-    // Sets and returns the game pause state, and throws an event if it changes
-    public bool isPaused
-    {
-        get
-        {
-            m_isPaused = m_game.isPaused;
-            return m_isPaused;
-        }
-        set
-        {
-            if (m_isPaused != value)
-            {
-                m_game.isPaused = m_isPaused = value;
-                if (gamePauseChange != null)
-                {
-                    gamePauseChange(value);
-                }
-            }
-        }
-    }
-
-    
-
+    public GameState gameState;
 
     // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
-        if (!isPaused)
-        {
-            return;
-        }
-
         if (improvement == MapTile.TileImprovement.Direction)
         {
             if (tile.improvement == MapTile.TileImprovement.None || tile.improvement == MapTile.TileImprovement.Direction)
@@ -55,20 +25,18 @@ public class GameController : MonoBehaviour {
 
     public void runGame(GameMode newMode)
     {
-        /*
-        if (game != null)
+        if (m_game != null)
         {
-            game.endGame();
+            m_game.endGame();
         }
-        */
 
         if (newMode == GameMode.Puzzle)
         {
-            m_game = new PuzzleGame();
+            m_game = new PuzzleGame(gameState);
         }
         else if (newMode == GameMode.Editor)
         {
-            m_game = new EditorGame();
+            m_game = new EditorGame(gameState);
         }
 
         Editor editor = GetComponent<Editor>();
@@ -100,6 +68,8 @@ public class GameController : MonoBehaviour {
             Application.targetFrameRate = -1;
         }
 
+        gameState = new GameState();
+
         GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStageFile;
         if (currentStage != null)
@@ -110,8 +80,6 @@ public class GameController : MonoBehaviour {
         {
             stage.loadStage("Internal/default");
         }
-
-        m_isPaused = true;
 
         runGame(GlobalData.mode);
     }
@@ -125,7 +93,7 @@ public class GameController : MonoBehaviour {
             return;
         }
         // One scenario we could consider adding is to disable physics when there are no cats to collide with.
-        if (m_isPaused)
+        if (gameState.getMainState() != GameState.State.Started_Unpaused)
         {
             return;
         }
@@ -133,18 +101,5 @@ public class GameController : MonoBehaviour {
         Physics.Simulate(Time.fixedDeltaTime);
     }
 
-
-    // Update is called once per frame
-    void Update () {
-
-        // Unfortunately we have this messy poll for pause state change initiated by the game mode.
-        // This is because we don't want the game mode to talk to the game controller; communication should be one way only.
-        if (m_isPaused != m_game.isPaused)
-        {
-            isPaused = m_game.isPaused;
-        }
-	}
-
     private IGameMode m_game;
-    private bool m_isPaused; // Needed to check if value is equal to the game mode's
 }

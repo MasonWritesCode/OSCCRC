@@ -24,15 +24,9 @@ public class Pause_No : MonoBehaviour, IPointerClickHandler
 
             Canvas pauseDisplay = GameObject.Find("PauseMenu").GetComponent<Canvas>();
             GameController m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
-            PlayerController player1 = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
 
             pauseDisplay.enabled = false;
-            if (player1.menuPaused)
-            {
-                m_gameController.isPaused = false;
-                player1.menuPaused = false;
-            }
-
+            m_gameController.gameState.removeState(GameState.TaggableState.Suspended);
         }
     }
 }

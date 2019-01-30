@@ -45,7 +45,7 @@ public class Editor : MonoBehaviour {
         m_positionOffset = Vector3.zero;
 
         // Switch between placement and playtest
-        GameController.gamePauseChange += onPauseChange;
+        m_gameControl.gameState.mainStateChange += onStateChange;
     }
 
 	void Update () {
@@ -57,7 +57,7 @@ public class Editor : MonoBehaviour {
         Directions.Direction newDir = m_direction;
 
         // We ignore game input while an input field is focused
-        bool allowInput = m_gameControl.isPaused;
+        bool allowInput = m_gameControl.gameState.getMainState() == GameState.State.Started_Paused;
         if (m_eventSystem.currentSelectedGameObject)
         {
             InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
@@ -240,7 +240,7 @@ public class Editor : MonoBehaviour {
 
             // Place object if paused. We currently toggle the selected type between choice and false/none
             // We can change it to have right click remove and left click place, but I don't know if that is better.
-            if (Input.GetButtonDown("Select") && selectedTile != null && allowInput && m_gameControl.isPaused)
+            if (Input.GetButtonDown("Select") && selectedTile != null && allowInput)
             {
                 placeObject(selectedTile);
             }
@@ -502,14 +502,14 @@ public class Editor : MonoBehaviour {
         phRend.material.mainTexture = newTex;
     }
 
-    private void onPauseChange(bool paused)
+    private void onStateChange(GameState.State oldState, GameState.State newState)
     {
-        if (!paused)
+        if (newState == GameState.State.Started_Unpaused)
         {
             // Don't leave anything selected when unpausing
             disablePlaceholder();
         }
-        else
+        else if (newState == GameState.State.Started_Paused)
         {
             mapMovingObjToTile(m_gameMap);
         }

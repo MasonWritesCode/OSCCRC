@@ -5,8 +5,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // This is an interface between the game controller and the Puzzle game mode.
+// This mode requires being passed information about the game state.
 
 public class PuzzleGame : IGameMode {
+
+    public PuzzleGame(GameState gameStateRef)
+    {
+        m_gameState = gameStateRef;
+    }
 
     // Begins a puzzle game
     public void startGame()
@@ -39,15 +45,15 @@ public class PuzzleGame : IGameMode {
             }
         }
 
-        GameMap.mouseDestroyed += checkGameEnd;
-        GameMap.catDestroyed += checkGameEnd;
-        GameMap.mousePlaced += registerMouse;
-
-        m_paused = true;
+        m_gameMap.mouseDestroyed += checkGameEnd;
+        m_gameMap.catDestroyed += checkGameEnd;
+        m_gameMap.mousePlaced += registerMouse;
 
         setAvailablePlacements();
-
         saveAutosave();
+
+        m_gameState.setMainState(GameState.State.Started_Paused);
+        m_gameState.mainStateChange += onStateChange;
 
         return;
     }
@@ -56,10 +62,14 @@ public class PuzzleGame : IGameMode {
     // Ends a puzzle game
     public void endGame()
     {
-        return;
+        m_gameMap.mouseDestroyed -= checkGameEnd;
+        m_gameMap.catDestroyed -= checkGameEnd;
+        m_gameMap.mousePlaced -= registerMouse;
+        m_gameState.mainStateChange -= onStateChange;
     }
 
 
+    // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
         // pause?
@@ -70,30 +80,15 @@ public class PuzzleGame : IGameMode {
     }
 
 
-    public bool isPaused
-    {
-        get
-        {
-            return m_paused;
-        }
-        set
-        {
-            m_paused = value;
-            if (value)
-            {
-                loadAutosave();
-            }
-            else
-            {
-                saveAutosave();
-            }
-        }
-    }
-
-
     // Places a tile if it is in the stage's list of available placements
     public void placeDirection(MapTile tile, Directions.Direction dir)
     {
+        if (!m_paused)
+        {
+            // We aren't in a state where placement is allowed, so just ignore the request
+            return;
+        }
+
         if (tile.improvement == MapTile.TileImprovement.Direction && tile.improvementDirection == dir)
         {
             tile.improvement = MapTile.TileImprovement.None;
@@ -113,6 +108,21 @@ public class PuzzleGame : IGameMode {
         }
 
         setAvailablePlacements();
+    }
+
+
+    private void onStateChange(GameState.State oldState, GameState.State newState)
+    {
+        if (newState == GameState.State.Started_Paused)
+        {
+            m_paused = true;
+            loadAutosave();
+        }
+        else if (newState == GameState.State.Started_Unpaused)
+        {
+            m_paused = false;
+            saveAutosave();
+        }
     }
 
 
@@ -209,4 +219,5 @@ public class PuzzleGame : IGameMode {
     private bool m_paused;
     private byte[] mapSaveData;
     private GameMap m_gameMap;
+    private GameState m_gameState;
 }

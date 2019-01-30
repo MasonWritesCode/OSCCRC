@@ -85,29 +85,30 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        // Other controls, like pausing or menu
+        // "Pause" input does not suspend the game in the traditional sense of pause, but puts us into the puzzle-placement state
         if (Input.GetButtonDown("Pause"))
         {
-            m_gameController.isPaused = !m_gameController.isPaused;
+            if (m_gameController.gameState.getMainState() == GameState.State.Started_Unpaused)
+            {
+                m_gameController.gameState.setMainState(GameState.State.Started_Paused);
+            }
+            else if (m_gameController.gameState.getMainState() == GameState.State.Started_Paused)
+            {
+                m_gameController.gameState.setMainState(GameState.State.Started_Unpaused);
+            }
         }
 
-        // We don't have a menu yet, so quit the game when menu should be opened just for now
-        // TODO: UI
         if (Input.GetButtonDown("Menu"))
         {
             if (!pauseDisplay.enabled)
             {
                 pauseDisplay.enabled = true;
-                m_gameController.isPaused = true;
-                if (!m_gameController.isPaused) menuPaused = true;
+                m_gameController.gameState.addState(GameState.TaggableState.Suspended);
             }
             else
             {
                 pauseDisplay.enabled = false;
-                if (menuPaused) {
-                    m_gameController.isPaused = false;
-                    menuPaused = false;
-                }
+                m_gameController.gameState.removeState(GameState.TaggableState.Suspended);
             }
         }
 

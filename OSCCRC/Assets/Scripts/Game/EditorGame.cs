@@ -4,9 +4,15 @@ using System.IO;
 using UnityEngine;
 
 // This is an interface between the game controller and the Puzzle game mode.
+// This mode requires being passed information about the game state.
 
 public class EditorGame : IGameMode
 {
+
+    public EditorGame(GameState gameStateRef)
+    {
+        m_gameState = gameStateRef;
+    }
 
     // Begins a puzzle game
     public void startGame()
@@ -16,9 +22,9 @@ public class EditorGame : IGameMode
         m_saveMenu  = GameObject.Find("EditorMenu");
         m_saveMenu.GetComponent<Canvas>().enabled = true;
 
-        GameMap.mouseDestroyed += checkGameEnd;
-        GameMap.catDestroyed += checkGameEnd;
-        GameMap.mousePlaced += registerMouse;
+        m_gameMap.mouseDestroyed += checkGameEnd;
+        m_gameMap.catDestroyed += checkGameEnd;
+        m_gameMap.mousePlaced += registerMouse;
 
         numMice = 0;
 
@@ -36,9 +42,10 @@ public class EditorGame : IGameMode
             }
         }
 
-        m_paused = true;
-
         saveAutosave();
+
+        m_gameState.setMainState(GameState.State.Started_Paused);
+        m_gameState.mainStateChange += onStateChange;
 
         return;
     }
@@ -47,10 +54,14 @@ public class EditorGame : IGameMode
     // Ends a puzzle game
     public void endGame()
     {
-        return;
+        m_gameMap.mouseDestroyed -= checkGameEnd;
+        m_gameMap.catDestroyed -= checkGameEnd;
+        m_gameMap.mousePlaced -= registerMouse;
+        m_gameState.mainStateChange -= onStateChange;
     }
 
 
+    // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
         // pause?
@@ -60,32 +71,27 @@ public class EditorGame : IGameMode
         return;
     }
 
-    public bool isPaused
-    {
-        get
-        {
-            return m_paused;
-        }
-        set
-        {
-            m_paused = value;
-            if (value)
-            {
-                loadAutosave();
-            }
-            else
-            {
-                saveAutosave();
-            }
-        }
-    }
-
 
     // Places a tile if it is in the stage's list of available placements
     public void placeDirection(MapTile tile, Directions.Direction dir)
     {
-        // We only place tiles in edit mode, not during play
+        // We only place tiles in edit mode (handled by Editor.cs), not during play
         return;
+    }
+
+
+    private void onStateChange(GameState.State oldState, GameState.State newState)
+    {
+        if (newState == GameState.State.Started_Paused)
+        {
+            m_paused = true;
+            loadAutosave();
+        }
+        else if (newState == GameState.State.Started_Unpaused)
+        {
+            m_paused = false;
+            saveAutosave();
+        }
     }
 
 
@@ -172,4 +178,5 @@ public class EditorGame : IGameMode
     private bool m_paused;
     private byte[] mapSaveData;
     private GameMap m_gameMap;
+    private GameState m_gameState;
 }

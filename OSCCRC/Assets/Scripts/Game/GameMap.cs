@@ -12,9 +12,9 @@ public class GameMap : MonoBehaviour
     [HideInInspector] public float tileSize;
 
     public delegate void objectEvent(GameObject caller);
-    public static event objectEvent mouseDestroyed;
-    public static event objectEvent mousePlaced;
-    public static event objectEvent catDestroyed;
+    public event objectEvent mouseDestroyed;
+    public event objectEvent mousePlaced;
+    public event objectEvent catDestroyed;
 
     private MapTile[,] mapTiles;
     private Transform m_bigTile = null;

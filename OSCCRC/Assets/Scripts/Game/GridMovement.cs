@@ -34,48 +34,51 @@ public class GridMovement : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		if (!m_gameController.isPaused) {
-            tile = map.tileAt (m_transform.localPosition);
+        if (m_gameController.gameState.getMainState() != GameState.State.Started_Unpaused)
+        {
+            return;
+        }
 
-            float distance = speed * Time.smoothDeltaTime;
-            if (distance >= m_remainingDistance)
-            {
-                // We will reach our tile. So re-center, get new remaining movement distance, and get new heading
-                m_transform.localPosition = tile.transform.localPosition;
-                distance -= m_remainingDistance;
-                updateDirection();
-            }
+        tile = map.tileAt (m_transform.localPosition);
 
-            // Now move the distance we need to move
-            m_transform.Translate(Vector3.forward * distance);
-            m_remainingDistance -= distance;
+        float distance = speed * Time.smoothDeltaTime;
+        if (distance >= m_remainingDistance)
+        {
+            // We will reach our tile. So re-center, get new remaining movement distance, and get new heading
+            m_transform.localPosition = tile.transform.localPosition;
+            distance -= m_remainingDistance;
+            updateDirection();
+        }
 
-            // Wrap around to opposite side of map if necessary
-            Vector3 pos = m_transform.localPosition;
-            if (pos.x <= -(map.tileSize / 2))
-            {
-                pos.x = map.mapWidth - (map.tileSize / 2) - 0.1f;
-                m_transform.localPosition = pos;
-                updateDirection();
-            }
-            else if ( pos.x >= (map.mapWidth - (map.tileSize / 2)) )
-            {
-                pos.x = 0;
-                m_transform.localPosition = pos;
-                updateDirection();
-            }
-            if (pos.z <= -(map.tileSize / 2))
-            {
-                pos.z = map.mapHeight - (map.tileSize / 2) - 0.1f;
-                m_transform.localPosition = pos;
-                updateDirection();
-            }
-            else if ( pos.z >= (map.mapHeight - (map.tileSize / 2)) )
-            {
-                pos.z = 0;
-                m_transform.localPosition = pos;
-                updateDirection();
-            }
+        // Now move the distance we need to move
+        m_transform.Translate(Vector3.forward * distance);
+        m_remainingDistance -= distance;
+
+        // Wrap around to opposite side of map if necessary
+        Vector3 pos = m_transform.localPosition;
+        if (pos.x <= -(map.tileSize / 2))
+        {
+            pos.x = map.mapWidth - (map.tileSize / 2) - 0.1f;
+            m_transform.localPosition = pos;
+            updateDirection();
+        }
+        else if ( pos.x >= (map.mapWidth - (map.tileSize / 2)) )
+        {
+            pos.x = 0;
+            m_transform.localPosition = pos;
+            updateDirection();
+        }
+        if (pos.z <= -(map.tileSize / 2))
+        {
+            pos.z = map.mapHeight - (map.tileSize / 2) - 0.1f;
+            m_transform.localPosition = pos;
+            updateDirection();
+        }
+        else if ( pos.z >= (map.mapHeight - (map.tileSize / 2)) )
+        {
+            pos.z = 0;
+            m_transform.localPosition = pos;
+            updateDirection();
         }
 	}
 
@@ -205,14 +208,11 @@ public class GridMovement : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
-        if (m_gameController && !m_gameController.isPaused)
+        if (isCat && other.name.Contains("Mouse"))
         {
-            if (isCat && other.name.Contains("Mouse"))
+            if (!other.GetComponent<GridMovement>().isCat)
             {
-                if (!other.GetComponent<GridMovement>().isCat)
-                {
-                    map.destroyMouse(other.transform);
-                }
+                map.destroyMouse(other.transform);
             }
         }
     }
