@@ -44,6 +44,7 @@ public class EditorGame : IGameMode
 
         saveAutosave();
 
+        m_paused = true;
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
