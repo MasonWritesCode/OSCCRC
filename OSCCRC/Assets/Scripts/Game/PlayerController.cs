@@ -88,13 +88,13 @@ public class PlayerController : MonoBehaviour {
         // "Pause" input does not suspend the game in the traditional sense of pause, but puts us into the puzzle-placement state
         if (Input.GetButtonDown("Pause"))
         {
-            if (m_gameController.gameState.getMainState() == GameState.State.Started_Unpaused)
+            if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused)
             {
-                m_gameController.gameState.setMainState(GameState.State.Started_Paused);
+                m_gameController.gameState.mainState = GameState.State.Started_Paused;
             }
-            else if (m_gameController.gameState.getMainState() == GameState.State.Started_Paused)
+            else if (m_gameController.gameState.mainState == GameState.State.Started_Paused)
             {
-                m_gameController.gameState.setMainState(GameState.State.Started_Unpaused);
+                m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
             }
         }
 
@@ -103,12 +103,12 @@ public class PlayerController : MonoBehaviour {
             if (!pauseDisplay.enabled)
             {
                 pauseDisplay.enabled = true;
-                m_gameController.gameState.addState(GameState.TaggableState.Suspended);
+                m_gameController.gameState.addState(GameState.TagState.Suspended);
             }
             else
             {
                 pauseDisplay.enabled = false;
-                m_gameController.gameState.removeState(GameState.TaggableState.Suspended);
+                m_gameController.gameState.removeState(GameState.TagState.Suspended);
             }
         }
 

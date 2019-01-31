@@ -93,7 +93,7 @@ public class GameController : MonoBehaviour {
             return;
         }
         // One scenario we could consider adding is to disable physics when there are no cats to collide with.
-        if (gameState.getMainState() != GameState.State.Started_Unpaused)
+        if (gameState.mainState != GameState.State.Started_Unpaused)
         {
             return;
         }

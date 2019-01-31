@@ -5,12 +5,12 @@
 public class GameState
 {
     // The game can currently only have one main state. However, additional states can be applied on top of this.
-    // The state enum shows valid main states, and the TaggableState enum shows additional states that can be tagged on top.
+    // The state enum shows valid main states, and the TagState enum shows additional states that can be tagged on top.
     public enum State { None, Unstarted, Started_Paused, Started_Unpaused, Ended }
-    public enum TaggableState { Suspended }
+    public enum TagState { Suspended }
 
     public delegate void stateChangeEvent(State oldState, State newState);
-    public delegate void stateListChangeEvent(TaggableState state);
+    public delegate void stateListChangeEvent(TagState state);
     public event stateChangeEvent mainStateChange;
     public event stateListChangeEvent stateAdded;
     public event stateListChangeEvent stateRemoved;
@@ -19,28 +19,11 @@ public class GameState
     {
         m_mainState = startState;
 
-        m_additionalStates = new HashSet<TaggableState>();
-    }
-
-    // Returns the current main state of the GameState
-    public State getMainState()
-    {
-        return m_mainState;
-    }
-
-    // Sets the current main state of the GameState
-    public void setMainState(State newState)
-    {
-        State oldState = m_mainState;
-        m_mainState = newState;
-        if (mainStateChange != null)
-        {
-            mainStateChange(oldState, newState);
-        }
+        m_additionalStates = new HashSet<TagState>();
     }
 
     // Adds a new state to the GameState
-    public void addState(TaggableState state)
+    public void addState(TagState state)
     {
         if (!m_additionalStates.Contains(state))
         {
@@ -53,7 +36,7 @@ public class GameState
     }
 
     // Removes a state from the GameState
-    public void removeState(TaggableState state)
+    public void removeState(TagState state)
     {
         if (m_additionalStates.Contains(state))
         {
@@ -65,6 +48,36 @@ public class GameState
         }
     }
 
+    // Sets or returns the main state of the GameState
+    public State mainState
+    {
+        get
+        {
+            return m_mainState;
+        }
+
+        set
+        {
+            State oldState = m_mainState;
+            m_mainState = value;
+            if (mainStateChange != null)
+            {
+                mainStateChange(oldState, value);
+            }
+        }
+    }
+
+    // Returns a list of the Tag States set at the time the getter was called
+    public TagState[] tagStates
+    {
+        get
+        {
+            TagState[] stateList = new TagState[m_additionalStates.Count];
+            m_additionalStates.CopyTo(stateList);
+            return stateList;
+        }
+    }
+
     private State m_mainState;
-    private HashSet<TaggableState> m_additionalStates;
+    private HashSet<TagState> m_additionalStates;
 }

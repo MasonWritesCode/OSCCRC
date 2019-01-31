@@ -34,7 +34,7 @@ public class GridMovement : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-        if (m_gameController.gameState.getMainState() != GameState.State.Started_Unpaused)
+        if (m_gameController.gameState.mainState != GameState.State.Started_Unpaused)
         {
             return;
         }
