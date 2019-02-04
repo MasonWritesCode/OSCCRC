@@ -14,8 +14,9 @@ public class GridMovement : MonoBehaviour {
 
     private float m_remainingDistance;
 	private GameController m_gameController;
-    private Transform m_transform; // We have to store transform in a variable to pass it out as ref
+    private Transform m_transform; // We have to store transform in a variable to pass it out as ref for Directions.rotate
     private Vector3 m_oldPos;
+    private Animator m_animator;
 
 	// Use this for initialization
 	void Start () {
@@ -24,22 +25,27 @@ public class GridMovement : MonoBehaviour {
 
         m_transform = GetComponent<Transform>();
 
-        Animator anim = GetComponent<Animator>();
-        if (anim)
+        m_animator = GetComponent<Animator>();
+        if (m_animator)
         {
-            anim.speed = speed / 2;
+            m_animator.speed = speed / 2;
         }
 
         Directions.rotate(ref m_transform, direction);
+
+        m_gameController.gameState.stateAdded += onTagStateAdd;
+        m_gameController.gameState.stateRemoved += onTagStateRemove;
 	}
 
 	void FixedUpdate() {
-        if (m_gameController.gameState.mainState != GameState.State.Started_Unpaused)
+        if (   m_gameController.gameState.mainState != GameState.State.Started_Unpaused
+            || m_gameController.gameState.hasState(GameState.TagState.Suspended)
+           )
         {
             return;
         }
 
-        tile = map.tileAt (m_transform.localPosition);
+        tile = map.tileAt(m_transform.localPosition);
 
         float distance = speed * Time.smoothDeltaTime;
         if (distance >= m_remainingDistance)
@@ -203,7 +209,31 @@ public class GridMovement : MonoBehaviour {
 
         Directions.rotate(ref m_transform, direction);
 
-        m_remainingDistance = map.tileSize; // after rotating, so facing the desired direction
+        m_remainingDistance = map.tileSize;
+    }
+
+    // Disables the animator while suspended to not be wasteful
+    private void onTagStateAdd(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            if (m_animator)
+            {
+                m_animator.enabled = false;
+            }
+        }
+    }
+
+    // Re-enables the animator if onTagStateAdd disabled it
+    private void onTagStateRemove(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            if (m_animator)
+            {
+                m_animator.enabled = true;
+            }
+        }
     }
 
     void OnTriggerEnter(Collider other)

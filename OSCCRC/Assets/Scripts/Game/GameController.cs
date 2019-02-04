@@ -14,6 +14,11 @@ public class GameController : MonoBehaviour {
     // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
+        if (gameState.hasState(GameState.TagState.Suspended))
+        {
+            return;
+        }
+
         if (improvement == MapTile.TileImprovement.Direction)
         {
             if (tile.improvement == MapTile.TileImprovement.None || tile.improvement == MapTile.TileImprovement.Direction)
@@ -69,6 +74,8 @@ public class GameController : MonoBehaviour {
         }
 
         gameState = new GameState();
+        gameState.stateAdded += onTagStateAdd;
+        gameState.stateRemoved += onTagStateRemove;
 
         GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStageFile;
@@ -93,7 +100,7 @@ public class GameController : MonoBehaviour {
             return;
         }
         // One scenario we could consider adding is to disable physics when there are no cats to collide with.
-        if (gameState.mainState != GameState.State.Started_Unpaused)
+        if (gameState.mainState != GameState.State.Started_Unpaused || gameState.hasState(GameState.TagState.Suspended))
         {
             return;
         }
@@ -101,5 +108,33 @@ public class GameController : MonoBehaviour {
         Physics.Simulate(Time.fixedDeltaTime);
     }
 
+    // We have to make sure we restore the time scale when the scene changes
+    void OnDestroy()
+    {
+        Time.timeScale = m_timeScaleHolder;
+    }
+
+    // Set timescale to 0 for suspending the game
+    // Animators wont animate, but will still use the same resources, so scripts attached to an animated object should consider disabling the animation on this event
+    private void onTagStateAdd(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            m_timeScaleHolder = Time.timeScale;
+            Time.timeScale = 0.0f;
+        }
+    }
+
+    // Removes the actions of suspending the game
+    // Scripts should avoid doing things while the game is suspended, so that their actions aren't undone by the unsuspend
+    private void onTagStateRemove(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            Time.timeScale = m_timeScaleHolder;
+        }
+    }
+
     private IGameMode m_game;
+    private float m_timeScaleHolder = 1.0f;
 }

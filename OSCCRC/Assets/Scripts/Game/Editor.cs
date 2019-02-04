@@ -57,7 +57,8 @@ public class Editor : MonoBehaviour {
         Directions.Direction newDir = m_direction;
 
         // We ignore game input while an input field is focused
-        bool allowInput = m_gameControl.gameState.mainState == GameState.State.Started_Paused;
+        bool allowInput =    m_gameControl.gameState.mainState == GameState.State.Started_Paused
+                          || m_gameControl.gameState.hasState(GameState.TagState.Suspended);
         if (m_eventSystem.currentSelectedGameObject)
         {
             InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();

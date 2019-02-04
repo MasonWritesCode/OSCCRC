@@ -42,59 +42,63 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        // The mouse hovers over a tile to select it as the one where improvements will be placed
-        if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
+        // We want to ignore some inputs while the game is suspended
+        if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
         {
-            Ray tileSelector = m_mainCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hitObject;
-            if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Player Selectable")))
+            // The mouse hovers over a tile to select it as the one where improvements will be placed
+            if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
             {
-                MapTile newTile = hitObject.transform.GetComponent<MapTile>();
-                if (newTile != null && newTile != currentTile)
+                Ray tileSelector = m_mainCamera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitObject;
+                if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Player Selectable")))
                 {
-                    // Currently using a spotlight to highlight the currently slected tile
-                    highlighter.position = newTile.transform.position + Vector3.up * 2;
-                    currentTile = newTile;
+                    MapTile newTile = hitObject.transform.GetComponent<MapTile>();
+                    if (newTile != null && newTile != currentTile)
+                    {
+                        // Currently using a spotlight to highlight the currently slected tile
+                        highlighter.position = newTile.transform.position + Vector3.up * 2;
+                        currentTile = newTile;
+                    }
+                }
+                else
+                {
+                    highlighter.position = Vector3.one * -99;
+                    currentTile = null;
                 }
             }
-            else
-            {
-                highlighter.position = Vector3.one * -99;
-                currentTile = null;
-            }
-        }
 
-        // Placements: pretty sure the user can only place directional tiles in game
-        if (currentTile != null)
-        {
-            if (Input.GetButtonDown("Up"))
+            // Placements: pretty sure the user can only place directional tiles in game
+            if (currentTile != null)
             {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North);
+                if (Input.GetButtonDown("Up"))
+                {
+                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North);
+                }
+                else if (Input.GetButtonDown("Right"))
+                {
+                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East);
+                }
+                else if (Input.GetButtonDown("Down"))
+                {
+                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South);
+                }
+                else if (Input.GetButtonDown("Left"))
+                {
+                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West);
+                }
             }
-            else if (Input.GetButtonDown("Right"))
-            {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East);
-            }
-            else if (Input.GetButtonDown("Down"))
-            {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South);
-            }
-            else if (Input.GetButtonDown("Left"))
-            {
-                m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West);
-            }
-        }
 
-        // "Pause" input does not suspend the game in the traditional sense of pause, but puts us into the puzzle-placement state
-        if (Input.GetButtonDown("Pause"))
-        {
-            if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused)
+            // "Pause" input does not suspend the game in the traditional sense of pause, but puts us into the puzzle-placement state
+            if (Input.GetButtonDown("Pause"))
             {
-                m_gameController.gameState.mainState = GameState.State.Started_Paused;
-            }
-            else if (m_gameController.gameState.mainState == GameState.State.Started_Paused)
-            {
-                m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
+                if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused)
+                {
+                    m_gameController.gameState.mainState = GameState.State.Started_Paused;
+                }
+                else if (m_gameController.gameState.mainState == GameState.State.Started_Paused)
+                {
+                    m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
+                }
             }
         }
 
@@ -108,6 +112,8 @@ public class PlayerController : MonoBehaviour {
             else
             {
                 pauseDisplay.enabled = false;
+                // Currently the Menu input is the only one that can suspend the game.
+                // If this changes, we will need to make sure that we account for all toggles to suspend.
                 m_gameController.gameState.removeState(GameState.TagState.Suspended);
             }
         }
