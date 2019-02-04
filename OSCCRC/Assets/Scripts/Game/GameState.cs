@@ -7,7 +7,7 @@ public class GameState
     // The game can currently only have one main state. However, additional states can be applied on top of this.
     // The state enum shows valid main states, and the TagState enum shows additional states that can be tagged on top.
     public enum State { None, Unstarted, Started_Paused, Started_Unpaused, Ended }
-    public enum TagState { Suspended }
+    public enum TagState { Suspended, InputFocused }
 
     public delegate void stateChangeEvent(State oldState, State newState);
     public delegate void stateListChangeEvent(TagState state);

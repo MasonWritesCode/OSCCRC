@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 // This class controls the map building functionality of the game, allowing creation of a new Game Map and play testing it.
 
@@ -22,7 +20,6 @@ public class Editor : MonoBehaviour {
     private PlayerController m_controls;
     private GameController m_gameControl;
     private Camera m_mainCamera;
-    private EventSystem m_eventSystem;
     private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 
     void OnDisable() {
@@ -35,7 +32,6 @@ public class Editor : MonoBehaviour {
         m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
         m_gameControl = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         m_mainCamera = Camera.main;
-        m_eventSystem = EventSystem.current;
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
@@ -58,16 +54,8 @@ public class Editor : MonoBehaviour {
 
         // We ignore game input while an input field is focused
         bool allowInput =    m_gameControl.gameState.mainState == GameState.State.Started_Paused
-                          || m_gameControl.gameState.hasState(GameState.TagState.Suspended);
-        if (m_eventSystem.currentSelectedGameObject)
-        {
-            InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
-            if (field != null && field.isFocused)
-            {
-                allowInput = false;
-                disablePlaceholder();
-            }
-        }
+                          && !m_gameControl.gameState.hasState(GameState.TagState.Suspended)
+                          && !m_gameControl.gameState.hasState(GameState.TagState.InputFocused);
 
         if (allowInput)
         {
@@ -188,6 +176,11 @@ public class Editor : MonoBehaviour {
                 }
             }
             // End of UI stuff block
+        }
+        else // if (allowInput)
+        {
+            // Make sure the placement preview is disabled if input is not allowed
+            disablePlaceholder();
         }
 
 

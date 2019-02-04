@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 // This class controls various parts of gameplay and manages the state of the game.
 
@@ -73,6 +75,9 @@ public class GameController : MonoBehaviour {
             Application.targetFrameRate = -1;
         }
 
+        m_eventSystem = EventSystem.current;
+        m_wasInputFocused = false;
+
         gameState = new GameState();
         gameState.stateAdded += onTagStateAdd;
         gameState.stateRemoved += onTagStateRemove;
@@ -89,6 +94,30 @@ public class GameController : MonoBehaviour {
         }
 
         runGame(GlobalData.mode);
+    }
+
+
+    void Update()
+    {
+        // Unity does not have an event for a change in the currently selected game object, so we have to do a poll...
+        if (m_eventSystem.currentSelectedGameObject)
+        {
+            InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
+            bool isInputFocused = field != null && field.isFocused;
+            if (isInputFocused != m_wasInputFocused) // focus changed, so change input focus state
+            {
+                m_wasInputFocused = isInputFocused;
+
+                if (isInputFocused && !gameState.hasState(GameState.TagState.InputFocused))
+                {
+                    gameState.addState(GameState.TagState.InputFocused);
+                }
+                else if (!isInputFocused && gameState.hasState(GameState.TagState.InputFocused))
+                {
+                    gameState.removeState(GameState.TagState.InputFocused);
+                }
+            }
+        }
     }
 
 
@@ -137,4 +166,6 @@ public class GameController : MonoBehaviour {
 
     private IGameMode m_game;
     private float m_timeScaleHolder = 1.0f;
+    private EventSystem m_eventSystem;
+    private bool m_wasInputFocused;
 }

@@ -212,7 +212,7 @@ public class GridMovement : MonoBehaviour {
         m_remainingDistance = map.tileSize;
     }
 
-    // Disables the animator while suspended to not be wasteful
+    // Disables the animator while suspended purely to not be wasteful
     private void onTagStateAdd(GameState.TagState state)
     {
         if (state == GameState.TagState.Suspended)
