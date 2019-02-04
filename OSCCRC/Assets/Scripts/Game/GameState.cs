@@ -15,6 +15,7 @@ public class GameState
     public event stateListChangeEvent stateAdded;
     public event stateListChangeEvent stateRemoved;
 
+
     public GameState(State startState = State.None)
     {
         m_mainState = startState;
@@ -22,31 +23,6 @@ public class GameState
         m_additionalStates = new HashSet<TagState>();
     }
 
-    // Adds a new state to the GameState
-    public void addState(TagState state)
-    {
-        if (!m_additionalStates.Contains(state))
-        {
-            m_additionalStates.Add(state);
-            if (stateAdded != null)
-            {
-                stateAdded(state);
-            }
-        }
-    }
-
-    // Removes a state from the GameState
-    public void removeState(TagState state)
-    {
-        if (m_additionalStates.Contains(state))
-        {
-            m_additionalStates.Remove(state);
-            if (stateRemoved != null)
-            {
-                stateRemoved(state);
-            }
-        }
-    }
 
     // Sets or returns the main state of the GameState
     public State mainState
@@ -67,6 +43,42 @@ public class GameState
         }
     }
 
+
+    // Returns whether or not the state is added to the GameState
+    public bool hasState(TagState state)
+    {
+        return m_additionalStates.Contains(state);
+    }
+
+
+    // Adds a new state to the GameState
+    public void addState(TagState state)
+    {
+        if (!m_additionalStates.Contains(state))
+        {
+            m_additionalStates.Add(state);
+            if (stateAdded != null)
+            {
+                stateAdded(state);
+            }
+        }
+    }
+
+
+    // Removes a state from the GameState
+    public void removeState(TagState state)
+    {
+        if (m_additionalStates.Contains(state))
+        {
+            m_additionalStates.Remove(state);
+            if (stateRemoved != null)
+            {
+                stateRemoved(state);
+            }
+        }
+    }
+
+
     // Returns a list of the Tag States set at the time the getter was called
     public TagState[] tagStates
     {
@@ -77,6 +89,7 @@ public class GameState
             return stateList;
         }
     }
+
 
     private State m_mainState;
     private HashSet<TagState> m_additionalStates;
