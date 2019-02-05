@@ -98,8 +98,16 @@ public class PuzzleGame : IGameMode {
         }
         else if (placements.get(dir) > 0)
         {
+            if (tile.improvement == MapTile.TileImprovement.Direction)
+            {
+                placements.add(tile.improvementDirection);
+            }
+            else
+            {
+                tile.improvement = MapTile.TileImprovement.Direction;
+            }
+
             tile.improvementDirection = dir;
-            tile.improvement = MapTile.TileImprovement.Direction;
 
             placements.remove(dir);
         }
