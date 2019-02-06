@@ -40,8 +40,8 @@ public class Editor : MonoBehaviour {
         m_direction = Directions.Direction.East;
         m_positionOffset = Vector3.zero;
 
-        // Switch between placement and playtest
         m_gameControl.gameState.mainStateChange += onStateChange;
+        m_gameMap.mapLoaded += onMapLoaded;
     }
 
 	void Update () {
@@ -370,11 +370,11 @@ public class Editor : MonoBehaviour {
     {
         m_movingObjects.Clear();
 
-        GridMovement[] movingObjs = map.GetComponentsInChildren<GridMovement>(true);
+        GridMovement[] movingObjs = map.GetComponentsInChildren<GridMovement>();
         foreach (GridMovement i in movingObjs)
         {
             // Should be destroyed by map import, but seems to still be around?
-            // Checking if isActiveAndEnabled seems to work. 
+            // Checking if isActiveAndEnabled seems to work.
             if (i.isActiveAndEnabled)
             {
                 m_movingObjects.Add(map.tileAt(i.transform.localPosition), i.transform);
@@ -503,9 +503,10 @@ public class Editor : MonoBehaviour {
             // Don't leave anything selected when unpausing
             disablePlaceholder();
         }
-        else if (newState == GameState.State.Started_Paused)
-        {
-            mapMovingObjToTile(m_gameMap);
-        }
+    }
+
+    private void onMapLoaded()
+    {
+        mapMovingObjToTile(m_gameMap);
     }
 }

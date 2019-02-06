@@ -11,7 +11,9 @@ public class GameMap : MonoBehaviour
     [HideInInspector] public int mapWidth = 0;
     [HideInInspector] public float tileSize;
 
+    public delegate void voidEvent();
     public delegate void objectEvent(GameObject caller);
+    public event voidEvent mapLoaded;
     public event objectEvent mouseDestroyed;
     public event objectEvent mousePlaced;
     public event objectEvent catDestroyed;
@@ -239,6 +241,10 @@ public class GameMap : MonoBehaviour
             }
         }
 
+        if (mapLoaded != null)
+        {
+            mapLoaded();
+        }
         return true;
     }
 
