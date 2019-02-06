@@ -100,22 +100,25 @@ public class GameController : MonoBehaviour {
     void Update()
     {
         // Unity does not have an event for a change in the currently selected game object, so we have to do a poll...
+        bool isInputFocused = false;
         if (m_eventSystem.currentSelectedGameObject)
         {
             InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
-            bool isInputFocused = field != null && field.isFocused;
-            if (isInputFocused != m_wasInputFocused) // focus changed, so change input focus state
-            {
-                m_wasInputFocused = isInputFocused;
+            isInputFocused = field != null && field.isFocused;
+            
+        }
 
-                if (isInputFocused && !gameState.hasState(GameState.TagState.InputFocused))
-                {
-                    gameState.addState(GameState.TagState.InputFocused);
-                }
-                else if (!isInputFocused && gameState.hasState(GameState.TagState.InputFocused))
-                {
-                    gameState.removeState(GameState.TagState.InputFocused);
-                }
+        if (isInputFocused != m_wasInputFocused) // focus changed, so change input focus state
+        {
+            m_wasInputFocused = isInputFocused;
+
+            if (isInputFocused && !gameState.hasState(GameState.TagState.InputFocused))
+            {
+                gameState.addState(GameState.TagState.InputFocused);
+            }
+            else if (!isInputFocused && gameState.hasState(GameState.TagState.InputFocused))
+            {
+                gameState.removeState(GameState.TagState.InputFocused);
             }
         }
     }
