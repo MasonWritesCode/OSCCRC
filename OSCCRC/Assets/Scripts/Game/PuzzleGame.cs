@@ -44,10 +44,10 @@ public class PuzzleGame : IGameMode {
                 }
             }
         }
+        currentMice = numMice;
 
         m_gameMap.mouseDestroyed += checkGameEnd;
         m_gameMap.catDestroyed += checkGameEnd;
-        m_gameMap.mousePlaced += registerMouse;
 
         setAvailablePlacements();
         saveAutosave();
@@ -65,7 +65,6 @@ public class PuzzleGame : IGameMode {
     {
         m_gameMap.mouseDestroyed -= checkGameEnd;
         m_gameMap.catDestroyed -= checkGameEnd;
-        m_gameMap.mousePlaced -= registerMouse;
         m_gameState.mainStateChange -= onStateChange;
     }
 
@@ -126,6 +125,7 @@ public class PuzzleGame : IGameMode {
         {
             m_paused = true;
             loadAutosave();
+            currentMice = numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
@@ -137,8 +137,6 @@ public class PuzzleGame : IGameMode {
 
     private void checkGameEnd(GameObject deadMeat)
     {
-        --numMice;
-
         // Mice can only die when paused when loading to reset, in which case we don't need to gameover
         if (m_paused)
         {
@@ -161,23 +159,19 @@ public class PuzzleGame : IGameMode {
         }
         else
         {
+            --currentMice;
+
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 Debug.Log("A mouse was destroyed. Game Over.");
                 endGame(false);
             }
-            else if (numMice <= 0)
+            else if (currentMice <= 0)
             {
                 Debug.Log("The last mouse hit a goal, you won.");
                 endGame(true);
             }
         }
-    }
-
-
-    private void registerMouse(GameObject mouse)
-    {
-        ++numMice;
     }
 
 
@@ -223,6 +217,7 @@ public class PuzzleGame : IGameMode {
 
 
     private int numMice = 0;
+    private int currentMice = 0;
     private AvailablePlacements placements;
     private GameObject m_placementsDisplay;
     private bool m_paused;

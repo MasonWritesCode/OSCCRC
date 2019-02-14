@@ -24,7 +24,6 @@ public class EditorGame : IGameMode
 
         m_gameMap.mouseDestroyed += checkGameEnd;
         m_gameMap.catDestroyed += checkGameEnd;
-        m_gameMap.mousePlaced += registerMouse;
 
         numMice = 0;
 
@@ -41,6 +40,7 @@ public class EditorGame : IGameMode
                 }
             }
         }
+        currentMice = numMice;
 
         saveAutosave();
 
@@ -57,7 +57,6 @@ public class EditorGame : IGameMode
     {
         m_gameMap.mouseDestroyed -= checkGameEnd;
         m_gameMap.catDestroyed -= checkGameEnd;
-        m_gameMap.mousePlaced -= registerMouse;
         m_gameState.mainStateChange -= onStateChange;
     }
 
@@ -87,6 +86,7 @@ public class EditorGame : IGameMode
         {
             m_paused = true;
             loadAutosave();
+            currentMice = numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
@@ -98,8 +98,6 @@ public class EditorGame : IGameMode
 
     private void checkGameEnd(GameObject deadMeat)
     {
-        --numMice;
-
         // Mice can only die when paused when loading to reset, in which case we don't need to gameover
         if (m_paused)
         {
@@ -122,23 +120,19 @@ public class EditorGame : IGameMode
         }
         else
         {
+            --currentMice;
+
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 Debug.Log("A mouse was destroyed. Game Over.");
                 endGame(false);
             }
-            else if (numMice <= 0)
+            else if (currentMice <= 0)
             {
                 Debug.Log("The last mouse hit a goal, you won.");
                 endGame(true);
             }
         }
-    }
-
-
-    private void registerMouse(GameObject mouse)
-    {
-        ++numMice;
     }
 
 
@@ -175,6 +169,7 @@ public class EditorGame : IGameMode
 
 
     private int numMice = 0;
+    private int currentMice = 0;
     private GameObject m_saveMenu;
     private bool m_paused;
     private byte[] mapSaveData;
