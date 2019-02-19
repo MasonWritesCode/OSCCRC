@@ -15,7 +15,6 @@ public class GridMovement : MonoBehaviour {
     private float m_remainingDistance;
 	private GameController m_gameController;
     private Transform m_transform; // We have to store transform in a variable to pass it out as ref for Directions.rotate
-    private Vector3 m_oldPos;
     private Animator m_animator;
 
 	// Use this for initialization
@@ -45,52 +44,47 @@ public class GridMovement : MonoBehaviour {
             return;
         }
 
-        tile = map.tileAt(m_transform.localPosition);
-
         float distance = speed * Time.smoothDeltaTime;
         if (distance >= m_remainingDistance)
         {
-            // We will reach our tile. So re-center, get new remaining movement distance, and get new heading
-            m_transform.localPosition = tile.transform.localPosition;
+            // We should reach the center of destination tile. So re-center, get new remaining movement distance, and get new heading
             distance -= m_remainingDistance;
-            updateDirection();
+            setToTile(map.tileAt(m_transform.localPosition));
         }
 
         // Now move the distance we need to move
         m_transform.Translate(Vector3.forward * distance);
         m_remainingDistance -= distance;
 
-        // Wrap around to opposite side of map if necessary
+        // Wrap around to tile on opposite side of map if necessary
         Vector3 pos = m_transform.localPosition;
-        if (pos.x <= -(map.tileSize / 2))
+        if (pos.x <= -(map.tileSize / 2)) // West -> East
         {
-            pos.x = map.mapWidth - (map.tileSize / 2) - 0.1f;
+            pos.x += map.mapWidth * map.tileSize;
             m_transform.localPosition = pos;
-            updateDirection();
         }
-        else if ( pos.x >= (map.mapWidth - (map.tileSize / 2)) )
+        else if (pos.x >= (map.mapWidth - (map.tileSize / 2))) // East -> West
         {
-            pos.x = 0;
+            pos.x -= map.mapWidth * map.tileSize;
             m_transform.localPosition = pos;
-            updateDirection();
         }
-        if (pos.z <= -(map.tileSize / 2))
+        if (pos.z <= -(map.tileSize / 2)) // South -> North
         {
-            pos.z = map.mapHeight - (map.tileSize / 2) - 0.1f;
+            pos.z += map.mapHeight * map.tileSize;
             m_transform.localPosition = pos;
-            updateDirection();
         }
-        else if ( pos.z >= (map.mapHeight - (map.tileSize / 2)) )
+        else if (pos.z >= (map.mapHeight - (map.tileSize / 2))) // North -> South
         {
-            pos.z = 0;
+            pos.z -= map.mapHeight * map.tileSize;
             m_transform.localPosition = pos;
-            updateDirection();
         }
-	}
+    }
 
-    // Allows the parent object to decide which way to turn based on the tile it is located on, and do so
-    private void updateDirection()
+    // Sets the gameobject's tile, places it onto there, and resets its behavior to start moving across that tile
+    private void setToTile(MapTile tile)
     {
+        this.tile = tile;
+
         //check for goals and holes
         if (tile.improvement == MapTile.TileImprovement.Goal)
         {
@@ -103,6 +97,8 @@ public class GridMovement : MonoBehaviour {
             {
                 map.destroyMouse(transform);
             }
+
+            return;
         }
         else if (tile.improvement == MapTile.TileImprovement.Hole)
         {
@@ -115,6 +111,8 @@ public class GridMovement : MonoBehaviour {
             {
                 map.destroyMouse(transform);
             }
+
+            return;
         }
 
         //checking for arrows
@@ -207,6 +205,7 @@ public class GridMovement : MonoBehaviour {
             }
         }
 
+        m_transform.localPosition = tile.transform.localPosition;
         Directions.rotate(ref m_transform, direction);
 
         m_remainingDistance = map.tileSize;
