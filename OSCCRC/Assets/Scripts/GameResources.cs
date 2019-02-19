@@ -11,8 +11,8 @@ public class GameResources : MonoBehaviour {
 
     // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
 
-    public static Dictionary<string, Material> materials;
-    public static Dictionary<string, Transform> objects;
+    public static Dictionary<string, Material> materials = new Dictionary<string, Material>();
+    public static Dictionary<string, Transform> objects  = new Dictionary<string, Transform>();
     public static string resourcePack { get { return m_resourcePack; } set { loadResources(value); } }
 
     private static string m_resourcePack = string.Empty;
@@ -26,8 +26,8 @@ public class GameResources : MonoBehaviour {
             return;
         }
 
-        materials = new Dictionary<string, Material>();
-        objects = new Dictionary<string, Transform>();
+        materials.Clear();
+        objects.Clear();
 
         m_resourcePack = resourcePack;
         string currentDir;
@@ -60,10 +60,11 @@ public class GameResources : MonoBehaviour {
         {
             // Pull missing items from default pack to allow partial packs
             resource = Resources.Load("Default" + path);
-        }
-        if (resource == null)
-        {
-            Debug.LogWarning("Was not able to find default resource: " + path);
+
+            if (resource == null)
+            {
+                Debug.LogWarning("Was not able to find default resource: " + path);
+            }
         }
 
         return resource;
