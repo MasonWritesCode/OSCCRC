@@ -5,7 +5,7 @@ using UnityEngine;
 // This class inherits from IDisposable, make sure to use a using statement or call Dispose
 
 // This class is used to create pools of cloned GameObjects to be reused to prevent performance issues from frequent destruction and instantiation.
-// It also is used to know how many objects of a specific group are still alive.
+// It also can be used to know how many objects of a specific group are still alive.
 // Objects are destroyed when despawned if the number of allocated objects is above the desired minimum and large relative to active objects, or above desired maximum.
 // There is no guarantee whether a spawned object will call it's Start or not when spawned, so be sure to handle any necessary (re)initialization after spawning.
 //   However, if you have to do initialization beyond the arguments to Instantiate/spawn, it probably isn't an object that you should be pooling.

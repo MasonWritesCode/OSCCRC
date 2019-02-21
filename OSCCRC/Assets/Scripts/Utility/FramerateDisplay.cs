@@ -7,16 +7,8 @@ public class FramerateDisplay : MonoBehaviour {
 
     public float updateInterval; // number of updates per second
     public int precision; // number of decimal places to display
-    public bool isAdvanced = false; // Whether to include more information than just current framerate
+    public bool isAdvanced; // Whether to include more information than just current framerate
     public Text textDisplay;
-
-    private int m_updateNumber = 0;
-    private int m_frameAccum = 0;
-    private double m_timeAccum = 0.0;
-    private double m_timeRemaining = 0.0;
-    private double m_averageFramerate = 0.0;
-    private double m_minFramerate = -1.0;
-    private bool m_ignoreUpdates = true;
 
     private void OnEnable()
     {
@@ -86,4 +78,12 @@ public class FramerateDisplay : MonoBehaviour {
             m_timeAccum = 0.0;
         }
     }
+
+    private int m_updateNumber = 0;
+    private int m_frameAccum = 0;
+    private double m_timeAccum = 0.0;
+    private double m_timeRemaining = 0.0;
+    private double m_averageFramerate = 0.0;
+    private double m_minFramerate = -1.0;
+    private bool m_ignoreUpdates = true;
 }

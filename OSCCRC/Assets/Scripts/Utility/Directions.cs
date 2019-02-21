@@ -10,7 +10,7 @@ public static class Directions {
     public enum Direction { North = 1, East = 2, South = 4, West = 8 };
 
     // Rotates a transform into the specified cardinal direction
-    public static void rotate (ref Transform transform, Direction dir)
+    public static void rotate(ref Transform transform, Direction dir)
     {
         if (transform == null)
         {
@@ -21,6 +21,10 @@ public static class Directions {
         {
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 0.0f, transform.eulerAngles.z);
         }
+        else if (dir == Direction.East)
+        {
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 90.0f, transform.eulerAngles.z);
+        }
         else if (dir == Direction.South)
         {
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 180.0f, transform.eulerAngles.z);
@@ -28,10 +32,6 @@ public static class Directions {
         else if (dir == Direction.West)
         {
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 270.0f, transform.eulerAngles.z);
-        }
-        else if (dir == Direction.East)
-        {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 90.0f, transform.eulerAngles.z);
         }
     }
 
