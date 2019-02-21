@@ -15,8 +15,6 @@ public class GameResources : MonoBehaviour {
     public static Dictionary<string, Transform> objects  = new Dictionary<string, Transform>();
     public static string resourcePack { get { return m_resourcePack; } set { loadResources(value); } }
 
-    private static string m_resourcePack = string.Empty;
-
 
     // Loads the resources into the interface that are under the name specified by "resourcePack"
     public static void loadResources(string resourcePack)
@@ -52,7 +50,7 @@ public class GameResources : MonoBehaviour {
 
 
     // Returns a resource located at the specified path or the default equivalent if not found
-    static private Object resourceFromDir(string path)
+    private static Object resourceFromDir(string path)
     {
         Object resource = Resources.Load(m_resourcePack + path);
 
@@ -75,4 +73,7 @@ public class GameResources : MonoBehaviour {
     {
         loadResources("Default");
     }
+
+
+    private static string m_resourcePack = string.Empty;
 }
