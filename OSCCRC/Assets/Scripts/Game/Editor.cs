@@ -6,22 +6,6 @@ using UnityEngine;
 
 public class Editor : MonoBehaviour {
 
-    private enum ObjectType { None, Wall, Improvement }
-
-    private Transform m_placeholderObject;
-    private MapTile.TileImprovement m_selectedImprovement;
-    private ObjectType m_placeholderType;
-    private Directions.Direction m_direction;
-    private Vector3 m_positionOffset; // Used for wall facing
-
-    private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
-    private GameMap m_gameMap;
-    private GameStage m_gameStage;
-    private PlayerController m_controls;
-    private GameController m_gameControl;
-    private Camera m_mainCamera;
-    private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
-
     void OnDisable() {
         disablePlaceholder();
     }
@@ -509,4 +493,20 @@ public class Editor : MonoBehaviour {
     {
         mapMovingObjToTile(m_gameMap);
     }
+
+    private enum ObjectType { None, Wall, Improvement }
+
+    private Transform m_placeholderObject;
+    private MapTile.TileImprovement m_selectedImprovement;
+    private ObjectType m_placeholderType;
+    private Directions.Direction m_direction;
+    private Vector3 m_positionOffset; // Used for wall facing
+
+    private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
+    private GameMap m_gameMap;
+    private GameStage m_gameStage;
+    private PlayerController m_controls;
+    private GameController m_gameControl;
+    private Camera m_mainCamera;
+    private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 }

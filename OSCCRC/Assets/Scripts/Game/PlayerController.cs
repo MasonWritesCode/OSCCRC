@@ -10,12 +10,8 @@ public class PlayerController : MonoBehaviour {
     public Transform highlighter;
     public Canvas pauseDisplay;
     public Canvas fpsDisplay;
-    [HideInInspector] public MapTile currentTile = null;
-    [HideInInspector] public bool menuPaused = false;
+    public MapTile currentTile { get { return m_currentTile; } }
 
-    private GameController m_gameController;
-    private FramerateDisplay m_fpsScript;
-    private Camera m_mainCamera;
 
 	void Start () {
         m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
@@ -26,7 +22,8 @@ public class PlayerController : MonoBehaviour {
         // I don't know how that will work yet, but just assign a playerID of 1 to the player controls for now
         playerID = 1;
 	}
-	
+
+
 	void Update () {
         // We ignore game input while an input field is focused
         if (m_gameController.gameState.hasState(GameState.TagState.InputFocused))
@@ -45,38 +42,38 @@ public class PlayerController : MonoBehaviour {
                 if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Player Selectable")))
                 {
                     MapTile newTile = hitObject.transform.GetComponent<MapTile>();
-                    if (newTile != null && newTile != currentTile)
+                    if (newTile != null && newTile != m_currentTile)
                     {
                         // Currently using a spotlight to highlight the currently slected tile
                         highlighter.position = newTile.transform.position + Vector3.up * 2;
-                        currentTile = newTile;
+                        m_currentTile = newTile;
                     }
                 }
                 else
                 {
                     highlighter.position = Vector3.one * -99;
-                    currentTile = null;
+                    m_currentTile = null;
                 }
             }
 
             // Placements: pretty sure the user can only place directional tiles in game
-            if (currentTile != null)
+            if (m_currentTile != null)
             {
                 if (Input.GetButtonDown("Up"))
                 {
-                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North);
                 }
                 else if (Input.GetButtonDown("Right"))
                 {
-                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East);
                 }
                 else if (Input.GetButtonDown("Down"))
                 {
-                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South);
                 }
                 else if (Input.GetButtonDown("Left"))
                 {
-                    m_gameController.requestPlacement(currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West);
                 }
             }
 
@@ -130,4 +127,9 @@ public class PlayerController : MonoBehaviour {
             }
         }
     }
+
+    private GameController m_gameController;
+    private FramerateDisplay m_fpsScript;
+    private Camera m_mainCamera;
+    private MapTile m_currentTile = null;
 }

@@ -7,10 +7,6 @@ using UnityEngine;
 
 public class GameMap : MonoBehaviour
 {
-    [HideInInspector] public int mapHeight = 0;
-    [HideInInspector] public int mapWidth = 0;
-    [HideInInspector] public float tileSize;
-
     public delegate void voidEvent();
     public delegate void objectEvent(GameObject caller);
     public event voidEvent mapLoaded;
@@ -18,61 +14,24 @@ public class GameMap : MonoBehaviour
     public event objectEvent mousePlaced;
     public event objectEvent catDestroyed;
 
-    private MapTile[,] mapTiles;
-    private Transform m_bigTile = null;
+    public int mapHeight { get { return m_mapHeight; } }
+    public int mapWidth { get { return m_mapWidth; } }
+    public float tileSize { get { return m_tileSize; } }
 
-    // Generates a new rectangular map of the specified width and height
-    void generateMap(int height, int width)
-    {
-        mapHeight = height; mapWidth = width;
-        mapTiles = new MapTile[mapHeight, mapWidth];
-
-        tileSize = GameResources.objects["Tile"].localScale.x;
-
-        for (int j = 0; j < mapHeight; ++j)
-        {
-            for (int i = 0; i < mapWidth; ++i)
-            {
-                mapTiles[j, i] = createTile(i * tileSize, j * tileSize);
-            }
-        }
-
-        if (GlobalData.x_useBigTile)
-        {
-            // Here we set a single stretched tile that represents all blank tiles
-            // Since most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
-            if (m_bigTile == null)
-            {
-                Transform tilePrefab = GameResources.objects["Tile"];
-                m_bigTile = Instantiate(tilePrefab, Vector3.zero, tilePrefab.rotation, transform);
-            }
-
-            // We need to set the scale to mapsize
-            // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
-            // Material tiling has to be set to (mapsize / 2)
-            m_bigTile.transform.localScale = new Vector3(mapWidth, mapHeight, 1.0f);
-            m_bigTile.transform.position = new Vector3((mapWidth - 1.0f) / 2.0f, 0.0f, (mapHeight - 1.0f) / 2.0f);
-            MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
-            bigTileRend.material = GameResources.materials["TileTiledColor"];
-            bigTileRend.material.mainTextureScale = new Vector2(mapWidth / 2.0f, mapHeight / 2.0f);
-
-            bigTileRend.enabled = true;
-        }
-
-        setCameraView(Camera.main);
-    }
 
     // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(Vector3 point)
     {
-        return mapTiles[Mathf.RoundToInt(point.z / tileSize), Mathf.RoundToInt(point.x / tileSize)];
+        return m_mapTiles[Mathf.RoundToInt(point.z / m_tileSize), Mathf.RoundToInt(point.x / m_tileSize)];
     }
+
 
     // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(float y, float x)
     {
-        return mapTiles[Mathf.RoundToInt(y / tileSize), Mathf.RoundToInt(x / tileSize)];
+        return m_mapTiles[Mathf.RoundToInt(y / m_tileSize), Mathf.RoundToInt(x / m_tileSize)];
     }
+
 
     // Creates a map tile
     // The returned object should only be destroyed by calling the destroyTile function
@@ -86,6 +45,7 @@ public class GameMap : MonoBehaviour
         return newTile;
     }
 
+
     // Creates a wall game object
     // The returned object should only be destroyed by calling the destroyWall function
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
@@ -95,24 +55,56 @@ public class GameMap : MonoBehaviour
 
         if (direction == Directions.Direction.North)
         {
-            newWall.localPosition += Vector3.forward * (tileSize / 2);
+            newWall.localPosition += Vector3.forward * (m_tileSize / 2);
         }
         else if (direction == Directions.Direction.East)
         {
-            newWall.localPosition += Vector3.right * (tileSize / 2);
+            newWall.localPosition += Vector3.right * (m_tileSize / 2);
         }
         else if (direction == Directions.Direction.South)
         {
-            newWall.localPosition += Vector3.back * (tileSize / 2);
+            newWall.localPosition += Vector3.back * (m_tileSize / 2);
         }
         else if (direction == Directions.Direction.West)
         {
-            newWall.localPosition += Vector3.left * (tileSize / 2);
+            newWall.localPosition += Vector3.left * (m_tileSize / 2);
         }
         Directions.rotate(ref newWall, direction);
 
         return newWall;
     }
+
+
+    // Creates a mouse object and returns its transform
+    // The returned object should only be destroyed with the destroyMouse function
+    public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
+    {
+        Transform mousePrefab = GameResources.objects["Mouse"];
+        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, transform);
+        Directions.rotate(ref newMouse, direction);
+        newMouse.GetComponent<GridMovement>().direction = direction;
+
+        if (mousePlaced != null)
+        {
+            mousePlaced(newMouse.gameObject);
+        }
+
+        return newMouse;
+    }
+
+
+    // Creates a cat object and returns its transform
+    // The returned object should only be destroyed with the destroyCat function
+    public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
+    {
+        Transform catPrefab = GameResources.objects["Cat"];
+        Transform newCat = Instantiate(catPrefab, new Vector3(xPos, 0, zPos), catPrefab.rotation, transform);
+        Directions.rotate(ref newCat, direction);
+        newCat.GetComponent<GridMovement>().direction = direction;
+
+        return newCat;
+    }
+
 
     // Removes a tile game object
     public void destroyTile(MapTile tile)
@@ -120,11 +112,13 @@ public class GameMap : MonoBehaviour
         Destroy(tile.gameObject);
     }
 
+
     // Removes a wall game object with transform "wall"
     public void destroyWall(Transform wall)
     {
         Destroy(wall.gameObject);
     }
+
 
     // Removes a mouse game object with transform "mouse"
     public void destroyMouse(Transform mouse)
@@ -136,6 +130,7 @@ public class GameMap : MonoBehaviour
         Destroy(mouse.gameObject);
     }
 
+
     // Removes a cat game object with transform "cat"
     public void destroyCat(Transform cat)
     {
@@ -145,6 +140,7 @@ public class GameMap : MonoBehaviour
         }
         Destroy(cat.gameObject);
     }
+
 
     // Imports map data to the current game map from the open stream specified by "fin"
     public bool importMap(StreamReader fin)
@@ -170,31 +166,31 @@ public class GameMap : MonoBehaviour
         int newMapHeight = int.Parse(fin.ReadLine());
         int newMapWidth = int.Parse(fin.ReadLine());
 
-        if (newMapHeight != mapHeight && newMapWidth != mapWidth)
+        if (newMapHeight != m_mapHeight && newMapWidth != m_mapWidth)
         {
-            if (mapTiles != null)
+            if (m_mapTiles != null)
             {
-                for (int j = 0; j < mapHeight; ++j)
+                for (int j = 0; j < m_mapHeight; ++j)
                 {
-                    for (int i = 0; i < mapWidth; ++i)
+                    for (int i = 0; i < m_mapWidth; ++i)
                     {
-                        mapTiles[j, i].walls.clear();
-                        destroyTile(mapTiles[j, i]);
-                        mapTiles[j, i] = null;
+                        m_mapTiles[j, i].walls.clear();
+                        destroyTile(m_mapTiles[j, i]);
+                        m_mapTiles[j, i] = null;
                     }
                 }
-                mapTiles = null;
+                m_mapTiles = null;
             }
 
             generateMap(newMapHeight, newMapWidth);
         }
 
         // Old objects are gone, so now Add stuff onto the tiles
-        for (int j = 0; j < mapHeight; ++j)
+        for (int j = 0; j < m_mapHeight; ++j)
         {
-            for (int i = 0; i < mapWidth; ++i)
+            for (int i = 0; i < m_mapWidth; ++i)
             {
-                MapTile tile = mapTiles[j, i];
+                MapTile tile = m_mapTiles[j, i];
 
                 // An underscore indicates there is no improvement
                 if (fin.Peek() != '_')
@@ -248,24 +244,25 @@ public class GameMap : MonoBehaviour
         return true;
     }
 
+
     // Exports map data from the current game map to the open stream specified by "fout"
     public bool exportMap(StreamWriter fout)
     {
-        if (mapTiles == null)
+        if (m_mapTiles == null)
         {
             // There is currently no map to export
             Debug.LogWarning("Tried to export map while none exists.");
             return false;
         }
 
-        fout.WriteLine(mapHeight);
-        fout.WriteLine(mapWidth);
+        fout.WriteLine(m_mapHeight);
+        fout.WriteLine(m_mapWidth);
 
-        for (int j = 0; j < mapHeight; ++j)
+        for (int j = 0; j < m_mapHeight; ++j)
         {
-            for (int i = 0; i < mapWidth; ++i)
+            for (int i = 0; i < m_mapWidth; ++i)
             {
-                MapTile tile = mapTiles[j, i];
+                MapTile tile = m_mapTiles[j, i];
 
                 // We can combine these two into a single character if they are the same. Thus a completely blank default tile will be indicated simply by only an underscore
                 // This actually only saves two characters in this sistuation though, as a blank tile before was two single digit numbers (each with a new line)
@@ -316,6 +313,7 @@ public class GameMap : MonoBehaviour
         return true;
     }
 
+
     // Loads the map from the file specified by "fileName"
     public void loadMap(string fileName)
     {
@@ -335,6 +333,7 @@ public class GameMap : MonoBehaviour
         }
     }
 
+
     // Saves the current map to the file specified by "fileName"
     public void saveMap(string fileName)
     {
@@ -345,37 +344,9 @@ public class GameMap : MonoBehaviour
         }
     }
 
-    // Creates a mouse object and returns its transform
-    // The returned object should only be destroyed with the destroyMouse function
-    public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
-    {
-        Transform mousePrefab = GameResources.objects["Mouse"];
-        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, transform);
-        Directions.rotate(ref newMouse, direction);
-        newMouse.GetComponent<GridMovement>().direction = direction;
-
-        if (mousePlaced != null)
-        {
-            mousePlaced(newMouse.gameObject);
-        }
-
-        return newMouse;
-    }
-
-    // Creates a cat object and returns its transform
-    // The returned object should only be destroyed with the destroyCat function
-    public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
-    {
-        Transform catPrefab = GameResources.objects["Cat"];
-        Transform newCat = Instantiate(catPrefab, new Vector3(xPos, 0, zPos), catPrefab.rotation, transform);
-        Directions.rotate(ref newCat, direction);
-        newCat.GetComponent<GridMovement>().direction = direction;
-
-        return newCat;
-    }
 
     // Sets the position of camera "cam" to be able to see the entire map
-    public void setCameraView(Camera cam)
+    private void setCameraView(Camera cam)
     {
         // There is probably a correct thing to do here, but just do whatever for now since map sizes will probably always be the same.
 
@@ -383,7 +354,7 @@ public class GameMap : MonoBehaviour
         float cameraAngleAdjust = Mathf.Sin(cam.transform.eulerAngles.x * Mathf.Deg2Rad) * (scaleFactor / 2);
 
         // Because maps are currently always 12x9, don't bother doing extra calculations for for that case (this is probably worth the cost of the if statement)
-        if (mapHeight == 9 && mapWidth == 12)
+        if (m_mapHeight == 9 && m_mapWidth == 12)
         {
             cam.transform.position = new Vector3(22.5f,
                                                  33.6f + cameraAngleAdjust,
@@ -392,9 +363,58 @@ public class GameMap : MonoBehaviour
             return;
         }
 
-        cam.transform.position = new Vector3((mapWidth * 1.5f) + (mapHeight * 0.5f),
-                                             (mapWidth + mapHeight) * 1.6f + cameraAngleAdjust,
-                                             (mapWidth * 0.5f) + (mapHeight * 0.5f) - cameraAngleAdjust
+        cam.transform.position = new Vector3((m_mapWidth * 1.5f) + (m_mapHeight * 0.5f),
+                                             (m_mapWidth + m_mapHeight) * 1.6f + cameraAngleAdjust,
+                                             (m_mapWidth * 0.5f) + (m_mapHeight * 0.5f) - cameraAngleAdjust
                                             ) / scaleFactor;
     }
+
+
+    // Generates a new rectangular map of the specified width and height
+    private void generateMap(int height, int width)
+    {
+        m_mapHeight = height; m_mapWidth = width;
+        m_mapTiles = new MapTile[m_mapHeight, m_mapWidth];
+
+        m_tileSize = GameResources.objects["Tile"].localScale.x;
+
+        for (int j = 0; j < m_mapHeight; ++j)
+        {
+            for (int i = 0; i < m_mapWidth; ++i)
+            {
+                m_mapTiles[j, i] = createTile(i * m_tileSize, j * m_tileSize);
+            }
+        }
+
+        if (GlobalData.x_useBigTile)
+        {
+            // Here we set a single stretched tile that represents all blank tiles
+            // Since most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
+            if (m_bigTile == null)
+            {
+                Transform tilePrefab = GameResources.objects["Tile"];
+                m_bigTile = Instantiate(tilePrefab, Vector3.zero, tilePrefab.rotation, transform);
+            }
+
+            // We need to set the scale to mapsize
+            // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
+            // Material tiling has to be set to (mapsize / 2)
+            m_bigTile.transform.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
+            m_bigTile.transform.position = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
+            MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
+            bigTileRend.material = GameResources.materials["TileTiledColor"];
+            bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
+
+            bigTileRend.enabled = true;
+        }
+
+        setCameraView(Camera.main);
+    }
+
+
+    public int m_mapHeight = 0;
+    public int m_mapWidth = 0;
+    public float m_tileSize = 1;
+    private MapTile[,] m_mapTiles;
+    private Transform m_bigTile = null;
 }

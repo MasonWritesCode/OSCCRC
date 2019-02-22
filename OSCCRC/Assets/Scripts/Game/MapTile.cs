@@ -9,15 +9,16 @@ public class MapTile : MonoBehaviour
     // Material resource names will have to be manually added and adjusted in the start function as tile improvements change
     public enum TileImprovement { None, Hole, Goal, Spawner, Direction, Mouse, Cat }
 
+    // This needs to be public so that the editor can see the texture used for an improvement
+    public static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>();
+    public static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>();
+
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
     public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(ref m_tileObject, value); } }
     public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
     public Walls walls;
 
-    // This needs to be public so that the editor can see the texture used for an improvement
-    public static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>();
-    public static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>();
 
     // This static constructor is used to generate a map used to interface with resource packs
     static MapTile()

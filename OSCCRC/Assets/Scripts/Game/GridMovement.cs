@@ -7,19 +7,15 @@ using UnityEngine;
 public class GridMovement : MonoBehaviour {
 
     [Range(0, 255)] public float speed;
-	public GameMap map;
-	public Directions.Direction direction;
+
+    public Directions.Direction direction;
     public bool isCat;
-	public MapTile tile;
+    public MapTile tile { get { return m_tile; } }
 
-    private float m_remainingDistance;
-	private GameController m_gameController;
-    private Transform m_transform; // We have to store transform in a variable to pass it out as ref for Directions.rotate
-    private Animator m_animator;
 
-	// Use this for initialization
-	void Start () {
-		map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+    // Use this for initialization
+    void Start () {
+        m_map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
 		m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
 
         m_transform = GetComponent<Transform>();
@@ -36,6 +32,7 @@ public class GridMovement : MonoBehaviour {
         m_gameController.gameState.stateRemoved += onTagStateRemove;
 	}
 
+
 	void FixedUpdate() {
         if (   m_gameController.gameState.mainState != GameState.State.Started_Unpaused
             || m_gameController.gameState.hasState(GameState.TagState.Suspended)
@@ -49,7 +46,7 @@ public class GridMovement : MonoBehaviour {
         {
             // We should reach the center of destination tile. So re-center, get new remaining movement distance, and get new heading
             distance -= m_remainingDistance;
-            setToTile(map.tileAt(m_transform.localPosition));
+            setToTile(m_map.tileAt(m_transform.localPosition));
         }
 
         // Now move the distance we need to move
@@ -58,32 +55,33 @@ public class GridMovement : MonoBehaviour {
 
         // Wrap around to tile on opposite side of map if necessary
         Vector3 pos = m_transform.localPosition;
-        if (pos.x <= -(map.tileSize / 2)) // West -> East
+        if (pos.x <= -(m_map.tileSize / 2)) // West -> East
         {
-            pos.x += map.mapWidth * map.tileSize;
+            pos.x += m_map.mapWidth * m_map.tileSize;
             m_transform.localPosition = pos;
         }
-        else if (pos.x >= (map.mapWidth - (map.tileSize / 2))) // East -> West
+        else if (pos.x >= (m_map.mapWidth - (m_map.tileSize / 2))) // East -> West
         {
-            pos.x -= map.mapWidth * map.tileSize;
+            pos.x -= m_map.mapWidth * m_map.tileSize;
             m_transform.localPosition = pos;
         }
-        if (pos.z <= -(map.tileSize / 2)) // South -> North
+        if (pos.z <= -(m_map.tileSize / 2)) // South -> North
         {
-            pos.z += map.mapHeight * map.tileSize;
+            pos.z += m_map.mapHeight * m_map.tileSize;
             m_transform.localPosition = pos;
         }
-        else if (pos.z >= (map.mapHeight - (map.tileSize / 2))) // North -> South
+        else if (pos.z >= (m_map.mapHeight - (m_map.tileSize / 2))) // North -> South
         {
-            pos.z -= map.mapHeight * map.tileSize;
+            pos.z -= m_map.mapHeight * m_map.tileSize;
             m_transform.localPosition = pos;
         }
     }
 
+
     // Sets the gameobject's tile, places it onto there, and resets its behavior to start moving across that tile
     private void setToTile(MapTile tile)
     {
-        this.tile = tile;
+        m_tile = tile;
 
         //check for goals and holes
         if (tile.improvement == MapTile.TileImprovement.Goal)
@@ -91,11 +89,11 @@ public class GridMovement : MonoBehaviour {
             // TODO: additional handling of goals
             if (isCat)
             {
-                map.destroyCat(transform);
+                m_map.destroyCat(transform);
             }
             else
             {
-                map.destroyMouse(transform);
+                m_map.destroyMouse(transform);
             }
 
             return;
@@ -105,11 +103,11 @@ public class GridMovement : MonoBehaviour {
             // TODO: additional handlinng of holes (if needed)
             if (isCat)
             {
-                map.destroyCat(transform);
+                m_map.destroyCat(transform);
             }
             else
             {
-                map.destroyMouse(transform);
+                m_map.destroyMouse(transform);
             }
 
             return;
@@ -208,8 +206,9 @@ public class GridMovement : MonoBehaviour {
         m_transform.localPosition = tile.transform.localPosition;
         Directions.rotate(ref m_transform, direction);
 
-        m_remainingDistance = map.tileSize;
+        m_remainingDistance = m_map.tileSize;
     }
+
 
     // Disables the animator while suspended purely to not be wasteful
     private void onTagStateAdd(GameState.TagState state)
@@ -223,6 +222,7 @@ public class GridMovement : MonoBehaviour {
         }
     }
 
+
     // Re-enables the animator if onTagStateAdd disabled it
     private void onTagStateRemove(GameState.TagState state)
     {
@@ -235,14 +235,22 @@ public class GridMovement : MonoBehaviour {
         }
     }
 
+
     void OnTriggerEnter(Collider other)
     {
         if (isCat && other.name.Contains("Mouse"))
         {
             if (!other.GetComponent<GridMovement>().isCat)
             {
-                map.destroyMouse(other.transform);
+                m_map.destroyMouse(other.transform);
             }
         }
     }
+
+    private GameController m_gameController;
+    private GameMap m_map;
+    private Transform m_transform;
+    private Animator m_animator;
+    private MapTile m_tile;
+    private float m_remainingDistance;
 }

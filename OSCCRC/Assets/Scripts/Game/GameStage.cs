@@ -14,12 +14,6 @@ public class GameStage : MonoBehaviour {
     public string musicTrack { get { return m_musicTrack; } set { m_musicTrack = value; } }
     public string resourcePackName { get { return m_resourcePack; } set { m_resourcePack = value; } }
 
-    private string m_stageName = "Stage";
-    private string m_musicTrack = "Default";
-    private string m_resourcePack = "Default";
-    // Increment this whenever we change map or stage file layout after a release
-    private const int m_currentFileVersion = 1;
-
 
     // Get information of a stage without actually loading it.
     public void loadStageMetadata(string fileName)
@@ -47,6 +41,8 @@ public class GameStage : MonoBehaviour {
             resourcePackName = fin.ReadLine();
         }
     }
+
+
     // Loads a stage specified by "fileName" as the current stage
     public void loadStage(string fileName)
     {
@@ -101,4 +97,11 @@ public class GameStage : MonoBehaviour {
             gameMap.exportMap(fout);
         }
     }
+
+
+    private string m_stageName = "Stage";
+    private string m_musicTrack = "Default";
+    private string m_resourcePack = "Default";
+    // Increment this whenever we change map or stage file layout after a release
+    private const int m_currentFileVersion = 1;
 }

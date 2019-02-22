@@ -13,6 +13,7 @@ public class Walls
     public bool south { get { return m_walls[Directions.Direction.South] != null; } set { changeWall(Directions.Direction.South, value); } }
     public bool west { get { return m_walls[Directions.Direction.West] != null; } set { changeWall(Directions.Direction.West, value); } }
 
+
     public Walls(GameMap parentMap, Vector3 originPos)
     {
         m_map = parentMap;
@@ -26,6 +27,7 @@ public class Walls
         m_walls.Add(Directions.Direction.West, null);
     }
 
+
     // Removes all four walls if they exist
     public void clear()
     {
@@ -35,6 +37,7 @@ public class Walls
             m_walls[key] = null;
         }
     }
+
 
     // Walls are shared by the two tiles they touch, so we must inform the other tile to accept the created wall as its own
     private void changeWall(Directions.Direction wallID, bool isCreating)
@@ -106,6 +109,7 @@ public class Walls
             m_map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[Directions.getOppositeDir(wallID)] = wallSet;
         }
     }
+
 
     private Vector3 m_origin;
     private GameMap m_map;

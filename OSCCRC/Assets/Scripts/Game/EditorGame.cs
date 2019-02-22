@@ -8,7 +8,6 @@ using UnityEngine;
 
 public class EditorGame : IGameMode
 {
-
     public EditorGame(GameState gameStateRef)
     {
         m_gameState = gameStateRef;
@@ -25,7 +24,7 @@ public class EditorGame : IGameMode
         m_gameMap.mouseDestroyed += checkGameEnd;
         m_gameMap.catDestroyed += checkGameEnd;
 
-        numMice = 0;
+        m_numMice = 0;
 
         // We need to count the number of mice so that we know if a puzzle has been solved
         float tileSize = m_gameMap.tileSize;
@@ -36,11 +35,11 @@ public class EditorGame : IGameMode
                 MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
                 if (tile.movingObject == MapTile.TileImprovement.Mouse)
                 {
-                    ++numMice;
+                    ++m_numMice;
                 }
             }
         }
-        currentMice = numMice;
+        m_currentMice = m_numMice;
 
         saveAutosave();
 
@@ -86,7 +85,7 @@ public class EditorGame : IGameMode
         {
             m_paused = true;
             loadAutosave();
-            currentMice = numMice;
+            m_currentMice = m_numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
@@ -120,14 +119,14 @@ public class EditorGame : IGameMode
         }
         else
         {
-            --currentMice;
+            --m_currentMice;
 
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 Debug.Log("A mouse was destroyed. Game Over.");
                 endGame(false);
             }
-            else if (currentMice <= 0)
+            else if (m_currentMice <= 0)
             {
                 Debug.Log("The last mouse hit a goal, you won.");
                 endGame(true);
@@ -168,8 +167,8 @@ public class EditorGame : IGameMode
     }
 
 
-    private int numMice = 0;
-    private int currentMice = 0;
+    private int m_numMice = 0;
+    private int m_currentMice = 0;
     private GameObject m_saveMenu;
     private bool m_paused;
     private byte[] mapSaveData;

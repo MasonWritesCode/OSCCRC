@@ -22,11 +22,11 @@ public class PuzzleGame : IGameMode {
         m_placementsDisplay = GameObject.Find("PlacementsDisplay");
         m_placementsDisplay.GetComponent<Canvas>().enabled = true;
 
-        numMice = 0;
+        m_numMice = 0;
 
         // We need to remove all direction tiles, and count them up into a placements object
         // We also need to count up the number of mice at the same time, as the map has already been loaded before startGame is called
-        placements = new AvailablePlacements();
+        m_placements = new AvailablePlacements();
         float tileSize = m_gameMap.tileSize;
         for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
         {
@@ -35,16 +35,16 @@ public class PuzzleGame : IGameMode {
                 MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
                 if (tile.improvement == MapTile.TileImprovement.Direction)
                 {
-                    placements.add(tile.improvementDirection);
+                    m_placements.add(tile.improvementDirection);
                     tile.improvement = MapTile.TileImprovement.None;
                 }
                 if (tile.movingObject == MapTile.TileImprovement.Mouse)
                 {
-                    ++numMice;
+                    ++m_numMice;
                 }
             }
         }
-        currentMice = numMice;
+        m_currentMice = m_numMice;
 
         m_gameMap.mouseDestroyed += checkGameEnd;
         m_gameMap.catDestroyed += checkGameEnd;
@@ -93,13 +93,13 @@ public class PuzzleGame : IGameMode {
         {
             tile.improvement = MapTile.TileImprovement.None;
 
-            placements.add(dir);
+            m_placements.add(dir);
         }
-        else if (placements.get(dir) > 0)
+        else if (m_placements.get(dir) > 0)
         {
             if (tile.improvement == MapTile.TileImprovement.Direction)
             {
-                placements.add(tile.improvementDirection);
+                m_placements.add(tile.improvementDirection);
             }
             else
             {
@@ -108,7 +108,7 @@ public class PuzzleGame : IGameMode {
 
             tile.improvementDirection = dir;
 
-            placements.remove(dir);
+            m_placements.remove(dir);
         }
         else
         {
@@ -125,7 +125,7 @@ public class PuzzleGame : IGameMode {
         {
             m_paused = true;
             loadAutosave();
-            currentMice = numMice;
+            m_currentMice = m_numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
@@ -159,14 +159,14 @@ public class PuzzleGame : IGameMode {
         }
         else
         {
-            --currentMice;
+            --m_currentMice;
 
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 Debug.Log("A mouse was destroyed. Game Over.");
                 endGame(false);
             }
-            else if (currentMice <= 0)
+            else if (m_currentMice <= 0)
             {
                 Debug.Log("The last mouse hit a goal, you won.");
                 endGame(true);
@@ -177,10 +177,10 @@ public class PuzzleGame : IGameMode {
 
     private void setAvailablePlacements()
     {
-        m_placementsDisplay.transform.Find("UpText").GetComponentInChildren<Text>().text = "x" + placements.get(Directions.Direction.North).ToString();
-        m_placementsDisplay.transform.Find("DownText").GetComponentInChildren<Text>().text = "x" + placements.get(Directions.Direction.South).ToString();
-        m_placementsDisplay.transform.Find("LeftText").GetComponentInChildren<Text>().text = "x" + placements.get(Directions.Direction.West).ToString();
-        m_placementsDisplay.transform.Find("RightText").GetComponentInChildren<Text>().text = "x" + placements.get(Directions.Direction.East).ToString();
+        m_placementsDisplay.transform.Find("UpText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.North).ToString();
+        m_placementsDisplay.transform.Find("DownText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.South).ToString();
+        m_placementsDisplay.transform.Find("LeftText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.West).ToString();
+        m_placementsDisplay.transform.Find("RightText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.East).ToString();
     }
 
 
@@ -216,9 +216,9 @@ public class PuzzleGame : IGameMode {
     }
 
 
-    private int numMice = 0;
-    private int currentMice = 0;
-    private AvailablePlacements placements;
+    private int m_numMice = 0;
+    private int m_currentMice = 0;
+    private AvailablePlacements m_placements;
     private GameObject m_placementsDisplay;
     private bool m_paused;
     private byte[] mapSaveData;
