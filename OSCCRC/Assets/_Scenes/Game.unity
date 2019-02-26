@@ -314,7 +314,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &131032666
 GameObject:
@@ -486,7 +486,7 @@ RectTransform:
   - {fileID: 664995370}
   - {fileID: 906444263}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1429,7 +1429,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_TargetDisplay: 0
 --- !u!224 &996980961
 RectTransform:
@@ -1443,7 +1443,7 @@ RectTransform:
   m_Children:
   - {fileID: 1440261523}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1696,9 +1696,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7b4938d41c88e94284bd65c640b2e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapHeight: 1
-  mapWidth: 1
-  tileSize: 0
+  m_mapHeight: 0
+  m_mapWidth: 0
+  m_tileSize: 1
 --- !u!1 &1196397977
 GameObject:
   m_ObjectHideFlags: 0
@@ -2449,7 +2449,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1440261522
 GameObject:
@@ -2621,7 +2621,7 @@ Transform:
   m_Children:
   - {fileID: 1579695484}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1519803094
 GameObject:
@@ -2696,7 +2696,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1519803098
 RectTransform:
@@ -2765,8 +2765,6 @@ MonoBehaviour:
   highlighter: {fileID: 1406404670}
   pauseDisplay: {fileID: 1519803097}
   fpsDisplay: {fileID: 996980960}
-  currentTile: {fileID: 0}
-  menuPaused: 0
 --- !u!1 &1583046052
 GameObject:
   m_ObjectHideFlags: 0
