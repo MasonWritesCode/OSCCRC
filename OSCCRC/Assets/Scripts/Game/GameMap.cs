@@ -109,6 +109,7 @@ public class GameMap : MonoBehaviour
     // Removes a tile game object
     public void destroyTile(MapTile tile)
     {
+        tile.walls.clear();
         Destroy(tile.gameObject);
     }
 
@@ -166,23 +167,14 @@ public class GameMap : MonoBehaviour
         int newMapHeight = int.Parse(fin.ReadLine());
         int newMapWidth = int.Parse(fin.ReadLine());
 
-        if (newMapHeight != m_mapHeight && newMapWidth != m_mapWidth)
+        if (newMapHeight != m_mapHeight || newMapWidth != m_mapWidth)
         {
-            if (m_mapTiles != null)
-            {
-                for (int j = 0; j < m_mapHeight; ++j)
-                {
-                    for (int i = 0; i < m_mapWidth; ++i)
-                    {
-                        m_mapTiles[j, i].walls.clear();
-                        destroyTile(m_mapTiles[j, i]);
-                        m_mapTiles[j, i] = null;
-                    }
-                }
-                m_mapTiles = null;
-            }
-
             generateMap(newMapHeight, newMapWidth);
+        }
+        else
+        {
+            // We need to manually make sure we update the bigTile texture in case the resource pack changed
+            m_bigTile.GetComponent<MeshRenderer>().material = GameResources.materials["TileTiledColor"];
         }
 
         // Old objects are gone, so now Add stuff onto the tiles
@@ -373,6 +365,18 @@ public class GameMap : MonoBehaviour
     // Generates a new rectangular map of the specified width and height
     private void generateMap(int height, int width)
     {
+        if (m_mapTiles != null)
+        {
+            // We need to delete the old map first
+            for (int j = 0; j < m_mapHeight; ++j)
+            {
+                for (int i = 0; i < m_mapWidth; ++i)
+                {
+                    destroyTile(m_mapTiles[j, i]);
+                }
+            }
+        }
+
         m_mapHeight = height; m_mapWidth = width;
         m_mapTiles = new MapTile[m_mapHeight, m_mapWidth];
 
@@ -415,6 +419,6 @@ public class GameMap : MonoBehaviour
     public int m_mapHeight = 0;
     public int m_mapWidth = 0;
     public float m_tileSize = 1;
-    private MapTile[,] m_mapTiles;
+    private MapTile[,] m_mapTiles = null;
     private Transform m_bigTile = null;
 }
