@@ -31,10 +31,11 @@ public class Editor : MonoBehaviour {
 	void Update () {
         MapTile selectedTile = m_controls.currentTile;
 
-        // I'm not familiar with UI in Unity, so select what you want to place with buttons for now until UI gets set up.
         ObjectType newType = ObjectType.None;
         MapTile.TileImprovement newImprovement = MapTile.TileImprovement.None;
         Directions.Direction newDir = m_direction;
+
+        // I'm not familiar with UI in Unity, so select what you want to place with buttons for now until UI gets set up.
 
         // We ignore game input while an input field is focused
         bool allowInput =    m_gameControl.gameState.mainState == GameState.State.Started_Paused
@@ -223,18 +224,6 @@ public class Editor : MonoBehaviour {
                 placeObject(selectedTile);
             }
         }
-        
-
-        /*
-        if (Input.GetKeyDown(KeyCode.F6))
-        {
-            createSave("Internal/dev");
-        }
-        else if (Input.GetKeyDown(KeyCode.F7))
-        {
-            loadSave("Internal/dev");
-        }
-        */
     }
 
 
@@ -357,12 +346,7 @@ public class Editor : MonoBehaviour {
         GridMovement[] movingObjs = map.GetComponentsInChildren<GridMovement>();
         foreach (GridMovement i in movingObjs)
         {
-            // Should be destroyed by map import, but seems to still be around?
-            // Checking if isActiveAndEnabled seems to work.
-            if (i.isActiveAndEnabled)
-            {
-                m_movingObjects.Add(map.tileAt(i.transform.localPosition), i.transform);
-            }
+            m_movingObjects.Add(map.tileAt(i.transform.localPosition), i.transform);
         }
     }
 

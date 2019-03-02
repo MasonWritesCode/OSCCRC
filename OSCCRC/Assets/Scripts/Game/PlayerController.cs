@@ -4,8 +4,6 @@
 
 public class PlayerController : MonoBehaviour {
 
-    // I heard Unity is going to be overhauling its input system soon. It would be nice to subscribe to event callbacks rather than poll every frame.
-
     [Range(1, 4)] public int playerID;
     public Transform highlighter;
     public Canvas pauseDisplay;
@@ -56,7 +54,6 @@ public class PlayerController : MonoBehaviour {
                 }
             }
 
-            // Placements: pretty sure the user can only place directional tiles in game
             if (m_currentTile != null)
             {
                 if (Input.GetButtonDown("Up"))

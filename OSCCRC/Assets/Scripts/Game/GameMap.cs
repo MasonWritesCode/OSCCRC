@@ -144,9 +144,10 @@ public class GameMap : MonoBehaviour
 
 
     // Imports map data to the current game map from the open stream specified by "fin"
+    // Comments documenting the file format can be found in the exportMap() function
     public bool importMap(StreamReader fin)
     {
-        // Delete allocated game objects, since we are creating new ones
+        // First delete allocated game objects, since we are creating new ones
         // Removing walls will be handled at the same point in code where they are placed
 
         // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
@@ -177,14 +178,12 @@ public class GameMap : MonoBehaviour
             m_bigTile.GetComponent<MeshRenderer>().material = GameResources.materials["TileTiledColor"];
         }
 
-        // Old objects are gone, so now Add stuff onto the tiles
         for (int j = 0; j < m_mapHeight; ++j)
         {
             for (int i = 0; i < m_mapWidth; ++i)
             {
                 MapTile tile = m_mapTiles[j, i];
 
-                // An underscore indicates there is no improvement
                 if (fin.Peek() != '_')
                 {
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
@@ -345,7 +344,7 @@ public class GameMap : MonoBehaviour
         const float scaleFactor = 4.25f;
         float cameraAngleAdjust = Mathf.Sin(cam.transform.eulerAngles.x * Mathf.Deg2Rad) * (scaleFactor / 2);
 
-        // Because maps are currently always 12x9, don't bother doing extra calculations for for that case (this is probably worth the cost of the if statement)
+        // Because maps are currently always 12x9, don't bother doing extra calculations for for that case (this is probably worth the cost of the if statement?)
         if (m_mapHeight == 9 && m_mapWidth == 12)
         {
             cam.transform.position = new Vector3(22.5f,

@@ -30,6 +30,7 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    // Begins a new game of the specified mode
     public void runGame(GameMode newMode)
     {
         if (m_game != null)

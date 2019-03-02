@@ -63,10 +63,6 @@ public class EditorGame : IGameMode
     // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
-        // pause?
-
-        // UI WIN / LOSE screen thing
-
         return;
     }
 

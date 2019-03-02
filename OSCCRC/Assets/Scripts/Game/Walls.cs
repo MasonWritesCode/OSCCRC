@@ -33,8 +33,11 @@ public class Walls
     {
         foreach (Directions.Direction key in m_walls.Keys)
         {
-            m_map.destroyWall(m_walls[key]);
-            m_walls[key] = null;
+            if (m_walls[key] != null)
+            {
+                m_map.destroyWall(m_walls[key]);
+                m_walls[key] = null;
+            }
         }
     }
 
@@ -100,7 +103,6 @@ public class Walls
         }
         else
         {
-            // This can be done on a single line if you don't hate the ugliness of the ternary operator like I do
             Transform wallSet = null;
             if (isCreating)
             {

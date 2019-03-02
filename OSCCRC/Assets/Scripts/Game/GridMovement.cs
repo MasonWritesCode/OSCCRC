@@ -13,7 +13,6 @@ public class GridMovement : MonoBehaviour {
     public MapTile tile { get { return m_tile; } }
 
 
-    // Use this for initialization
     void Start () {
         m_map = GameObject.FindWithTag("Map").GetComponent<GameMap>();
 		m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
@@ -86,7 +85,6 @@ public class GridMovement : MonoBehaviour {
         //check for goals and holes
         if (tile.improvement == MapTile.TileImprovement.Goal)
         {
-            // TODO: additional handling of goals
             if (isCat)
             {
                 m_map.destroyCat(transform);
@@ -100,7 +98,6 @@ public class GridMovement : MonoBehaviour {
         }
         else if (tile.improvement == MapTile.TileImprovement.Hole)
         {
-            // TODO: additional handlinng of holes (if needed)
             if (isCat)
             {
                 m_map.destroyCat(transform);
@@ -246,6 +243,7 @@ public class GridMovement : MonoBehaviour {
             }
         }
     }
+
 
     private GameController m_gameController;
     private GameMap m_map;
