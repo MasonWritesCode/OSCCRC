@@ -9,14 +9,13 @@ using UnityEngine.EventSystems;
 public class GameController : MonoBehaviour {
 
     public enum GameMode { None, Editor, Puzzle, Multiplayer };
-    public GameMode mode = GameMode.None;
-
-    public GameState gameState;
+    public GameMode mode { get { return m_mode; } }
+    public GameState gameState { get { return m_gameState; } }
 
     // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
-        if (gameState.hasState(GameState.TagState.Suspended))
+        if (m_gameState.hasState(GameState.TagState.Suspended))
         {
             return;
         }
@@ -40,11 +39,11 @@ public class GameController : MonoBehaviour {
 
         if (newMode == GameMode.Puzzle)
         {
-            m_game = new PuzzleGame(gameState);
+            m_game = new PuzzleGame(m_gameState);
         }
         else if (newMode == GameMode.Editor)
         {
-            m_game = new EditorGame(gameState);
+            m_game = new EditorGame(m_gameState);
         }
 
         Editor editor = GetComponent<Editor>();
@@ -65,7 +64,7 @@ public class GameController : MonoBehaviour {
             m_game.startGame();
         }
 
-        mode = newMode;
+        m_mode = newMode;
     }
 
 
@@ -79,9 +78,9 @@ public class GameController : MonoBehaviour {
         m_eventSystem = EventSystem.current;
         m_wasInputFocused = false;
 
-        gameState = new GameState();
-        gameState.stateAdded += onTagStateAdd;
-        gameState.stateRemoved += onTagStateRemove;
+        m_gameState = new GameState();
+        m_gameState.stateAdded += onTagStateAdd;
+        m_gameState.stateRemoved += onTagStateRemove;
 
         GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStageFile;
@@ -113,13 +112,13 @@ public class GameController : MonoBehaviour {
         {
             m_wasInputFocused = isInputFocused;
 
-            if (isInputFocused && !gameState.hasState(GameState.TagState.InputFocused))
+            if (isInputFocused && !m_gameState.hasState(GameState.TagState.InputFocused))
             {
-                gameState.addState(GameState.TagState.InputFocused);
+                m_gameState.addState(GameState.TagState.InputFocused);
             }
-            else if (!isInputFocused && gameState.hasState(GameState.TagState.InputFocused))
+            else if (!isInputFocused && m_gameState.hasState(GameState.TagState.InputFocused))
             {
-                gameState.removeState(GameState.TagState.InputFocused);
+                m_gameState.removeState(GameState.TagState.InputFocused);
             }
         }
     }
@@ -133,7 +132,7 @@ public class GameController : MonoBehaviour {
             return;
         }
         // One scenario we could consider adding is to disable physics when there are no cats to collide with.
-        if (gameState.mainState != GameState.State.Started_Unpaused || gameState.hasState(GameState.TagState.Suspended))
+        if (m_gameState.mainState != GameState.State.Started_Unpaused || m_gameState.hasState(GameState.TagState.Suspended))
         {
             return;
         }
@@ -168,6 +167,8 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    private GameMode m_mode = GameMode.None;
+    private GameState m_gameState;
     private IGameMode m_game;
     private float m_timeScaleHolder = 1.0f;
     private EventSystem m_eventSystem;
