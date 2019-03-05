@@ -18,7 +18,7 @@ public class EditorGame : IGameMode
     {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
 
-        m_saveMenu  = GameObject.Find("EditorMenu");
+        m_saveMenu  = GameObject.Find("EditorMenu (UI)");
         m_saveMenu.GetComponent<Canvas>().enabled = true;
 
         m_gameMap.mouseDestroyed += checkGameEnd;

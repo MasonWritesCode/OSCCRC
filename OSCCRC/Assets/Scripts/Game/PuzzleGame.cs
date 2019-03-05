@@ -19,7 +19,7 @@ public class PuzzleGame : IGameMode {
     {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
 
-        m_placementsDisplay = GameObject.Find("PlacementsDisplay");
+        m_placementsDisplay = GameObject.Find("PlacementsDisplay (UI)");
         m_placementsDisplay.GetComponent<Canvas>().enabled = true;
 
         m_numMice = 0;

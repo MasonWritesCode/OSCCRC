@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 582529794}
   - component: {fileID: 582529793}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Menu (UI)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

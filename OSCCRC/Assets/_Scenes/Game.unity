@@ -403,7 +403,7 @@ GameObject:
   - component: {fileID: 473156098}
   - component: {fileID: 473156097}
   m_Layer: 5
-  m_Name: PlacementsDisplay
+  m_Name: PlacementsDisplay (UI)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1144,7 +1144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb37ff7cf511404e87e25d8d72a78ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 0
 --- !u!4 &903401645
 Transform:
   m_ObjectHideFlags: 0
@@ -1368,7 +1367,7 @@ GameObject:
   - component: {fileID: 996980959}
   - component: {fileID: 996980958}
   m_Layer: 5
-  m_Name: FPSDisplay
+  m_Name: FPSDisplay (UI)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2635,7 +2634,7 @@ GameObject:
   - component: {fileID: 1519803096}
   - component: {fileID: 1519803095}
   m_Layer: 5
-  m_Name: PauseMenu
+  m_Name: PauseMenu (UI)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2777,7 +2776,7 @@ GameObject:
   - component: {fileID: 1583046054}
   - component: {fileID: 1583046053}
   m_Layer: 5
-  m_Name: EditorMenu
+  m_Name: EditorMenu (UI)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
