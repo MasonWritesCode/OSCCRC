@@ -56,7 +56,7 @@ public class Menu_Panel : MonoBehaviour {
         FileInfo selectedFile = m_fileList[place + m_startIndex];
         SceneManager.LoadScene("Game", LoadSceneMode.Single);
         //m_tempStageInfo.loadStage(m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", ""));
-        GlobalData.currentStageFile = m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", "");
+        GlobalData.currentStageFile = m_folderNames[GlobalData.folder] + selectedFile.Name.Remove(selectedFile.Name.Length - selectedFile.Extension.Length);
     }
 
 
@@ -66,7 +66,7 @@ public class Menu_Panel : MonoBehaviour {
         Menu_MapEntry newEntry = newEntryObj.GetComponent<Menu_MapEntry>();
         newEntry.entryID = place;
 
-        m_tempStageInfo.loadStageMetadata(m_folderNames[GlobalData.folder] + file.Name.Replace(".stage", ""));
+        m_tempStageInfo.loadStageMetadata(m_folderNames[GlobalData.folder] + file.Name.Remove(file.Name.Length - file.Extension.Length));
 
         newEntry.setName(m_tempStageInfo.stageName);
 

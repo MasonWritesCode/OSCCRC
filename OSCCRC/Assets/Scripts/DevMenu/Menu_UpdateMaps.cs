@@ -43,7 +43,7 @@ public class Menu_UpdateMaps : MonoBehaviour, IPointerClickHandler
             FileInfo[] mapFiles = mapCollections[i].GetFiles("*.map");
             for (int j = 0; j < mapFiles.Length; ++j)
             {
-                string path = mapCollections[i].Name + '/' + mapFiles[j].Name.Replace(".map", "");
+                string path = mapCollections[i].Name + '/' + mapFiles[j].Name.Remove(mapFiles[j].Name.Length - mapFiles[j].Extension.Length);
                 mapData.loadMap(path);
                 mapData.saveMap(path);
             }
@@ -51,7 +51,7 @@ public class Menu_UpdateMaps : MonoBehaviour, IPointerClickHandler
             FileInfo[] stageFiles = mapCollections[i].GetFiles("*.stage");
             for (int j = 0; j < stageFiles.Length; ++j)
             {
-                string path = mapCollections[i].Name + '/' + stageFiles[j].Name.Replace(".stage", "");
+                string path = mapCollections[i].Name + '/' + stageFiles[j].Name.Remove(stageFiles[j].Name.Length - stageFiles[j].Extension.Length);
                 stageData.loadStage(path);
                 stageData.saveStage(path);
             }
