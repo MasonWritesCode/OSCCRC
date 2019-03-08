@@ -8,6 +8,8 @@ public class Menu_Panel : MonoBehaviour {
 
     public enum Folder { Retro, New, Custom };
 
+    public int page { get { return m_pageNum; } set { setPage(value); } }
+
     void Awake()
     {
         m_folderNames.Add(Folder.Retro, "Retro/");
@@ -28,14 +30,23 @@ public class Menu_Panel : MonoBehaviour {
 
 
     // Displays a page of the file list
-    public void showPage(int page)
+    public void setPage(int pageNum)
     {
-        m_startIndex = page * m_numEntries;
+        if (pageNum < 0)
+        {
+            m_pageNum = 0;
+        }
+        else
+        {
+            m_pageNum = pageNum;
+        }
+
+        m_startIndex = m_pageNum * m_numEntries;
         // If we navigate past all the entries, we want to stay filled with the last entries
         if (m_startIndex > (m_fileList.Length - m_numEntries) && m_fileList.Length > m_numEntries)
         {
             m_startIndex = m_fileList.Length - m_numEntries;
-            GlobalData.curPage--;
+            m_pageNum--;
         }
 
         Menu_MapEntry[] entries = GetComponentsInChildren<Menu_MapEntry>();
@@ -90,6 +101,7 @@ public class Menu_Panel : MonoBehaviour {
 
 
     private const int m_numEntries = 10;
+    private int m_pageNum = 0;
     private int m_startIndex = 0;
     private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(3);
     private FileInfo[] m_fileList;
