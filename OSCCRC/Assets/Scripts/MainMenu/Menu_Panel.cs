@@ -8,14 +8,6 @@ public class Menu_Panel : MonoBehaviour {
 
     public enum Folder { Retro, New, Custom };
 
-    private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(3);
-
-    private const int m_numEntries = 10;
-    private FileInfo[] m_fileList;
-    private Transform m_entryPrefab;
-
-    private GameStage m_tempStageInfo;
-
     void Awake()
     {
         m_folderNames.Add(Folder.Retro, "Retro/");
@@ -26,6 +18,7 @@ public class Menu_Panel : MonoBehaviour {
         m_tempStageInfo = gameObject.AddComponent<GameStage>();
     }
 
+
     // Retrieves file list for the globally selected folder
     public void getFiles()
     {
@@ -33,18 +26,18 @@ public class Menu_Panel : MonoBehaviour {
         m_fileList = di.GetFiles("*.stage");
     }
 
+
     // Displays a page of the file list
     public void showPage(int page)
     {
-        int startIndex = page * m_numEntries;
+        m_startIndex = page * m_numEntries;
         // If we navigate past all the entries, we want to stay filled with the last entries
-        if (startIndex > (m_fileList.Length - m_numEntries) && m_fileList.Length > m_numEntries)
+        if (m_startIndex > (m_fileList.Length - m_numEntries) && m_fileList.Length > m_numEntries)
         {
-            startIndex = m_fileList.Length - m_numEntries;
+            m_startIndex = m_fileList.Length - m_numEntries;
             GlobalData.curPage--;
         }
 
-        // Destroy the old entries
         Menu_MapEntry[] entries = GetComponentsInChildren<Menu_MapEntry>();
         for (int i = 0; i < entries.Length; ++i)
         {
@@ -53,9 +46,19 @@ public class Menu_Panel : MonoBehaviour {
 
         for (int i = 0; i < m_numEntries && i < m_fileList.Length; ++i)
         {
-            placeEntry(m_fileList[i+startIndex], i);
+            placeEntry(m_fileList[i+ m_startIndex], i);
         }
     }
+
+
+    public void load(int place)
+    {
+        FileInfo selectedFile = m_fileList[place + m_startIndex];
+        SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        //m_tempStageInfo.loadStage(m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", ""));
+        GlobalData.currentStageFile = m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", "");
+    }
+
 
     private void placeEntry(FileInfo file, int place)
     {
@@ -79,16 +82,17 @@ public class Menu_Panel : MonoBehaviour {
         rt.anchoredPosition = new Vector2(m_XAxis, m_YAxis);
     }
 
+
     private void removeEntry(Menu_MapEntry entry)
     {
         Destroy(entry.gameObject);
     }
 
-    public void load(int place)
-    {
-        FileInfo selectedFile = m_fileList[place];
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
-        //m_tempStageInfo.loadStage(m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", ""));
-        GlobalData.currentStageFile = m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", "");
-    }
+
+    private const int m_numEntries = 10;
+    private int m_startIndex = 0;
+    private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(3);
+    private FileInfo[] m_fileList;
+    private Transform m_entryPrefab;
+    private GameStage m_tempStageInfo;
 }
