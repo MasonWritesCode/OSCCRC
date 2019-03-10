@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 
 public class Menu_Custom : MonoBehaviour, IPointerClickHandler
 {
@@ -16,10 +15,8 @@ public class Menu_Custom : MonoBehaviour, IPointerClickHandler
             typeSelect.SetActive(false);
             levelSelect.SetActive(true);
 
-            // Show page 0 to start with
             Menu_Panel panelScript = levelSelect.transform.Find("MapsList").GetComponent<Menu_Panel>();
             panelScript.folder = Menu_Panel.Folder.Custom;
-            panelScript.page = 0;
         }
     }
 }

@@ -6,9 +6,9 @@ using System.IO;
 
 public class Menu_Panel : MonoBehaviour {
 
-    public enum Folder { Retro, New, Custom };
+    public enum Folder { Unset, Retro, New, Custom };
 
-    public Folder folder { get { return m_folder; } set { m_folder = value; getFiles(value); } }
+    public Folder folder { get { return m_folder; } set { m_folder = value; getFiles(value); page = 0; } }
     public int page { get { return m_pageNum; } set { setPage(value); } }
 
     void Awake()
@@ -26,7 +26,6 @@ public class Menu_Panel : MonoBehaviour {
     {
         FileInfo selectedFile = m_fileList[place + m_startIndex];
         SceneManager.LoadScene("Game", LoadSceneMode.Single);
-        //m_tempStageInfo.loadStage(m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", ""));
         GlobalData.currentStageFile = m_folderNames[m_folder] + selectedFile.Name.Remove(selectedFile.Name.Length - selectedFile.Extension.Length);
     }
 
@@ -106,7 +105,7 @@ public class Menu_Panel : MonoBehaviour {
     private const int m_numEntries = 10;
     private int m_pageNum = 0;
     private int m_startIndex = 0;
-    private Folder m_folder = Folder.Retro;
+    private Folder m_folder = Folder.Unset;
     private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(3);
     private FileInfo[] m_fileList;
     private Transform m_entryPrefab;
