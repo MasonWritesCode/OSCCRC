@@ -10,8 +10,6 @@ public class Menu_New : MonoBehaviour, IPointerClickHandler
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            GlobalData.folder = Menu_Panel.Folder.New;
-
             GameObject typeSelect = transform.parent.gameObject;
             GameObject levelSelect = GameObject.FindWithTag("Menu").transform.Find("LevelFolder").gameObject;
 
@@ -20,7 +18,7 @@ public class Menu_New : MonoBehaviour, IPointerClickHandler
 
             // Show page 0 to start with
             Menu_Panel panelScript = levelSelect.transform.Find("MapsList").GetComponent<Menu_Panel>();
-            panelScript.getFiles();
+            panelScript.folder = Menu_Panel.Folder.New;
             panelScript.page = 0;
         }
     }

@@ -3,10 +3,9 @@
 
 public static class GlobalData {
 
-    // Global Data:
+    // MainManu exports:
 
     public static GameController.GameMode mode;
-    public static Menu_Panel.Folder folder;
     public static string currentStageFile;
 
 

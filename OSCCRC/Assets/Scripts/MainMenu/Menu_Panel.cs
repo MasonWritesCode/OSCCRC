@@ -8,6 +8,7 @@ public class Menu_Panel : MonoBehaviour {
 
     public enum Folder { Retro, New, Custom };
 
+    public Folder folder { get { return m_folder; } set { m_folder = value; getFiles(value); } }
     public int page { get { return m_pageNum; } set { setPage(value); } }
 
     void Awake()
@@ -21,16 +22,56 @@ public class Menu_Panel : MonoBehaviour {
     }
 
 
-    // Retrieves file list for the globally selected folder
-    public void getFiles()
+    public void load(int place)
     {
-        DirectoryInfo di = new DirectoryInfo(Application.streamingAssetsPath + "/Maps/" + m_folderNames[GlobalData.folder]);
+        FileInfo selectedFile = m_fileList[place + m_startIndex];
+        SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        //m_tempStageInfo.loadStage(m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", ""));
+        GlobalData.currentStageFile = m_folderNames[m_folder] + selectedFile.Name.Remove(selectedFile.Name.Length - selectedFile.Extension.Length);
+    }
+
+
+    // Retrieves the stage files for the currently selected folder
+    private void getFiles(Folder folder)
+    {
+        DirectoryInfo di = new DirectoryInfo(Application.streamingAssetsPath + "/Maps/" + m_folderNames[folder]);
         m_fileList = di.GetFiles("*.stage");
     }
 
 
+    // Creates and places a new GameObjects for listing stages
+    private void placeEntry(FileInfo file, int place)
+    {
+        Transform newEntryObj = Instantiate(m_entryPrefab, transform);
+        Menu_MapEntry newEntry = newEntryObj.GetComponent<Menu_MapEntry>();
+        newEntry.entryID = place;
+
+        m_tempStageInfo.loadStageMetadata(m_folderNames[m_folder] + file.Name.Remove(file.Name.Length - file.Extension.Length));
+
+        newEntry.setName(m_tempStageInfo.stageName);
+
+        RectTransform rt = newEntry.GetComponent<RectTransform>();
+
+        int myHeight = 25;
+        int myWidth = 560;
+        int m_XAxis = 0;
+        int m_YAxis = 165 - ((myHeight + 5) * place);
+
+        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, myHeight);
+        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, myWidth);
+        rt.anchoredPosition = new Vector2(m_XAxis, m_YAxis);
+    }
+
+
+    // Removes an entry from the GameObjects used for listing stages
+    private void removeEntry(Menu_MapEntry entry)
+    {
+        Destroy(entry.gameObject);
+    }
+
+
     // Displays a page of the file list
-    public void setPage(int pageNum)
+    private void setPage(int pageNum)
     {
         if (pageNum < 0)
         {
@@ -57,52 +98,15 @@ public class Menu_Panel : MonoBehaviour {
 
         for (int i = 0; i < m_numEntries && i < m_fileList.Length; ++i)
         {
-            placeEntry(m_fileList[i+ m_startIndex], i);
+            placeEntry(m_fileList[i + m_startIndex], i);
         }
-    }
-
-
-    public void load(int place)
-    {
-        FileInfo selectedFile = m_fileList[place + m_startIndex];
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
-        //m_tempStageInfo.loadStage(m_folderNames[GlobalData.folder] + selectedFile.Name.Replace(".stage", ""));
-        GlobalData.currentStageFile = m_folderNames[GlobalData.folder] + selectedFile.Name.Remove(selectedFile.Name.Length - selectedFile.Extension.Length);
-    }
-
-
-    private void placeEntry(FileInfo file, int place)
-    {
-        Transform newEntryObj = Instantiate(m_entryPrefab, transform);
-        Menu_MapEntry newEntry = newEntryObj.GetComponent<Menu_MapEntry>();
-        newEntry.entryID = place;
-
-        m_tempStageInfo.loadStageMetadata(m_folderNames[GlobalData.folder] + file.Name.Remove(file.Name.Length - file.Extension.Length));
-
-        newEntry.setName(m_tempStageInfo.stageName);
-
-        RectTransform rt = newEntry.GetComponent<RectTransform>();
-
-        int myHeight = 25;
-        int myWidth = 560;
-        int m_XAxis = 0;
-        int m_YAxis = 165 - ((myHeight + 5) * place);
-
-        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, myHeight);
-        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, myWidth);
-        rt.anchoredPosition = new Vector2(m_XAxis, m_YAxis);
-    }
-
-
-    private void removeEntry(Menu_MapEntry entry)
-    {
-        Destroy(entry.gameObject);
     }
 
 
     private const int m_numEntries = 10;
     private int m_pageNum = 0;
     private int m_startIndex = 0;
+    private Folder m_folder = Folder.Retro;
     private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(3);
     private FileInfo[] m_fileList;
     private Transform m_entryPrefab;
