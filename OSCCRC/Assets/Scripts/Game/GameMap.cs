@@ -184,46 +184,45 @@ public class GameMap : MonoBehaviour
             {
                 MapTile tile = m_mapTiles[j, i];
 
-                if (fin.Peek() != '_')
+                int tileFlags = int.Parse(fin.ReadLine());
+
+                if ((tileFlags >> 0 & 1) == 1)
                 {
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
-                    if (tileImprovement != MapTile.TileImprovement.None)
-                    {
-                        tile.improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
-                    }
-                    MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
-                    if (movingObj != MapTile.TileImprovement.None)
-                    {
-                        tile.movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
-
-                        if (movingObj == MapTile.TileImprovement.Mouse)
-                        {
-                            placeMouse(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
-                        }
-                        else if (movingObj == MapTile.TileImprovement.Cat)
-                        {
-                            placeCat(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
-                        }
-                    }
+                    tile.improvementDirection = (Directions.Direction)int.Parse(fin.ReadLine());
                     tile.improvement = tileImprovement;
-                    tile.movingObject = movingObj;
                 }
                 else
                 {
                     tile.improvement = MapTile.TileImprovement.None;
-                    tile.movingObject = MapTile.TileImprovement.None;
-
-                    // Pass by the underscore
-                    fin.ReadLine();
                 }
 
-                if (i == 0 || j == 0 || (i + j) % 2 == 0)
+                if ((tileFlags >> 1 & 1) == 1)
                 {
-                    int wallsValue = int.Parse(fin.ReadLine());
-                    tile.walls.north = (wallsValue >> 0 & 1) == 1;
-                    tile.walls.east = (wallsValue >> 1 & 1) == 1;
-                    tile.walls.south = (wallsValue >> 2 & 1) == 1;
-                    tile.walls.west = (wallsValue >> 3 & 1) == 1;
+                    MapTile.TileImprovement movingObj = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
+                    tile.movingObjDirection = (Directions.Direction)int.Parse(fin.ReadLine());
+                    tile.movingObject = movingObj;
+
+                    if (movingObj == MapTile.TileImprovement.Mouse)
+                    {
+                        placeMouse(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
+                    }
+                    else if (movingObj == MapTile.TileImprovement.Cat)
+                    {
+                        placeCat(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
+                    }
+                }
+                else
+                {
+                    tile.movingObject = MapTile.TileImprovement.None;
+                }
+
+                if ((tileFlags >> 2 & 1) == 1)
+                {
+                    tile.walls.north = (tileFlags >> 4 & 1) == 1;
+                    tile.walls.east = (tileFlags >> 5 & 1) == 1;
+                    tile.walls.south = (tileFlags >> 6 & 1) == 1;
+                    tile.walls.west = (tileFlags >> 7 & 1) == 1;
                 }
             }
         }
@@ -255,48 +254,57 @@ public class GameMap : MonoBehaviour
             {
                 MapTile tile = m_mapTiles[j, i];
 
-                // We can combine these two into a single character if they are the same. Thus a completely blank default tile will be indicated simply by only an underscore
-                // This actually only saves two characters in this sistuation though, as a blank tile before was two single digit numbers (each with a new line)
-                // 2 characters per tile is actually pretty significant relatively though
-                if (tile.improvement == MapTile.TileImprovement.None && tile.movingObject == MapTile.TileImprovement.None)
-                {
-                    fout.WriteLine('_');
-                }
-                else
-                {
-                    fout.WriteLine((int)tile.improvement);
-                    if (tile.improvement != MapTile.TileImprovement.None)
-                    {
-                        fout.WriteLine((int)tile.improvementDirection);
-                    }
+                // tileFlags holds all of the boolean values for the tile
+                // Currently, the values each bit represents is as follows:
+                // 0 0 0 0  0 0 0 0  0 0 0 0  0 0 0 0
+                //                   \ \ / /  | | | TileImprovement
+                //                      |     | | MovingObject
+                //                      |     | HasWalls
+                //                      |     Reserved-For-Future-Use    
+                //                      WallsFlags(w,s,e,n)
+                int tileFlags = 0;
 
-                    fout.WriteLine((int)tile.movingObject);
-                    if (tile.movingObject != MapTile.TileImprovement.None)
-                    {
-                        fout.WriteLine((int)tile.movingObjDirection);
-                    }
+                if (tile.improvement != MapTile.TileImprovement.None)
+                {
+                    tileFlags |= 1 << 0;
                 }
-
+                if (tile.movingObject != MapTile.TileImprovement.None)
+                {
+                    tileFlags |= 1 << 1;
+                }
                 if (i == 0 || j == 0 || (i + j) % 2 == 0)
                 {
-                    int wallsValue = 0;
+                    tileFlags |= 1 << 2;
+
                     if (tile.walls.north)
                     {
-                        wallsValue |= 1 << 0;
+                        tileFlags |= 1 << 4;
                     }
                     if (tile.walls.east)
                     {
-                        wallsValue |= 1 << 1;
+                        tileFlags |= 1 << 5;
                     }
                     if (tile.walls.south)
                     {
-                        wallsValue |= 1 << 2;
+                        tileFlags |= 1 << 6;
                     }
                     if (tile.walls.west)
                     {
-                        wallsValue |= 1 << 3;
+                        tileFlags |= 1 << 7;
                     }
-                    fout.WriteLine(wallsValue);
+                }
+                fout.WriteLine(tileFlags);
+
+                // Write remaining data if necessary
+                if ((tileFlags >> 0 & 1) == 1)
+                {
+                    fout.WriteLine((int)tile.improvement);
+                    fout.WriteLine((int)tile.improvementDirection);
+                }
+                if ((tileFlags >> 1 & 1) == 1)
+                {
+                    fout.WriteLine((int)tile.movingObject);
+                    fout.WriteLine((int)tile.movingObjDirection);
                 }
             }
         }
