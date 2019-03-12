@@ -175,7 +175,10 @@ public class GameMap : MonoBehaviour
         else
         {
             // We need to manually make sure we update the bigTile texture in case the resource pack changed
-            m_bigTile.GetComponent<MeshRenderer>().material = GameResources.materials["TileTiledColor"];
+            if (m_bigTile != null)
+            {
+                m_bigTile.GetComponent<MeshRenderer>().material = GameResources.materials["TileTiledColor"];
+            }
         }
 
         for (int j = 0; j < m_mapHeight; ++j)
