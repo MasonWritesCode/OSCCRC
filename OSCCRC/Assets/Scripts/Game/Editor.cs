@@ -12,9 +12,9 @@ public class Editor : MonoBehaviour {
 
 	void Start () {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-        m_gameStage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
-        m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
         m_gameControl = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        m_gameStage = m_gameControl.GetComponent<GameStage>();
+        m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
         m_mainCamera = Camera.main;
 
         m_placeholderType = ObjectType.None;

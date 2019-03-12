@@ -38,7 +38,7 @@ public class MapTile : MonoBehaviour
         movingObject = TileImprovement.None;
         improvementDirection = Directions.Direction.North;
         movingObjDirection = Directions.Direction.North;
-        walls = new Walls(parentMap, GetComponent<Transform>().localPosition);
+        walls = new Walls(parentMap, transform.localPosition);
         m_tileObject = null;
 
         m_rendererRef = GetComponent<MeshRenderer>();
