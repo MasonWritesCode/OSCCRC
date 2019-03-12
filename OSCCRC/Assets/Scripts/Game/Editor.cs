@@ -344,9 +344,9 @@ public class Editor : MonoBehaviour {
         m_movingObjects.Clear();
 
         GridMovement[] movingObjs = map.GetComponentsInChildren<GridMovement>();
-        foreach (GridMovement i in movingObjs)
+        for (int i = 0; i < movingObjs.Length; ++i)
         {
-            m_movingObjects.Add(map.tileAt(i.transform.localPosition), i.transform);
+            m_movingObjects.Add(map.tileAt(movingObjs[i].transform.localPosition), movingObjs[i].transform);
         }
     }
 

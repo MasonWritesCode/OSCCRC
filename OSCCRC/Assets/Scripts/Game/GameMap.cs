@@ -151,16 +151,18 @@ public class GameMap : MonoBehaviour
         // Removing walls will be handled at the same point in code where they are placed
 
         // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
-        GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>(true);
-        foreach (GridMovement i in deadMeat)
+        GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>();
+        for (int i = 0; i < deadMeat.Length; ++i)
         {
-            if (i.isCat)
+            if (deadMeat[i].isCat)
             {
-                destroyCat(i.transform);
+                deadMeat[i].gameObject.SetActive(false);
+                destroyCat(deadMeat[i].transform);
             }
             else
             {
-                destroyMouse(i.transform);
+                deadMeat[i].gameObject.SetActive(false);
+                destroyMouse(deadMeat[i].transform);
             }
         }
 
