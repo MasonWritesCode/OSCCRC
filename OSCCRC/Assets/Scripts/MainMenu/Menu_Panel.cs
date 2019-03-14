@@ -8,6 +8,8 @@ public class Menu_Panel : MonoBehaviour {
 
     public enum Folder { Unset, Retro, New, Custom };
 
+    public RectTransform mapEntryPrefab;
+
     public Folder folder { get { return m_folder; } set { m_folder = value; getFiles(value); page = 0; } }
     public int page { get { return m_pageNum; } set { setPage(value); } }
 
@@ -17,7 +19,6 @@ public class Menu_Panel : MonoBehaviour {
         m_folderNames.Add(Folder.New, "New/");
         m_folderNames.Add(Folder.Custom, "Custom/");
 
-        m_entryPrefab = GameResources.objects["MapEntry"];
         m_tempStageInfo = gameObject.AddComponent<GameStage>();
     }
 
@@ -41,7 +42,7 @@ public class Menu_Panel : MonoBehaviour {
     // Creates and places a new GameObjects for listing stages
     private void placeEntry(FileInfo file, int place)
     {
-        Transform newEntryObj = Instantiate(m_entryPrefab, transform);
+        Transform newEntryObj = Instantiate(mapEntryPrefab, transform);
         Menu_MapEntry newEntry = newEntryObj.GetComponent<Menu_MapEntry>();
         newEntry.entryID = place;
 
@@ -108,6 +109,5 @@ public class Menu_Panel : MonoBehaviour {
     private Folder m_folder = Folder.Unset;
     private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(3);
     private FileInfo[] m_fileList;
-    private Transform m_entryPrefab;
     private GameStage m_tempStageInfo;
 }
