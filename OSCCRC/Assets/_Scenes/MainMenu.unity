@@ -1285,7 +1285,6 @@ GameObject:
   - component: {fileID: 709736395}
   - component: {fileID: 709736394}
   - component: {fileID: 709736393}
-  - component: {fileID: 709736397}
   m_Layer: 5
   m_Name: Menu (UI)
   m_TagString: Menu
@@ -1373,17 +1372,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &709736397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 709736392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b72e705cc57c057458cf1561efef4c19, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &748211042
 GameObject:
   m_ObjectHideFlags: 0
