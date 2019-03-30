@@ -11,11 +11,9 @@ public class GameResources : MonoBehaviour {
 
     // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
 
-    public static Dictionary<string, Material> materials;
-    public static Dictionary<string, Transform> objects;
+    public static Dictionary<string, Material> materials = new Dictionary<string, Material>();
+    public static Dictionary<string, Transform> objects  = new Dictionary<string, Transform>();
     public static string resourcePack { get { return m_resourcePack; } set { loadResources(value); } }
-
-    private static string m_resourcePack = string.Empty;
 
 
     // Loads the resources into the interface that are under the name specified by "resourcePack"
@@ -26,8 +24,8 @@ public class GameResources : MonoBehaviour {
             return;
         }
 
-        materials = new Dictionary<string, Material>();
-        objects = new Dictionary<string, Transform>();
+        materials.Clear();
+        objects.Clear();
 
         m_resourcePack = resourcePack;
         string currentDir;
@@ -35,6 +33,7 @@ public class GameResources : MonoBehaviour {
         currentDir = "/Materials/";
         materials.Add("Tile", resourceFromDir(currentDir + "Tile") as Material);
         materials.Add("TileAlt", resourceFromDir(currentDir + "TileAlt") as Material);
+        materials.Add("TileTiledColor", resourceFromDir(currentDir + "TileTiledColor") as Material);
         materials.Add("Hole", resourceFromDir(currentDir + "Hole") as Material);
         materials.Add("Goal", resourceFromDir(currentDir + "Goal") as Material);
         materials.Add("Placeholder", resourceFromDir(currentDir + "ObjectPlace") as Material);
@@ -46,12 +45,11 @@ public class GameResources : MonoBehaviour {
         objects.Add("Mouse", (resourceFromDir(currentDir + "Mouse") as GameObject).transform);
         objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
         objects.Add("Placeholder", (resourceFromDir(currentDir + "Placeholder") as GameObject).transform);
-        objects.Add("MapEntry", (resourceFromDir(currentDir + "MapEntry") as GameObject).transform);
     }
 
 
     // Returns a resource located at the specified path or the default equivalent if not found
-    static private Object resourceFromDir(string path)
+    private static Object resourceFromDir(string path)
     {
         Object resource = Resources.Load(m_resourcePack + path);
 
@@ -59,10 +57,11 @@ public class GameResources : MonoBehaviour {
         {
             // Pull missing items from default pack to allow partial packs
             resource = Resources.Load("Default" + path);
-        }
-        if (resource == null)
-        {
-            Debug.LogWarning("Was not able to find default resource: " + path);
+
+            if (resource == null)
+            {
+                Debug.LogWarning("Was not able to find default resource: " + path);
+            }
         }
 
         return resource;
@@ -73,4 +72,7 @@ public class GameResources : MonoBehaviour {
     {
         loadResources("Default");
     }
+
+
+    private static string m_resourcePack = string.Empty;
 }

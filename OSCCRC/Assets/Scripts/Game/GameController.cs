@@ -1,95 +1,176 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 // This class controls various parts of gameplay and manages the state of the game.
 
 public class GameController : MonoBehaviour {
 
-    // isPaused needs to be moved to IGameMode probably
-	public bool isPaused { get { return m_isPaused; } set { game.pauseGame();  m_isPaused = value; } }
-
     public enum GameMode { None, Editor, Puzzle, Multiplayer };
-
-    //public static readonly GameMode mode = GameMode.Puzzle;
-    public static GameMode mode = GameMode.None;
-
-    private IGameMode game;
-    private bool m_isPaused;
-
+    public GameMode mode { get { return m_mode; } }
+    public GameState gameState { get { return m_gameState; } }
 
     // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
-        if (!isPaused)
+        if (m_gameState.hasState(GameState.TagState.Suspended))
         {
             return;
         }
 
         if (improvement == MapTile.TileImprovement.Direction)
         {
-            game.placeDirection(tile, dir);
+            if (tile.improvement == MapTile.TileImprovement.None || tile.improvement == MapTile.TileImprovement.Direction)
+            {
+                m_game.placeDirection(tile, dir);
+            }
         }
     }
 
-    public void runGame(GameMode mode)
+    // Begins a new game of the specified mode
+    public void runGame(GameMode newMode)
     {
-        if (game != null)
+        if (m_game != null)
         {
-            game.endGame();
+            m_game.endGame();
         }
 
-        if (mode == GameMode.Puzzle)
+        if (newMode == GameMode.Puzzle)
         {
-            game = new PuzzleGame();
+            m_game = new PuzzleGame(m_gameState);
         }
-        else if (mode == GameMode.Editor)
+        else if (newMode == GameMode.Editor)
         {
-            game = new EditorGame();
+            m_game = new EditorGame(m_gameState);
         }
 
         Editor editor = GetComponent<Editor>();
         if (editor)
         {
-            if (mode == GameMode.Editor && !editor.enabled)
+            if (newMode == GameMode.Editor && !editor.enabled)
             {
                 editor.enabled = true;
             }
-            else if (mode != GameMode.Editor && editor.enabled)
+            else if (newMode != GameMode.Editor && editor.enabled)
             {
                 editor.enabled = false;
             }
         }
 
-        if (mode != GameMode.None)
+        if (newMode != GameMode.None)
         {
-            game.startGame();
+            m_game.startGame();
         }
+
+        m_mode = newMode;
     }
 
 
     void Start () {
-        /*
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 60;
-        */
+        if (GlobalData.d_uncapFrames)
+        {
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = -1;
+        }
 
+        m_eventSystem = EventSystem.current;
+        m_wasInputFocused = false;
+
+        m_gameState = new GameState();
+        m_gameState.stateAdded += onTagStateAdd;
+        m_gameState.stateRemoved += onTagStateRemove;
+
+        GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStageFile;
         if (currentStage != null)
         {
-            GameStage stage = GetComponent<GameStage>();
             stage.loadStage(currentStage);
         }
-
-        m_isPaused = true;
+        else
+        {
+            stage.loadStage("Internal/default");
+        }
 
         runGame(GlobalData.mode);
     }
 
 
-    // Update is called once per frame
-    void Update () {
+    void Update()
+    {
+        // Unity does not have an event for a change in the currently selected game object, so we have to do a poll...
+        bool isInputFocused = false;
+        if (m_eventSystem.currentSelectedGameObject)
+        {
+            InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
+            isInputFocused = field != null && field.isFocused;
+            
+        }
 
-        //
-	}
+        if (isInputFocused != m_wasInputFocused) // focus changed, so change input focus state
+        {
+            m_wasInputFocused = isInputFocused;
+
+            if (isInputFocused && !m_gameState.hasState(GameState.TagState.InputFocused))
+            {
+                m_gameState.addState(GameState.TagState.InputFocused);
+            }
+            else if (!isInputFocused && m_gameState.hasState(GameState.TagState.InputFocused))
+            {
+                m_gameState.removeState(GameState.TagState.InputFocused);
+            }
+        }
+    }
+
+
+    void FixedUpdate()
+    {
+        // Here we manually simulate physics, so that we can avoid physics processing while paused (or possibly other scenarios)
+        if (Physics.autoSimulation)
+        {
+            return;
+        }
+        // One scenario we could consider adding is to disable physics when there are no cats to collide with.
+        if (m_gameState.mainState != GameState.State.Started_Unpaused || m_gameState.hasState(GameState.TagState.Suspended))
+        {
+            return;
+        }
+
+        Physics.Simulate(Time.fixedDeltaTime);
+    }
+
+    // We have to make sure we restore the time scale when the scene changes
+    void OnDestroy()
+    {
+        Time.timeScale = m_timeScaleHolder;
+    }
+
+    // Set timescale to 0 for suspending the game
+    // Animators wont animate, but will still use the same resources, so scripts attached to an animated object should consider disabling the animation on this event
+    private void onTagStateAdd(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            m_timeScaleHolder = Time.timeScale;
+            Time.timeScale = 0.0f;
+        }
+    }
+
+    // Removes the actions of suspending the game
+    // Scripts should avoid doing things while the game is suspended, so that their actions aren't undone by the unsuspend
+    private void onTagStateRemove(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            Time.timeScale = m_timeScaleHolder;
+        }
+    }
+
+    private GameMode m_mode = GameMode.None;
+    private GameState m_gameState;
+    private IGameMode m_game;
+    private float m_timeScaleHolder = 1.0f;
+    private EventSystem m_eventSystem;
+    private bool m_wasInputFocused;
 }
