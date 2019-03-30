@@ -174,7 +174,7 @@ public class MapTile : MonoBehaviour
                 {
                     // Directional arrows are objects that are implemented as tile objects themselves, which can cause z-fighting.
                     // We avoid z-fighting issues for directional tile objects by placing slightly above. Mathf.Epsilon doesn't seem to be enough for this.
-                    m_tileObject.localPosition = new Vector3(0.0f, 0.0f, -0.00001f);
+                    m_tileObject.localPosition = new Vector3(0.0f, 0.0f, -0.0001f);
                 }
                 Directions.rotate(ref m_tileObject, m_improvementDir);
             }

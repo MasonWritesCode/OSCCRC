@@ -39,7 +39,7 @@ public class GameMap : MonoBehaviour
     {
         Transform tilePrefab = GameResources.objects["Tile"];
         // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.00001f, zPos), tilePrefab.rotation, transform);
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.0001f, zPos), tilePrefab.rotation, transform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile(this);
         return newTile;
