@@ -86,10 +86,10 @@ public class GameController : MonoBehaviour {
         m_gameState.mainStateChange += onLevelComplete;
 
         GameStage stage = GetComponent<GameStage>();
-        string currentStage = GlobalData.currentStageFile;
+        string currentStage = GlobalData.currentStagePath;
         if (currentStage != null)
         {
-            stage.loadStage(currentStage);
+            stage.loadStage(currentStage.Remove(currentStage.Length - ".stage".Length));
         }
         else
         {
@@ -172,11 +172,8 @@ public class GameController : MonoBehaviour {
 
     private void onLevelComplete(GameState.State stateOld, GameState.State stateNew)
     {
-        Debug.Log("onLevelComplete");
-        Debug.Log(stateNew);
         if (stateNew == GameState.State.Ended)
         {
-            Debug.Log("ended");
             completeDisplay.enabled = true;
         }
     }

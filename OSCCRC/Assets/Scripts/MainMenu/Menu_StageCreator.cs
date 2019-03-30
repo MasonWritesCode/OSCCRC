@@ -10,7 +10,7 @@ public class Menu_StageCreator : MonoBehaviour, IPointerClickHandler
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            GlobalData.currentStageFile = "Internal/default";
+            GlobalData.currentStagePath = "Internal/default.stage";
             GlobalData.mode = GameController.GameMode.Editor;
 
             SceneManager.LoadScene("Game", LoadSceneMode.Single);

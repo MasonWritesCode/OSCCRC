@@ -27,7 +27,7 @@ public class Menu_Panel : MonoBehaviour {
     {
         FileInfo selectedFile = m_fileList[place + m_startIndex];
         SceneManager.LoadScene("Game", LoadSceneMode.Single);
-        GlobalData.currentStageFile = m_folderNames[m_folder] + selectedFile.Name.Remove(selectedFile.Name.Length - selectedFile.Extension.Length);
+        GlobalData.currentStagePath = m_folderNames[m_folder] + selectedFile.Name;
     }
 
 
