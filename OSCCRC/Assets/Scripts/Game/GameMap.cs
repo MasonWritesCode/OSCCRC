@@ -128,6 +128,7 @@ public class GameMap : MonoBehaviour
         {
             mouseDestroyed(mouse.gameObject);
         }
+        mouse.gameObject.SetActive(false);
         Destroy(mouse.gameObject);
     }
 
@@ -139,6 +140,7 @@ public class GameMap : MonoBehaviour
         {
             catDestroyed(cat.gameObject);
         }
+        cat.gameObject.SetActive(false);
         Destroy(cat.gameObject);
     }
 
