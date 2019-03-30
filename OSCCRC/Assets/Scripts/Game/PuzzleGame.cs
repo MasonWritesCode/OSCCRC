@@ -72,6 +72,12 @@ public class PuzzleGame : IGameMode {
     // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
+        Debug.Log("endGame");
+        if (victory)
+        {
+            Debug.Log("victory");
+            m_gameState.mainState = GameState.State.Ended;
+        }
         return;
     }
 

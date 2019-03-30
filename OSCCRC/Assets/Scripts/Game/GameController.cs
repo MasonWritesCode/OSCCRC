@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour {
     public enum GameMode { None, Editor, Puzzle, Multiplayer };
     public GameMode mode { get { return m_mode; } }
     public GameState gameState { get { return m_gameState; } }
+    public Canvas completeDisplay;
 
     // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
@@ -81,6 +82,8 @@ public class GameController : MonoBehaviour {
         m_gameState = new GameState();
         m_gameState.stateAdded += onTagStateAdd;
         m_gameState.stateRemoved += onTagStateRemove;
+
+        m_gameState.mainStateChange += onLevelComplete;
 
         GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStageFile;
@@ -164,6 +167,17 @@ public class GameController : MonoBehaviour {
         if (state == GameState.TagState.Suspended)
         {
             Time.timeScale = m_timeScaleHolder;
+        }
+    }
+
+    private void onLevelComplete(GameState.State stateOld, GameState.State stateNew)
+    {
+        Debug.Log("onLevelComplete");
+        Debug.Log(stateNew);
+        if (stateNew == GameState.State.Ended)
+        {
+            Debug.Log("ended");
+            completeDisplay.enabled = true;
         }
     }
 
