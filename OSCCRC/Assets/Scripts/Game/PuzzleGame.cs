@@ -72,6 +72,10 @@ public class PuzzleGame : IGameMode {
     // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
+        if (victory)
+        {
+            m_gameState.mainState = GameState.State.Ended;
+        }
         return;
     }
 
@@ -155,17 +159,19 @@ public class PuzzleGame : IGameMode {
         }
         else
         {
-            --m_currentMice;
-
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 Debug.Log("A mouse was destroyed. Game Over.");
                 endGame(false);
             }
-            else if (m_currentMice <= 0)
+            else
             {
-                Debug.Log("The last mouse hit a goal, you won.");
-                endGame(true);
+                --m_currentMice;
+                if (m_currentMice <= 0)
+                {
+                    Debug.Log("The last mouse hit a goal, you won.");
+                    endGame(true);
+                }
             }
         }
     }

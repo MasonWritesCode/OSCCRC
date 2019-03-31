@@ -39,7 +39,7 @@ public class GameMap : MonoBehaviour
     {
         Transform tilePrefab = GameResources.objects["Tile"];
         // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.00001f, zPos), tilePrefab.rotation, transform);
+        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.0001f, zPos), tilePrefab.rotation, transform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile(this);
         return newTile;
@@ -128,6 +128,7 @@ public class GameMap : MonoBehaviour
         {
             mouseDestroyed(mouse.gameObject);
         }
+        mouse.gameObject.SetActive(false);
         Destroy(mouse.gameObject);
     }
 
@@ -139,6 +140,7 @@ public class GameMap : MonoBehaviour
         {
             catDestroyed(cat.gameObject);
         }
+        cat.gameObject.SetActive(false);
         Destroy(cat.gameObject);
     }
 
@@ -354,6 +356,13 @@ public class GameMap : MonoBehaviour
     {
         // There is probably a correct thing to do here, but just do whatever for now since map sizes will probably always be the same.
 
+        // We want to center the camera within non-ui space. This space is currently the rightmost 80% of the screen.
+        cam.orthographicSize = Mathf.Max(mapWidth, mapHeight) * 0.4f;
+        float orthoscale = 4.2f / cam.orthographicSize;
+        cam.transform.position = new Vector3((mapWidth-1) * 0.4f * orthoscale, 50.0f, mapHeight * 0.5f * orthoscale);
+
+        // Old code for perspective camera
+        /*
         const float scaleFactor = 4.25f;
         float cameraAngleAdjust = Mathf.Sin(cam.transform.eulerAngles.x * Mathf.Deg2Rad) * (scaleFactor / 2);
 
@@ -371,6 +380,7 @@ public class GameMap : MonoBehaviour
                                              (m_mapWidth + m_mapHeight) * 1.6f + cameraAngleAdjust,
                                              (m_mapWidth * 0.5f) + (m_mapHeight * 0.5f) - cameraAngleAdjust
                                             ) / scaleFactor;
+    */
     }
 
 

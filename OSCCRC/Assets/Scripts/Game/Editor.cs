@@ -191,7 +191,7 @@ public class Editor : MonoBehaviour {
                 m_selectedImprovement = newImprovement;
                 m_direction = newDir;
                 // We set this slightly above to make sure it never has z-fighting issues with anything of the other "floor level" tiles
-                m_positionOffset = new Vector3(0.0f, 0.00002f, 0.0f);
+                m_positionOffset = new Vector3(0.0f, 0.0002f, 0.0f);
 
                 drawPlaceholder();
                 activatePlaceholder();

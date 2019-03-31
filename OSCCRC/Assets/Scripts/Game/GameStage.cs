@@ -76,6 +76,8 @@ public class GameStage : MonoBehaviour {
             {
                 Debug.LogWarning("Failed to read stage file " + fileName);
             }
+
+            GlobalData.currentStagePath = fileName + ".stage";
         }
     }
 

@@ -6,7 +6,7 @@ public static class GlobalData {
     // MainManu exports:
 
     public static GameController.GameMode mode;
-    public static string currentStageFile;
+    public static string currentStagePath;
 
 
     // Development Related Values:
