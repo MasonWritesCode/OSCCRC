@@ -5,10 +5,14 @@ using UnityEngine.EventSystems;
 
 public class Menu_New : MonoBehaviour, IPointerClickHandler
 {
+    public AudioSource audioData;
+
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
+            audioData.Play(0);
+
             GameObject typeSelect = transform.parent.gameObject;
             GameObject levelSelect = GameObject.FindWithTag("Menu").transform.Find("LevelFolder").gameObject;
 
