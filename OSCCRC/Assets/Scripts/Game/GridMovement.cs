@@ -18,6 +18,8 @@ public class GridMovement : MonoBehaviour {
 		m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
 
         m_transform = GetComponent<Transform>();
+        m_rigidbody = GetComponent<Rigidbody>();
+        m_interpolationMode = m_rigidbody.interpolation;
 
         m_animator = GetComponent<Animator>();
         if (m_animator)
@@ -53,26 +55,46 @@ public class GridMovement : MonoBehaviour {
         m_remainingDistance -= distance;
 
         // Wrap around to tile on opposite side of map if necessary
+        if (m_isOnEdgeTile)
+        {
+            applyMapWrap();
+        }
+    }
+
+
+    // Wraps the transform to the other side of the map if necessary
+    private void applyMapWrap()
+    {
+        bool willWrap = false;
         Vector3 pos = m_transform.localPosition;
+
         if (pos.x <= -(m_map.tileSize / 2)) // West -> East
         {
             pos.x += m_map.mapWidth * m_map.tileSize;
-            m_transform.localPosition = pos;
+            willWrap = true;
         }
-        else if (pos.x >= (m_map.mapWidth - (m_map.tileSize / 2))) // East -> West
+        else if (pos.x >= (m_map.mapWidth - 0.5f) * m_map.tileSize) // East -> West
         {
             pos.x -= m_map.mapWidth * m_map.tileSize;
-            m_transform.localPosition = pos;
+            willWrap = true;
         }
         if (pos.z <= -(m_map.tileSize / 2)) // South -> North
         {
             pos.z += m_map.mapHeight * m_map.tileSize;
-            m_transform.localPosition = pos;
+            willWrap = true;
         }
-        else if (pos.z >= (m_map.mapHeight - (m_map.tileSize / 2))) // North -> South
+        else if (pos.z >= (m_map.mapHeight - 0.5f) * m_map.tileSize) // North -> South
         {
             pos.z -= m_map.mapHeight * m_map.tileSize;
+            willWrap = true;
+        }
+
+        if (willWrap)
+        {
+            // We don't want to interpolate a "warp", so temporarily disable it
+            m_rigidbody.interpolation = RigidbodyInterpolation.None;
             m_transform.localPosition = pos;
+            m_rigidbody.interpolation = m_interpolationMode;
         }
     }
 
@@ -204,6 +226,12 @@ public class GridMovement : MonoBehaviour {
         Directions.rotate(ref m_transform, direction);
 
         m_remainingDistance = m_map.tileSize;
+
+        // We only want to check for wrapping per update when we are on a tile that is at the edge
+        m_isOnEdgeTile = m_transform.localPosition.x < (m_map.tileSize / 2)
+                         || m_transform.localPosition.x > (m_map.mapWidth - 1.5f) * m_map.tileSize
+                         || m_transform.localPosition.z < (m_map.tileSize / 2)
+                         || m_transform.localPosition.z > (m_map.mapHeight - 1.5f) * m_map.tileSize;
     }
 
 
@@ -248,7 +276,10 @@ public class GridMovement : MonoBehaviour {
     private GameController m_gameController;
     private GameMap m_map;
     private Transform m_transform;
+    private Rigidbody m_rigidbody;
+    private RigidbodyInterpolation m_interpolationMode;
     private Animator m_animator;
     private MapTile m_tile;
     private float m_remainingDistance;
+    private bool m_isOnEdgeTile;
 }
