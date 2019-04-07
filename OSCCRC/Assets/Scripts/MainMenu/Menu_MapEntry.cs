@@ -7,8 +7,9 @@ using UnityEngine.EventSystems;
 public class Menu_MapEntry : MonoBehaviour, IPointerClickHandler {
 
     public int entryID;
-	
-	public void setThumbnail(string fileName)
+    public AudioSource audioData;
+
+    public void setThumbnail(string fileName)
     {
         //
     }
@@ -28,6 +29,9 @@ public class Menu_MapEntry : MonoBehaviour, IPointerClickHandler {
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
+            audioData = GameObject.Find("ClickSound").GetComponent<AudioSource>();
+            audioData.Play(0);
+
             transform.parent.GetComponent<Menu_Panel>().load(entryID);
         }
     }

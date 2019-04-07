@@ -7,10 +7,15 @@ using UnityEngine.SceneManagement;
 
 public class Complete_Next : MonoBehaviour, IPointerClickHandler
 {
+    public AudioSource audioData;
+
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
+            audioData = GameObject.Find("ClickSound").GetComponent<AudioSource>();
+            audioData.Play(0);
+
             GlobalData.mode = GameController.GameMode.None;
 
             string [] splitFilePath = GlobalData.currentStagePath.Split(new char[] {'/'});
