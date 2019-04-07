@@ -354,33 +354,22 @@ public class GameMap : MonoBehaviour
     // Sets the position of camera "cam" to be able to see the entire map
     private void setCameraView(Camera cam)
     {
-        // There is probably a correct thing to do here, but just do whatever for now since map sizes will probably always be the same.
-
+        // Currently this is set up for an orthographic camera.
         // We want to center the camera within non-ui space. This space is currently the rightmost 80% of the screen.
-        cam.orthographicSize = Mathf.Max(mapWidth, mapHeight) * 0.4f;
-        float orthoscale = 4.2f / cam.orthographicSize;
-        cam.transform.position = new Vector3((mapWidth-1) * 0.4f * orthoscale, 50.0f, mapHeight * 0.5f * orthoscale);
 
-        // Old code for perspective camera
-        /*
-        const float scaleFactor = 4.25f;
-        float cameraAngleAdjust = Mathf.Sin(cam.transform.eulerAngles.x * Mathf.Deg2Rad) * (scaleFactor / 2);
+        // Increasing adds more empty space around the map, effectively controlling how zoomed in it is.
+        const float mapPaddingRatio = 0.05f;
 
-        // Because maps are currently always 12x9, don't bother doing extra calculations for for that case (this is probably worth the cost of the if statement?)
-        if (m_mapHeight == 9 && m_mapWidth == 12)
-        {
-            cam.transform.position = new Vector3(22.5f,
-                                                 33.6f + cameraAngleAdjust,
-                                                 10.5f - cameraAngleAdjust
-                                                ) / scaleFactor; 
-            return;
-        }
+        // We want to get the camera width and height necessary for fitting the map. Then we decide on an orthographic size that fits.
+        float neededHeight = mapHeight * tileSize * (1.0f + mapPaddingRatio);
+        float neededWidth = mapWidth * tileSize * (1.0f + mapPaddingRatio);
+        float newOrthographicSize = Mathf.Max(neededHeight / 2.0f, neededWidth / (cam.aspect * 2.0f * 0.8f));
+        cam.orthographicSize = newOrthographicSize;
 
-        cam.transform.position = new Vector3((m_mapWidth * 1.5f) + (m_mapHeight * 0.5f),
-                                             (m_mapWidth + m_mapHeight) * 1.6f + cameraAngleAdjust,
-                                             (m_mapWidth * 0.5f) + (m_mapHeight * 0.5f) - cameraAngleAdjust
-                                            ) / scaleFactor;
-    */
+        // Now we position the resized map. The width must also subtract half of the screen space devoted to UI
+        // (I'm not sure why, but our UI offset calculation seems to be slightly off, so I am adding a -0.5f to it which seems to work)
+        float UIOffset = (newOrthographicSize * cam.aspect * 0.2f) - 0.5f;
+        cam.transform.position = new Vector3(((mapWidth - 1) / 2) - UIOffset, 50.0f, (mapHeight - 1) / 2);
     }
 
 
