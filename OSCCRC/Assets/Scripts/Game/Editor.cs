@@ -281,7 +281,11 @@ public class Editor : MonoBehaviour {
             }
             else // Not a moving obj
             {
-                if (selectedTile.improvement == m_selectedImprovement && selectedTile.improvementDirection == m_direction)
+                if ( selectedTile.improvement == m_selectedImprovement &&
+                     ( selectedTile.improvementDirection == m_direction ||
+                       (selectedTile.improvement == MapTile.TileImprovement.Goal || selectedTile.improvement == MapTile.TileImprovement.Hole)
+                     )
+                   )
                 {
                     selectedTile.improvement = MapTile.TileImprovement.None;
                 }
