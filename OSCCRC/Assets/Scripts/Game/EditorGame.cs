@@ -127,17 +127,19 @@ public class EditorGame : IGameMode
         }
         else
         {
-            --m_currentMice;
-
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 Debug.Log("A mouse was destroyed. Game Over.");
                 endGame(false);
             }
-            else if (m_currentMice <= 0)
+            else
             {
-                Debug.Log("The last mouse hit a goal, you won.");
-                endGame(true);
+                --m_currentMice;
+                if (m_currentMice <= 0)
+                {
+                    Debug.Log("The last mouse hit a goal, you won.");
+                    endGame(true);
+                }
             }
         }
     }
