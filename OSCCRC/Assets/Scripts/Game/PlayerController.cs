@@ -86,6 +86,12 @@ public class PlayerController : MonoBehaviour {
                     m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
                 }
             }
+
+            // Reset to clear all placements. This will simply reload the map and re-initialize the game mode for now.
+            if (Input.GetButtonDown("Reset"))
+            {
+                m_gameController.resetGame();
+            }
         }
 
         if (Input.GetButtonDown("Menu"))

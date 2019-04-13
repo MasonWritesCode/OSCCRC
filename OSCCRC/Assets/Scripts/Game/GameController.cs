@@ -31,6 +31,7 @@ public class GameController : MonoBehaviour {
     }
 
     // Begins a new game of the specified mode
+    // Only call this after a new GameStage has just been loaded
     public void runGame(GameMode newMode)
     {
         if (m_game != null)
@@ -66,6 +67,18 @@ public class GameController : MonoBehaviour {
         }
 
         m_mode = newMode;
+    }
+
+
+    // Resets the game of the currently started mode
+    public void resetGame()
+    {
+        if (m_game == null)
+        {
+            return;
+        }
+
+        m_game.resetGame();
     }
 
 
@@ -170,6 +183,7 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    // Does actions when a user completes a stage
     private void onLevelComplete(GameState.State stateOld, GameState.State stateNew)
     {
         if (stateNew == GameState.State.Ended)
@@ -177,6 +191,7 @@ public class GameController : MonoBehaviour {
             completeDisplay.enabled = true;
         }
     }
+
 
     private GameMode m_mode = GameMode.None;
     private GameState m_gameState;

@@ -10,6 +10,7 @@ public class GameStage : MonoBehaviour {
 
     // Not using file name as the stage name gives more flexibility in naming, should we choose to show a map name somewhere
     public string stageName { get { return m_stageName; } set { m_stageName = value; } }
+    public string fileName { get { return m_fileName; } }
     // Maybe add a game mode? Probably will later just in case it gets used.
     public string musicTrack { get { return m_musicTrack; } set { m_musicTrack = value; } }
     public string resourcePackName { get { return m_resourcePack; } set { m_resourcePack = value; } }
@@ -77,6 +78,7 @@ public class GameStage : MonoBehaviour {
                 Debug.LogWarning("Failed to read stage file " + fileName);
             }
 
+            m_fileName = fileName;
             GlobalData.currentStagePath = fileName + ".stage";
         }
     }
@@ -101,6 +103,7 @@ public class GameStage : MonoBehaviour {
     }
 
 
+    private string m_fileName = "Internal/default";
     private string m_stageName = "Stage";
     private string m_musicTrack = "Default";
     private string m_resourcePack = "Default";

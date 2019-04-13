@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44393003, g: 0.49330938, b: 0.57279044, a: 1}
+  m_IndirectSpecularColor: {r: 0.44392988, g: 0.49330902, b: 0.5727899, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1244,6 +1244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab5d227b74e2c646a8e15df6673bc78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioData: {fileID: 0}
 --- !u!114 &702161110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1635,6 +1636,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 951996f504865a145b61bf71606569f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioData: {fileID: 0}
   pauseDisplay: {fileID: 1519803097}
 --- !u!1 &903401643
 GameObject:
@@ -2986,6 +2988,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa04d3ac3721cd443a32c74837ca1206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioData: {fileID: 0}
 --- !u!1 &1356459081
 GameObject:
   m_ObjectHideFlags: 0
@@ -4189,6 +4192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa04d3ac3721cd443a32c74837ca1206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioData: {fileID: 0}
 --- !u!114 &1857983499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4308,7 +4312,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.99
+  near clip plane: 40.99
   far clip plane: 500
   field of view: 60
   orthographic: 1
