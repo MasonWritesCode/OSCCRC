@@ -42,12 +42,12 @@ public class Cat : GridMovement {
         //checking for arrows
         else if (tile.improvement == MapTile.TileImprovement.Direction)
         {
-            direction = tile.improvementDirection;
-
             if (direction == Directions.getOppositeDir(tile.improvementDirection))
             {
                 tile.damageTile();
             }
+
+            direction = tile.improvementDirection;
         }
     }
 }
