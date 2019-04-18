@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour {
             {
                 Ray tileSelector = m_mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hitObject;
-                if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Player Selectable")))
+                if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Map Selectable")))
                 {
                     MapTile newTile = hitObject.transform.GetComponent<MapTile>();
                     if (newTile != null && newTile != m_currentTile)
