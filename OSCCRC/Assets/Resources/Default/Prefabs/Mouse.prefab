@@ -70,10 +70,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4476613451300466}
-  - component: {fileID: 114052251384721900}
   - component: {fileID: 95502869000028644}
   - component: {fileID: 135525755073462502}
   - component: {fileID: 54332728872675912}
+  - component: {fileID: 114856738673410134}
   m_Layer: 0
   m_Name: Mouse
   m_TagString: Untagged
@@ -660,7 +660,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114052251384721900
+--- !u!114 &114856738673410134
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -668,12 +668,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1468713278425226}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18893cb5c1faa864c9353e63cde63754, type: 3}
+  m_Script: {fileID: 11500000, guid: 373e4dd5da2abb248bb213f57715ea6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 6.6666
-  direction: 0
-  isCat: 0
+  direction: 1
 --- !u!135 &135525755073462502
 SphereCollider:
   m_ObjectHideFlags: 1

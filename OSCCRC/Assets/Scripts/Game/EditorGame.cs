@@ -117,7 +117,7 @@ public class EditorGame : IGameMode
             return;
         }
 
-        if (gm.isCat)
+        if (gm is Cat)
         {
             if (gm.tile.improvement == MapTile.TileImprovement.Goal)
             {

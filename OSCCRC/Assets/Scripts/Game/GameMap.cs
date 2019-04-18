@@ -156,15 +156,14 @@ public class GameMap : MonoBehaviour
         GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>();
         for (int i = 0; i < deadMeat.Length; ++i)
         {
-            if (deadMeat[i].isCat)
+            deadMeat[i].gameObject.SetActive(false);
+            if (deadMeat[i] is Mouse)
             {
-                deadMeat[i].gameObject.SetActive(false);
-                destroyCat(deadMeat[i].transform);
-            }
-            else
-            {
-                deadMeat[i].gameObject.SetActive(false);
                 destroyMouse(deadMeat[i].transform);
+            }
+            else if (deadMeat[i] is Cat)
+            {
+                destroyCat(deadMeat[i].transform);
             }
         }
 

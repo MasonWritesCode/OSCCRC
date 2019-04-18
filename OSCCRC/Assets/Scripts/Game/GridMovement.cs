@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // This class controls the behavior of moving objects such as Cats and Mice.
+// As an abstract class, one should Instantiate a Mouse or Cat object directly instead.
 
-public class GridMovement : MonoBehaviour {
+public abstract class GridMovement : MonoBehaviour {
 
     [Range(0, 255)] public float speed;
 
     public Directions.Direction direction;
-    public bool isCat;
     public MapTile tile { get { return m_tile; } }
+
+
+    // Runs interactions with the specified tile improvement
+    protected abstract void interactWithImprovement(MapTile.TileImprovement improvement);
 
 
     void Start () {
@@ -104,47 +108,7 @@ public class GridMovement : MonoBehaviour {
     {
         m_tile = tile;
 
-        //check for goals and holes
-        if (tile.improvement == MapTile.TileImprovement.Goal)
-        {
-            if (isCat)
-            {
-                m_map.destroyCat(transform);
-            }
-            else
-            {
-                m_map.destroyMouse(transform);
-            }
-
-            return;
-        }
-        else if (tile.improvement == MapTile.TileImprovement.Hole)
-        {
-            if (isCat)
-            {
-                m_map.destroyCat(transform);
-            }
-            else
-            {
-                m_map.destroyMouse(transform);
-            }
-
-            return;
-        }
-
-        //checking for arrows
-        if (tile.improvement == MapTile.TileImprovement.Direction)
-        {
-            if (isCat && direction == Directions.getOppositeDir(tile.improvementDirection))
-            {
-                direction = tile.improvementDirection;
-                tile.damageTile();
-            }
-            else
-            {
-                direction = tile.improvementDirection;
-            }
-        }
+        interactWithImprovement(tile.improvement);
 
         //Checking for walls
         if (tile.walls.north && direction == Directions.Direction.North)
@@ -261,24 +225,12 @@ public class GridMovement : MonoBehaviour {
     }
 
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (isCat && other.name.Contains("Mouse"))
-        {
-            if (!other.GetComponent<GridMovement>().isCat)
-            {
-                m_map.destroyMouse(other.transform);
-            }
-        }
-    }
-
-
-    private GameController m_gameController;
-    private GameMap m_map;
-    private Transform m_transform;
-    private Rigidbody m_rigidbody;
+    protected GameController m_gameController;
+    protected GameMap m_map;
+    protected Transform m_transform;
+    protected Rigidbody m_rigidbody;
+    protected Animator m_animator;
     private RigidbodyInterpolation m_interpolationMode;
-    private Animator m_animator;
     private MapTile m_tile;
     private float m_remainingDistance;
     private bool m_isOnEdgeTile;

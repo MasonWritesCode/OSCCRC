@@ -155,10 +155,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4932463689872970}
-  - component: {fileID: 114070464262402396}
   - component: {fileID: 95781845954143718}
   - component: {fileID: 135955852886912508}
   - component: {fileID: 54199121661686834}
+  - component: {fileID: 114092590358716338}
   m_Layer: 0
   m_Name: Cat
   m_TagString: Untagged
@@ -733,7 +733,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114070464262402396
+--- !u!114 &114092590358716338
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -741,12 +741,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1583404243129010}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18893cb5c1faa864c9353e63cde63754, type: 3}
+  m_Script: {fileID: 11500000, guid: fb9d61a1a7a188a46ab483188abca51d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 4.4444
-  direction: 0
-  isCat: 1
+  direction: 1
 --- !u!135 &135955852886912508
 SphereCollider:
   m_ObjectHideFlags: 1
