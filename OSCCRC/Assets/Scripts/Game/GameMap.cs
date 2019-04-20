@@ -426,9 +426,9 @@ public class GameMap : MonoBehaviour
     }
 
 
-    public int m_mapHeight = 0;
-    public int m_mapWidth = 0;
-    public float m_tileSize = 1;
+    private int m_mapHeight = 0;
+    private int m_mapWidth = 0;
+    private float m_tileSize = 1;
     private MapTile[,] m_mapTiles = null;
     private Transform m_bigTile = null;
 }
