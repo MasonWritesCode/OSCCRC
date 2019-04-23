@@ -70,8 +70,10 @@ public class PuzzleGame : IGameMode {
         }
         else
         {
-            loadAutosave(ref m_resetSaveData);
+            loadAutosave(m_resetSaveData);
+            m_currentMice = m_numMice;
         }
+
         m_placements = new AvailablePlacements(m_originalPlacements);
         showAvailablePlacements();
     }
@@ -93,6 +95,13 @@ public class PuzzleGame : IGameMode {
         {
             m_gameState.mainState = GameState.State.Ended;
         }
+        else
+        {
+            // We reset for the player after a period of time when they fail
+            m_gameState.mainState = GameState.State.Started_Paused;
+            loadAutosaveDelayed(m_pauseSaveData, 1.5f);
+        }
+
         return;
     }
 
@@ -141,7 +150,13 @@ public class PuzzleGame : IGameMode {
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
-            loadAutosave(ref m_pauseSaveData);
+
+            if (m_deadMouse == null)
+            {
+                // We don't want to immediately load the map when the player has failed so that we can show what failed
+                // For now, we will just ignore it here and let the fail-triggered actions reload for us, even though it is ugly
+                loadAutosave(m_pauseSaveData);
+            }
             m_currentMice = m_numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
@@ -180,6 +195,7 @@ public class PuzzleGame : IGameMode {
         }
         else
         {
+            m_deadMouse = gm;
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 AudioSource audioData;
@@ -212,6 +228,7 @@ public class PuzzleGame : IGameMode {
     }
 
 
+    // Updates the display of available placements
     private void showAvailablePlacements()
     {
         m_placementsDisplay.transform.Find("UpText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.North).ToString();
@@ -241,7 +258,7 @@ public class PuzzleGame : IGameMode {
 
 
     // Loads a save of the map for reseting the puzzle
-    private void loadAutosave(ref byte[] saveLocation)
+    private void loadAutosave(byte[] saveLocation)
     {
         using (MemoryStream ms = new MemoryStream(saveLocation))
         {
@@ -253,12 +270,30 @@ public class PuzzleGame : IGameMode {
     }
 
 
+    // Loads a save after the specified time has elapsed
+    private void loadAutosaveDelayed(byte[] saveLocation, float delayInSeconds)
+    {
+        // We have to rely on a closure to pass data to the timer event as far as I know
+        // Because of this we are spawning a new timer to clear the lambda subscriber
+        // This is very ugly but it will have to do for now
+        m_timer = new Timer();
+        m_timer.timerCompleted += () =>
+        {
+            loadAutosave(saveLocation);
+            m_timer = null;
+        };
+        m_timer.startTimer(delayInSeconds);
+    }
+
+
     private int m_numMice = 0;
     private int m_currentMice = 0;
     private AvailablePlacements m_placements;
     private AvailablePlacements m_originalPlacements;
     private GameObject m_placementsDisplay;
     private bool m_paused;
+    private GridMovement m_deadMouse = null;
+    private Timer m_timer = null;
     private byte[] m_pauseSaveData;
     private byte[] m_resetSaveData;
     private GameMap m_gameMap;
