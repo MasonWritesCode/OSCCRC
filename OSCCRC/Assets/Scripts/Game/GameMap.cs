@@ -18,6 +18,8 @@ public class GameMap : MonoBehaviour
     public int mapWidth { get { return m_mapWidth; } }
     public float tileSize { get { return m_tileSize; } }
 
+    public Transform ringPrefab;
+
 
     // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(Vector3 point)
@@ -142,6 +144,15 @@ public class GameMap : MonoBehaviour
         }
         cat.gameObject.SetActive(false);
         Destroy(cat.gameObject);
+    }
+
+
+    // Draws a ring around the specified location on the map for the specified length of time to draw the user's attention.
+    // Location is a map-relative position.
+    public void pingLocation(Vector3 location, float timeInSeconds)
+    {
+        Transform pingRing = Instantiate(ringPrefab, new Vector3(location.x, 5.0f, location.z), ringPrefab.rotation, transform);
+        Destroy(pingRing.gameObject, timeInSeconds);
     }
 
 

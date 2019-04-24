@@ -2345,9 +2345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7b4938d41c88e94284bd65c640b2e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_mapHeight: 0
-  m_mapWidth: 0
-  m_tileSize: 1
+  ringPrefab: {fileID: 4215024253298442, guid: 6a7995dd4bb633746b9e28f1962b3554, type: 2}
 --- !u!1 &1196397977
 GameObject:
   m_ObjectHideFlags: 0

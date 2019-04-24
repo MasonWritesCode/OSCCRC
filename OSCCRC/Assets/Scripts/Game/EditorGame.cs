@@ -76,6 +76,10 @@ public class EditorGame : IGameMode
     public void endGame(bool victory)
     {
         // We reset for the player after a period of time when they win or lose
+        if (!victory)
+        {
+            m_gameMap.pingLocation(m_deadMouse.transform.localPosition, 1.5f);
+        }
         m_gameState.mainState = GameState.State.Started_Paused;
         loadAutosaveDelayed(m_pauseSaveData, 1.5f);
     }
