@@ -39,7 +39,10 @@ public abstract class GridMovement : MonoBehaviour {
 
 
 	void FixedUpdate() {
-        if (   m_gameController.gameState.mainState != GameState.State.Started_Unpaused
+        if (   !(
+                    m_gameController.gameState.mainState == GameState.State.Started_Unpaused
+                 || m_gameController.gameState.mainState == GameState.State.Ended_Unpaused
+                )
             || m_gameController.gameState.hasState(GameState.TagState.Suspended)
            )
         {
