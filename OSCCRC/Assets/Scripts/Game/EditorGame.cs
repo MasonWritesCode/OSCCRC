@@ -75,13 +75,13 @@ public class EditorGame : IGameMode
     // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
-        // We reset for the player after a period of time when they win or lose
+        // We reset for the player after a period of time when they win or lose by "pressing pause"
         if (!victory)
         {
             m_gameMap.pingLocation(m_deadMouse.transform.localPosition, 1.5f);
         }
-        m_gameState.mainState = GameState.State.Started_Paused;
-        loadAutosaveDelayed(m_pauseSaveData, 1.5f);
+        m_gameState.mainState = GameState.State.Ended_Paused;
+        setStateDelayed(GameState.State.Started_Paused, 1.5f);
     }
 
 
@@ -98,19 +98,21 @@ public class EditorGame : IGameMode
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
-
-            if (m_deadMouse == null)
-            {
-                // We don't want to immediately load the map when the player has failed so that we can show what failed
-                // For now, we will just ignore it here and let the fail-triggered actions reload for us, even though it is ugly
-                loadAutosave(m_pauseSaveData);
-            }
+            loadAutosave(m_pauseSaveData);
             m_currentMice = m_numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
             m_paused = false;
             saveAutosave(ref m_pauseSaveData);
+        }
+        else if (newState == GameState.State.Ended_Paused)
+        {
+            m_paused = true;
+        }
+        else if (newState == GameState.State.Ended_Unpaused)
+        {
+            m_paused = false;
         }
     }
 
@@ -190,8 +192,8 @@ public class EditorGame : IGameMode
     }
 
 
-    // Loads a save after the specified time has elapsed
-    private void loadAutosaveDelayed(byte[] saveLocation, float delayInSeconds)
+    // Changes the state of m_gameState after the specified delay
+    private void setStateDelayed(GameState.State state, float delayInSeconds)
     {
         // We have to rely on a closure to pass data to the timer event as far as I know
         // Because of this we are spawning a new timer to clear the lambda subscriber
@@ -199,7 +201,7 @@ public class EditorGame : IGameMode
         m_timer = new Timer();
         m_timer.timerCompleted += () =>
         {
-            loadAutosave(saveLocation);
+            m_gameState.mainState = state;
             m_timer = null;
         };
         m_timer.startTimer(delayInSeconds);

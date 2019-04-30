@@ -186,8 +186,9 @@ public class GameController : MonoBehaviour {
     // Does actions when a user completes a stage
     private void onLevelComplete(GameState.State stateOld, GameState.State stateNew)
     {
-        if (stateNew == GameState.State.Ended)
+        if (stateNew == GameState.State.Ended_Unpaused)
         {
+            // This should be moved into PuzzleGame in some way or another at some point
             completeDisplay.enabled = true;
         }
     }
