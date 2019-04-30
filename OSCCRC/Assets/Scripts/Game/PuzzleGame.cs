@@ -50,6 +50,7 @@ public class PuzzleGame : IGameMode {
         m_pauseSaveData = (byte[]) m_resetSaveData.Clone();
 
         m_paused = true;
+        m_playing = true;
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
@@ -98,9 +99,8 @@ public class PuzzleGame : IGameMode {
         else
         {
             // We reset for the player after a period of time when they fail by "pressing pause"
-            m_gameMap.pingLocation(m_deadMouse.transform.localPosition, 1.5f);
             m_gameState.mainState = GameState.State.Ended_Paused;
-            setStateDelayed(GameState.State.Started_Paused, 1.5f);
+            setStateDelayed(GameState.State.Started_Paused, m_autoResetDelay);
         }
 
         return;
@@ -110,7 +110,7 @@ public class PuzzleGame : IGameMode {
     // Places a tile if it is in the stage's list of available placements
     public void placeDirection(MapTile tile, Directions.Direction dir)
     {
-        if (!m_paused)
+        if (!m_paused || !m_playing)
         {
             // We aren't in a state where placement is allowed, so just ignore the request
             return;
@@ -151,21 +151,25 @@ public class PuzzleGame : IGameMode {
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
+            m_playing = true;
             loadAutosave(m_pauseSaveData);
             m_currentMice = m_numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
             m_paused = false;
+            m_playing = true;
             saveAutosave(ref m_pauseSaveData);
         }
         else if (newState == GameState.State.Ended_Paused)
         {
             m_paused = true;
+            m_playing = false;
         }
         else if (newState == GameState.State.Ended_Unpaused)
         {
             m_paused = false;
+            m_playing = false;
         }
     }
 
@@ -173,7 +177,7 @@ public class PuzzleGame : IGameMode {
     private void checkGameEnd(GameObject deadMeat)
     {
         // Mice can only die when paused when loading to reset, in which case we don't need to gameover
-        if (m_paused)
+        if (m_paused || !m_playing)
         {
             return;
         }
@@ -193,12 +197,12 @@ public class PuzzleGame : IGameMode {
                 audioData.Play(0);
 
                 Debug.Log("Cat hit goal, you lose.");
+                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
         }
         else
         {
-            m_deadMouse = gm;
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 AudioSource audioData;
@@ -206,6 +210,7 @@ public class PuzzleGame : IGameMode {
                 audioData.Play(0);
 
                 Debug.Log("A mouse was destroyed. Game Over.");
+                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
             else
@@ -295,7 +300,8 @@ public class PuzzleGame : IGameMode {
     private AvailablePlacements m_originalPlacements;
     private GameObject m_placementsDisplay;
     private bool m_paused;
-    private GridMovement m_deadMouse = null;
+    private bool m_playing;
+    private float m_autoResetDelay = 1.5f;
     private Timer m_timer = null;
     private byte[] m_pauseSaveData;
     private byte[] m_resetSaveData;

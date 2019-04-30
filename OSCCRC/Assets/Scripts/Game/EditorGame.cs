@@ -41,6 +41,7 @@ public class EditorGame : IGameMode
         saveAutosave(ref m_pauseSaveData);
 
         m_paused = true;
+        m_playing = true;
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
@@ -76,12 +77,8 @@ public class EditorGame : IGameMode
     public void endGame(bool victory)
     {
         // We reset for the player after a period of time when they win or lose by "pressing pause"
-        if (!victory)
-        {
-            m_gameMap.pingLocation(m_deadMouse.transform.localPosition, 1.5f);
-        }
         m_gameState.mainState = GameState.State.Ended_Paused;
-        setStateDelayed(GameState.State.Started_Paused, 1.5f);
+        setStateDelayed(GameState.State.Started_Paused, m_autoResetDelay);
     }
 
 
@@ -98,21 +95,25 @@ public class EditorGame : IGameMode
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
+            m_playing = true;
             loadAutosave(m_pauseSaveData);
             m_currentMice = m_numMice;
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
             m_paused = false;
+            m_playing = true;
             saveAutosave(ref m_pauseSaveData);
         }
         else if (newState == GameState.State.Ended_Paused)
         {
             m_paused = true;
+            m_playing = false;
         }
         else if (newState == GameState.State.Ended_Unpaused)
         {
             m_paused = false;
+            m_playing = false;
         }
     }
 
@@ -120,7 +121,7 @@ public class EditorGame : IGameMode
     private void checkGameEnd(GameObject deadMeat)
     {
         // Mice can only die when paused when loading to reset, in which case we don't need to gameover
-        if (m_paused)
+        if (m_paused || !m_playing)
         {
             return;
         }
@@ -136,15 +137,16 @@ public class EditorGame : IGameMode
             if (gm.tile.improvement == MapTile.TileImprovement.Goal)
             {
                 Debug.Log("Cat hit goal, you lose.");
+                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
         }
         else
         {
-            m_deadMouse = gm;
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
                 Debug.Log("A mouse was destroyed. Game Over.");
+                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
             else
@@ -212,7 +214,8 @@ public class EditorGame : IGameMode
     private int m_currentMice = 0;
     private GameObject m_saveMenu;
     private bool m_paused;
-    private GridMovement m_deadMouse = null;
+    private bool m_playing;
+    private float m_autoResetDelay = 1.5f;
     private Timer m_timer = null;
     private byte[] m_pauseSaveData;
     private GameMap m_gameMap;
