@@ -136,6 +136,9 @@ public class EditorGame : IGameMode
         {
             if (gm.tile.improvement == MapTile.TileImprovement.Goal)
             {
+                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
                 Debug.Log("Cat hit goal, you lose.");
                 m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
@@ -145,6 +148,9 @@ public class EditorGame : IGameMode
         {
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
+                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
                 Debug.Log("A mouse was destroyed. Game Over.");
                 m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
@@ -154,8 +160,16 @@ public class EditorGame : IGameMode
                 --m_currentMice;
                 if (m_currentMice <= 0)
                 {
+                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
+                    audioData.Play(0);
+
                     Debug.Log("The last mouse hit a goal, you won.");
                     endGame(true);
+                }
+                else
+                {
+                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
+                    audioData.Play(0);
                 }
             }
         }

@@ -192,8 +192,7 @@ public class PuzzleGame : IGameMode {
         {
             if (gm.tile.improvement == MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData;
-                audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
+                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
                 Debug.Log("Cat hit goal, you lose.");
@@ -205,8 +204,7 @@ public class PuzzleGame : IGameMode {
         {
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData;
-                audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
+                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
                 Debug.Log("A mouse was destroyed. Game Over.");
@@ -218,8 +216,7 @@ public class PuzzleGame : IGameMode {
                 --m_currentMice;
                 if (m_currentMice <= 0)
                 {
-                    AudioSource audioData;
-                    audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
+                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
                     audioData.Play(0);
 
                     Debug.Log("The last mouse hit a goal, you won.");
@@ -227,8 +224,7 @@ public class PuzzleGame : IGameMode {
                 }
                 else
                 {
-                    AudioSource audioData;
-                    audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
+                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
                     audioData.Play(0);
                 }
             }
