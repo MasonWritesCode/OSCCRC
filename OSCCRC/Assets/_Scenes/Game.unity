@@ -1648,7 +1648,6 @@ GameObject:
   - component: {fileID: 903401645}
   - component: {fileID: 903401644}
   - component: {fileID: 903401646}
-  - component: {fileID: 903401648}
   - component: {fileID: 903401647}
   - component: {fileID: 903401649}
   m_Layer: 0
@@ -1707,17 +1706,6 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 89b398df7b4037e4389bdbb692d94e3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &903401648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 903401643}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b72e705cc57c057458cf1561efef4c19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &903401649
@@ -2314,6 +2302,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1141874401}
   - component: {fileID: 1141874402}
+  - component: {fileID: 1141874403}
   m_Layer: 0
   m_Name: Map
   m_TagString: Map
@@ -2346,6 +2335,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ringPrefab: {fileID: 4215024253298442, guid: 6a7995dd4bb633746b9e28f1962b3554, type: 2}
+--- !u!114 &1141874403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1141874400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b72e705cc57c057458cf1561efef4c19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1196397977
 GameObject:
   m_ObjectHideFlags: 0
