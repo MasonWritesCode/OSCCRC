@@ -20,15 +20,14 @@ public class Timer {
     public Timer()
     {
         m_timerObj = new GameObject().AddComponent<TimerComponent>();
-        m_timerObj.timerComponentEnd += onComponentComplete;
     }
 
     public void startTimer(float timeInSeconds)
     {
-        m_timerObj.startTimer(timeInSeconds);
+        m_timerObj.startTimer(timeInSeconds, setTimerComplete);
     }
 
-    private void onComponentComplete()
+    private void setTimerComplete()
     {
         if (timerCompleted != null)
         {
@@ -42,35 +41,30 @@ public class Timer {
 
     private class TimerComponent : MonoBehaviour
     {
-        public event voidEvent timerComponentEnd;
-
-        public void startTimer(float timeInSeconds)
+        public void startTimer(float timeInSeconds, voidEvent completionCallback)
         {
+            if (m_timerRunning)
+            {
+                Debug.LogWarning("Attempted to start a timer that was already running");
+                return;
+            }
+
+            m_completionCallback = completionCallback;
             m_timerLengthSeconds = timeInSeconds;
             StartCoroutine(runTimer());
         }
 
         private IEnumerator runTimer()
         {
-            if (m_timerRunning)
-            {
-                Debug.LogWarning("Attempted to start a timer that was already running");
-                yield break;
-            }
-
             m_timerRunning = true;
             yield return new WaitForSeconds(m_timerLengthSeconds);
 
             m_timerRunning = false;
-            if (timerComponentEnd != null)
-            {
-                timerComponentEnd();
-            }
+            m_completionCallback();
         }
 
+        private voidEvent m_completionCallback;
         private bool m_timerRunning = false;
         private float m_timerLengthSeconds = 0.0f;
     }
 }
-
-
