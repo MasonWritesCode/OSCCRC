@@ -76,8 +76,15 @@ public class EditorGame : IGameMode
     // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
+        if (victory)
+        {
+            m_gameState.mainState = GameState.State.Ended_Unpaused;
+        }
+        else
+        {
+            m_gameState.mainState = GameState.State.Ended_Paused;
+        }
         // We reset for the player after a period of time when they win or lose by "pressing pause"
-        m_gameState.mainState = GameState.State.Ended_Paused;
         setStateDelayed(GameState.State.Started_Paused, m_autoResetDelay);
     }
 

@@ -189,7 +189,11 @@ public class GameController : MonoBehaviour {
         if (stateNew == GameState.State.Ended_Unpaused)
         {
             // This should be moved into PuzzleGame in some way or another at some point
-            completeDisplay.enabled = true;
+            //   when we figure out how we want to store the display reference to the mode without it being a monobehavior
+            if (m_mode == GameMode.Puzzle)
+            {
+                completeDisplay.enabled = true;
+            }
         }
     }
 

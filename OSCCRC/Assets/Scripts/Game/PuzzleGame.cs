@@ -102,8 +102,6 @@ public class PuzzleGame : IGameMode {
             m_gameState.mainState = GameState.State.Ended_Paused;
             setStateDelayed(GameState.State.Started_Paused, m_autoResetDelay);
         }
-
-        return;
     }
 
 
