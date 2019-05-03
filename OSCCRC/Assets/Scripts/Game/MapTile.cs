@@ -38,6 +38,7 @@ public class MapTile : MonoBehaviour
         movingObject = TileImprovement.None;
         improvementDirection = Directions.Direction.North;
         movingObjDirection = Directions.Direction.North;
+        m_gameResources = parentMap.GetComponent<GameResources>();
         walls = new Walls(parentMap, transform.localPosition);
         m_tileObject = null;
 
@@ -116,9 +117,9 @@ public class MapTile : MonoBehaviour
             }
             else
             {
-                if (GameResources.materials.ContainsKey(materialName))
+                if (m_gameResources.materials.ContainsKey(materialName))
                 {
-                    m_rendererRef.material = GameResources.materials[materialName];
+                    m_rendererRef.material = m_gameResources.materials[materialName];
 
                     if (!m_rendererRef.enabled)
                     {
@@ -148,9 +149,9 @@ public class MapTile : MonoBehaviour
 
             if (materialName != null)
             {
-                if (GameResources.materials.ContainsKey(materialName))
+                if (m_gameResources.materials.ContainsKey(materialName))
                 {
-                    GetComponent<MeshRenderer>().material = GameResources.materials[materialName];
+                    GetComponent<MeshRenderer>().material = m_gameResources.materials[materialName];
                 }
                 else
                 {
@@ -167,9 +168,9 @@ public class MapTile : MonoBehaviour
         }
         if (objectName != null)
         {
-            if (GameResources.objects.ContainsKey(objectName))
+            if (m_gameResources.objects.ContainsKey(objectName))
             {
-                m_tileObject = Instantiate(GameResources.objects[objectName], transform);
+                m_tileObject = Instantiate(m_gameResources.objects[objectName], transform);
                 if (improvement == TileImprovement.Direction)
                 {
                     // Directional arrows are objects that are implemented as tile objects themselves, which can cause z-fighting.
@@ -194,4 +195,5 @@ public class MapTile : MonoBehaviour
     private Transform m_tileObject;
     private int m_tileDamage;
     private MeshRenderer m_rendererRef;
+    private GameResources m_gameResources;
 }

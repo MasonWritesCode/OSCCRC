@@ -21,6 +21,12 @@ public class GameMap : MonoBehaviour
     public Transform ringPrefab;
 
 
+    void Awake()
+    {
+        m_gameResources = GetComponent<GameResources>();
+    }
+
+
     // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(Vector3 point)
     {
@@ -39,7 +45,7 @@ public class GameMap : MonoBehaviour
     // The returned object should only be destroyed by calling the destroyTile function
     public MapTile createTile(float xPos, float zPos)
     {
-        Transform tilePrefab = GameResources.objects["Tile"];
+        Transform tilePrefab = m_gameResources.objects["Tile"];
         // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
         Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.0001f, zPos), tilePrefab.rotation, transform);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
@@ -52,7 +58,7 @@ public class GameMap : MonoBehaviour
     // The returned object should only be destroyed by calling the destroyWall function
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
-        Transform wallPrefab = GameResources.objects["Wall"];
+        Transform wallPrefab = m_gameResources.objects["Wall"];
         Transform newWall = Instantiate(wallPrefab, new Vector3(xPos, 0, zPos), wallPrefab.rotation, transform);
 
         if (direction == Directions.Direction.North)
@@ -81,7 +87,7 @@ public class GameMap : MonoBehaviour
     // The returned object should only be destroyed with the destroyMouse function
     public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
-        Transform mousePrefab = GameResources.objects["Mouse"];
+        Transform mousePrefab = m_gameResources.objects["Mouse"];
         Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, transform);
         Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
@@ -99,7 +105,7 @@ public class GameMap : MonoBehaviour
     // The returned object should only be destroyed with the destroyCat function
     public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
     {
-        Transform catPrefab = GameResources.objects["Cat"];
+        Transform catPrefab = m_gameResources.objects["Cat"];
         Transform newCat = Instantiate(catPrefab, new Vector3(xPos, 0, zPos), catPrefab.rotation, transform);
         Directions.rotate(ref newCat, direction);
         newCat.GetComponent<GridMovement>().direction = direction;
@@ -191,7 +197,7 @@ public class GameMap : MonoBehaviour
             // We need to manually make sure we update the bigTile texture in case the resource pack changed
             if (m_bigTile != null)
             {
-                m_bigTile.GetComponent<MeshRenderer>().material = GameResources.materials["TileTiledColor"];
+                m_bigTile.GetComponent<MeshRenderer>().material = m_gameResources.materials["TileTiledColor"];
             }
         }
 
@@ -401,7 +407,7 @@ public class GameMap : MonoBehaviour
         m_mapHeight = height; m_mapWidth = width;
         m_mapTiles = new MapTile[m_mapHeight, m_mapWidth];
 
-        m_tileSize = GameResources.objects["Tile"].localScale.x;
+        m_tileSize = m_gameResources.objects["Tile"].localScale.x;
 
         for (int j = 0; j < m_mapHeight; ++j)
         {
@@ -417,7 +423,7 @@ public class GameMap : MonoBehaviour
             // Since most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
             if (m_bigTile == null)
             {
-                Transform tilePrefab = GameResources.objects["Tile"];
+                Transform tilePrefab = m_gameResources.objects["Tile"];
                 m_bigTile = Instantiate(tilePrefab, Vector3.zero, tilePrefab.rotation, transform);
             }
 
@@ -427,7 +433,7 @@ public class GameMap : MonoBehaviour
             m_bigTile.transform.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
             m_bigTile.transform.position = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
             MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
-            bigTileRend.material = GameResources.materials["TileTiledColor"];
+            bigTileRend.material = m_gameResources.materials["TileTiledColor"];
             bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
 
             bigTileRend.enabled = true;
@@ -442,4 +448,5 @@ public class GameMap : MonoBehaviour
     private float m_tileSize = 1;
     private MapTile[,] m_mapTiles = null;
     private Transform m_bigTile = null;
+    private GameResources m_gameResources;
 }

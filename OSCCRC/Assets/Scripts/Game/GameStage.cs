@@ -65,14 +65,15 @@ public class GameStage : MonoBehaviour {
                 return;
             }
 
+            GameObject gameMap = GameObject.FindWithTag("Map");
+
             stageName = fin.ReadLine();
             musicTrack = fin.ReadLine();
             resourcePackName = fin.ReadLine();
-            GameResources.loadResources(resourcePackName);
+            gameMap.GetComponent<GameResources>().loadResources(resourcePackName);
 
             // Now load the map itself
-            GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
-            bool wasLoaded = gameMap.importMap(fin);
+            bool wasLoaded = gameMap.GetComponent<GameMap>().importMap(fin);
             if (!wasLoaded)
             {
                 Debug.LogWarning("Failed to read stage file " + fileName);
