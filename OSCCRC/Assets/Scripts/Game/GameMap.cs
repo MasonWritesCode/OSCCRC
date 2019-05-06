@@ -30,14 +30,26 @@ public class GameMap : MonoBehaviour
     // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(Vector3 point)
     {
-        return m_mapTiles[Mathf.RoundToInt(point.z / m_tileSize), Mathf.RoundToInt(point.x / m_tileSize)];
+        int yIndex = Mathf.RoundToInt(point.z / m_tileSize);
+        int xIndex = Mathf.RoundToInt(point.x / m_tileSize);
+        if (yIndex < 0 || xIndex < 0 || yIndex > mapHeight || xIndex > mapWidth)
+        {
+            return null;
+        }
+        return m_mapTiles[yIndex, xIndex];
     }
 
 
     // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(float y, float x)
     {
-        return m_mapTiles[Mathf.RoundToInt(y / m_tileSize), Mathf.RoundToInt(x / m_tileSize)];
+        int yIndex = Mathf.RoundToInt(y / m_tileSize);
+        int xIndex = Mathf.RoundToInt(x / m_tileSize);
+        if (yIndex < 0 || xIndex < 0 || yIndex > mapHeight || xIndex > mapWidth)
+        {
+            return null;
+        }
+        return m_mapTiles[yIndex, xIndex];
     }
 
 
