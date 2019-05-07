@@ -72,35 +72,13 @@ public abstract class GridMovement : MonoBehaviour {
     // Wraps the transform to the other side of the map if necessary
     private void applyMapWrap()
     {
-        bool willWrap = false;
-        Vector3 pos = m_transform.localPosition;
+        Vector3 wrappedPos = m_map.wrapCoord(m_transform.localPosition);
 
-        if (pos.x <= -(m_map.tileSize / 2)) // West -> East
-        {
-            pos.x += m_map.mapWidth * m_map.tileSize;
-            willWrap = true;
-        }
-        else if (pos.x >= (m_map.mapWidth - 0.5f) * m_map.tileSize) // East -> West
-        {
-            pos.x -= m_map.mapWidth * m_map.tileSize;
-            willWrap = true;
-        }
-        if (pos.z <= -(m_map.tileSize / 2)) // South -> North
-        {
-            pos.z += m_map.mapHeight * m_map.tileSize;
-            willWrap = true;
-        }
-        else if (pos.z >= (m_map.mapHeight - 0.5f) * m_map.tileSize) // North -> South
-        {
-            pos.z -= m_map.mapHeight * m_map.tileSize;
-            willWrap = true;
-        }
-
-        if (willWrap)
+        if (wrappedPos != m_transform.localPosition)
         {
             // We don't want to interpolate a "warp", so temporarily disable it
             m_rigidbody.interpolation = RigidbodyInterpolation.None;
-            m_transform.localPosition = pos;
+            m_transform.localPosition = wrappedPos;
             m_rigidbody.interpolation = m_interpolationMode;
         }
     }
@@ -195,10 +173,7 @@ public abstract class GridMovement : MonoBehaviour {
         m_remainingDistance = m_map.tileSize;
 
         // We only want to check for wrapping per update when we are on a tile that is at the edge
-        m_isOnEdgeTile = m_transform.localPosition.x < (m_map.tileSize / 2)
-                         || m_transform.localPosition.x > (m_map.mapWidth - 1.5f) * m_map.tileSize
-                         || m_transform.localPosition.z < (m_map.tileSize / 2)
-                         || m_transform.localPosition.z > (m_map.mapHeight - 1.5f) * m_map.tileSize;
+        m_isOnEdgeTile = m_map.isEdgeTile(tile);
     }
 
 

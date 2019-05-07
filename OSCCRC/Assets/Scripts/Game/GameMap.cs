@@ -32,7 +32,7 @@ public class GameMap : MonoBehaviour
     {
         int yIndex = Mathf.RoundToInt(point.z / m_tileSize);
         int xIndex = Mathf.RoundToInt(point.x / m_tileSize);
-        if (yIndex < 0 || xIndex < 0 || yIndex > mapHeight || xIndex > mapWidth)
+        if (yIndex < 0 || xIndex < 0 || yIndex >= mapHeight || xIndex >= mapWidth)
         {
             return null;
         }
@@ -45,11 +45,46 @@ public class GameMap : MonoBehaviour
     {
         int yIndex = Mathf.RoundToInt(y / m_tileSize);
         int xIndex = Mathf.RoundToInt(x / m_tileSize);
-        if (yIndex < 0 || xIndex < 0 || yIndex > mapHeight || xIndex > mapWidth)
+        if (yIndex < 0 || xIndex < 0 || yIndex >= mapHeight || xIndex >= mapWidth)
         {
             return null;
         }
         return m_mapTiles[yIndex, xIndex];
+    }
+
+
+    // Returns true if a tile is on the edge of the map, otherwise returns false
+    public bool isEdgeTile(MapTile tile)
+    {
+        Vector3 tilePos = tile.transform.localPosition;
+        int yIndex = Mathf.FloorToInt(tilePos.z / m_tileSize);
+        int xIndex = Mathf.FloorToInt(tilePos.x / m_tileSize);
+
+        return xIndex == 0 || xIndex == (mapWidth - 1) || yIndex == 0 || yIndex == (mapHeight - 1);
+    }
+
+
+    // Wraps a coordinate to always be a location on the GameMap
+    public Vector3 wrapCoord(Vector3 coord)
+    {
+        if (coord.x <= -(tileSize / 2)) // West -> East
+        {
+            coord.x += mapWidth * tileSize;
+        }
+        else if (coord.x >= (mapWidth - 0.5f) * tileSize) // East -> West
+        {
+            coord.x -= mapWidth * tileSize;
+        }
+        if (coord.z <= -(tileSize / 2)) // South -> North
+        {
+            coord.z += mapHeight * tileSize;
+        }
+        else if (coord.z >= (mapHeight - 0.5f) * tileSize) // North -> South
+        {
+            coord.z -= mapHeight * tileSize;
+        }
+
+        return coord;
     }
 
 
