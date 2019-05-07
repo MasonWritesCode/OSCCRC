@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 // This class handles the game map, including the tiles, walls, and moving entities within.
 // It will be used to create new map objects and to access them.
@@ -210,9 +211,11 @@ public class GameMap : MonoBehaviour
 
 
     // Imports map data to the current game map from the open stream specified by "fin"
-    // Comments documenting the file format can be found in the exportMap() function
+    // Comments documenting the file format can be found in the exportMap function
     public bool importMap(StreamReader fin)
     {
+        Profiler.BeginSample("GameMap.importMap");
+
         // First delete allocated game objects, since we are creating new ones
         // Removing walls will be handled at the same point in code where they are placed
 
@@ -297,6 +300,8 @@ public class GameMap : MonoBehaviour
             }
         }
 
+        Profiler.EndSample();
+
         if (mapLoaded != null)
         {
             mapLoaded();
@@ -314,6 +319,8 @@ public class GameMap : MonoBehaviour
             Debug.LogWarning("Tried to export map while none exists.");
             return false;
         }
+
+        Profiler.BeginSample("GameMap.exportMap");
 
         fout.WriteLine(m_mapHeight);
         fout.WriteLine(m_mapWidth);
@@ -378,6 +385,8 @@ public class GameMap : MonoBehaviour
                 }
             }
         }
+
+        Profiler.EndSample();
 
         return true;
     }
