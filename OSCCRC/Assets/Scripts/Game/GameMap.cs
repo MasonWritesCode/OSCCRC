@@ -200,6 +200,7 @@ public class GameMap : MonoBehaviour
     // Location is a map-relative position.
     public void pingLocation(Vector3 location, float timeInSeconds)
     {
+        location = transform.TransformPoint(location);
         Transform pingRing = Instantiate(ringPrefab, new Vector3(location.x, 5.0f, location.z), ringPrefab.rotation, transform);
         Destroy(pingRing.gameObject, timeInSeconds);
     }
