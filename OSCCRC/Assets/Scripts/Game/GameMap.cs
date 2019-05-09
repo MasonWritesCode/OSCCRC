@@ -68,21 +68,15 @@ public class GameMap : MonoBehaviour
     // Wraps a coordinate to always be a location on the GameMap
     public Vector3 wrapCoord(Vector3 coord)
     {
-        if (coord.x <= -(tileSize / 2)) // West -> East
+        coord.x = (coord.x + 0.5f) % (mapWidth * tileSize) - 0.5f;
+        coord.z = (coord.z + 0.5f) % (mapHeight * tileSize) - 0.5f;
+        if (coord.x < -0.5f)
         {
-            coord.x += mapWidth * tileSize;
+            coord.x = mapWidth + coord.x;
         }
-        else if (coord.x >= (mapWidth - 0.5f) * tileSize) // East -> West
+        if (coord.z < -0.5f)
         {
-            coord.x -= mapWidth * tileSize;
-        }
-        if (coord.z <= -(tileSize / 2)) // South -> North
-        {
-            coord.z += mapHeight * tileSize;
-        }
-        else if (coord.z >= (mapHeight - 0.5f) * tileSize) // North -> South
-        {
-            coord.z -= mapHeight * tileSize;
+            coord.z = mapHeight + coord.z;
         }
 
         return coord;
