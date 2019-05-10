@@ -332,11 +332,11 @@ public class Editor : MonoBehaviour {
                 Transform newMovingObj = null;
                 if (selectedTile.movingObject == MapTile.TileImprovement.Mouse)
                 {
-                    newMovingObj = m_gameMap.placeMouse(selectedTile.transform.localPosition.x, selectedTile.transform.localPosition.z, m_direction);
+                    newMovingObj = m_gameMap.placeMouse(selectedTile.transform.localPosition, m_direction);
                 }
                 else if (selectedTile.movingObject == MapTile.TileImprovement.Cat)
                 {
-                    newMovingObj = m_gameMap.placeCat(selectedTile.transform.localPosition.x, selectedTile.transform.localPosition.z, m_direction);
+                    newMovingObj = m_gameMap.placeCat(selectedTile.transform.localPosition, m_direction);
                 }
                 m_movingObjects.Add(selectedTile, newMovingObj);
             }
@@ -400,7 +400,7 @@ public class Editor : MonoBehaviour {
             // Need to set a position offset to show which wall facing is used
             // Easiest way is to spawn a wall and then destroy it. This is wasteful, but only done once per object select.
             // The point of using a mesh is to avoid spawning objects, so this is also messy and bad. It can be changed later.
-            Transform temp = m_gameMap.createWall(0, 0, m_direction);
+            Transform temp = m_gameMap.createWall(Vector3.zero, m_direction);
             m_positionOffset = temp.localPosition;
             m_gameMap.destroyWall(temp);
 

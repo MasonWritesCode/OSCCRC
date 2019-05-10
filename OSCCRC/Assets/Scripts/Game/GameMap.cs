@@ -86,11 +86,11 @@ public class GameMap : MonoBehaviour
 
     // Creates a wall game object The position is map-relative.
     // The returned object should only be destroyed by calling the destroyWall function
-    public Transform createWall(float xPos, float zPos, Directions.Direction direction)
+    public Transform createWall(Vector3 position, Directions.Direction direction)
     {
         Transform wallPrefab = m_gameResources.objects["Wall"];
         Transform newWall = Instantiate(wallPrefab, transform);
-        newWall.localPosition = new Vector3(xPos, 0, zPos);
+        newWall.localPosition = position;
 
         if (direction == Directions.Direction.North)
         {
@@ -116,11 +116,11 @@ public class GameMap : MonoBehaviour
 
     // Creates a mouse object and returns its transform. The position is map-relative.
     // The returned object should only be destroyed with the destroyMouse function
-    public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
+    public Transform placeMouse(Vector3 position, Directions.Direction direction)
     {
         Transform mousePrefab = m_gameResources.objects["Mouse"];
         Transform newMouse = Instantiate(mousePrefab, transform);
-        newMouse.localPosition = new Vector3(xPos, 0, zPos);
+        newMouse.localPosition = position;
         Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
 
@@ -135,11 +135,11 @@ public class GameMap : MonoBehaviour
 
     // Creates a cat object and returns its transform. The position is map-relative.
     // The returned object should only be destroyed with the destroyCat function
-    public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
+    public Transform placeCat(Vector3 position, Directions.Direction direction)
     {
         Transform catPrefab = m_gameResources.objects["Cat"];
         Transform newCat = Instantiate(catPrefab, transform);
-        newCat.localPosition = new Vector3(xPos, 0, zPos);
+        newCat.localPosition = position;
         Directions.rotate(ref newCat, direction);
         newCat.GetComponent<GridMovement>().direction = direction;
 
@@ -256,11 +256,11 @@ public class GameMap : MonoBehaviour
 
                     if (movingObj == MapTile.TileImprovement.Mouse)
                     {
-                        placeMouse(tile.transform.localPosition.x, tile.transform.localPosition.z, tile.movingObjDirection);
+                        placeMouse(tile.transform.localPosition, tile.movingObjDirection);
                     }
                     else if (movingObj == MapTile.TileImprovement.Cat)
                     {
-                        placeCat(tile.transform.localPosition.x, tile.transform.localPosition.z, tile.movingObjDirection);
+                        placeCat(tile.transform.localPosition, tile.movingObjDirection);
                     }
                 }
                 else
