@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 // This class is used to determine when a length of time has passed. It is used similarly to a C# Timing.Timer, throwing an event upon the time fully elapsing.
@@ -12,59 +11,43 @@ using UnityEngine;
 public class Timer {
 
     // We can't make Timer a monobehavior, because monobehaviors needs to be added to GameObjects.
-    // So Timer is a wrapper around a sub-class that actually does the work. This is ugly, but is necessary afaik.
+    // So Timer creates a static reference to a GameObject with a monobehavior to run its coroutine, even though it is messy and annoying.
+    // We want to create a dedicated GameObject so that we can guarantee the object will persist as long as the timer
 
     public delegate void voidEvent();
     public event voidEvent timerCompleted;
 
-    public Timer()
-    {
-        m_timerObj = new GameObject().AddComponent<TimerComponent>();
-    }
-
     public void startTimer(float timeInSeconds)
     {
-        m_timerObj.startTimer(timeInSeconds, setTimerComplete);
+        if (m_timerRunning)
+        {
+            Debug.LogWarning("Attempted to start a timer that was already running");
+            return;
+        }
+
+        m_timerObj.StartCoroutine(runTimer(timeInSeconds));
     }
 
-    private void setTimerComplete()
+    static Timer()
     {
+        m_timerObj = new GameObject("Timer").AddComponent<TimerComponent>();
+    }
+
+    private IEnumerator runTimer(float timeInSeconds)
+    {
+        m_timerRunning = true;
+        yield return new WaitForSeconds(timeInSeconds);
+
+        m_timerRunning = false;
         if (timerCompleted != null)
         {
             timerCompleted();
         }
     }
 
-    private TimerComponent m_timerObj = null;
+    private bool m_timerRunning = false;
+    private static TimerComponent m_timerObj = null;
 
-
-
-    private class TimerComponent : MonoBehaviour
-    {
-        public void startTimer(float timeInSeconds, voidEvent completionCallback)
-        {
-            if (m_timerRunning)
-            {
-                Debug.LogWarning("Attempted to start a timer that was already running");
-                return;
-            }
-
-            m_completionCallback = completionCallback;
-            m_timerLengthSeconds = timeInSeconds;
-            StartCoroutine(runTimer());
-        }
-
-        private IEnumerator runTimer()
-        {
-            m_timerRunning = true;
-            yield return new WaitForSeconds(m_timerLengthSeconds);
-
-            m_timerRunning = false;
-            m_completionCallback();
-        }
-
-        private voidEvent m_completionCallback;
-        private bool m_timerRunning = false;
-        private float m_timerLengthSeconds = 0.0f;
-    }
+    // We can't add a Monobehavior directly, so we create an empty wrapper
+    private class TimerComponent : MonoBehaviour { }
 }
