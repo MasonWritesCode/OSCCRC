@@ -84,20 +84,6 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Creates a map tile. The position is map-relative.
-    // The returned object should only be destroyed by calling the destroyTile function
-    public MapTile createTile(float xPos, float zPos)
-    {
-        Transform tilePrefab = m_gameResources.objects["Tile"];
-        Transform newTileTransform = Instantiate(tilePrefab, transform);
-        // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
-        newTileTransform.localPosition = new Vector3(xPos, 0.0001f, zPos);
-        MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
-        newTile.initTile(this);
-        return newTile;
-    }
-
-
     // Creates a wall game object The position is map-relative.
     // The returned object should only be destroyed by calling the destroyWall function
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
@@ -158,14 +144,6 @@ public class GameMap : MonoBehaviour
         newCat.GetComponent<GridMovement>().direction = direction;
 
         return newCat;
-    }
-
-
-    // Removes a tile game object
-    public void destroyTile(MapTile tile)
-    {
-        tile.walls.clear();
-        Destroy(tile.gameObject);
     }
 
 
@@ -420,6 +398,28 @@ public class GameMap : MonoBehaviour
         {
             exportMap(fout);
         }
+    }
+
+
+    // Creates a map tile. The position is map-relative.
+    // The returned object should only be destroyed by calling the destroyTile function
+    private MapTile createTile(float xPos, float zPos)
+    {
+        Transform tilePrefab = m_gameResources.objects["Tile"];
+        Transform newTileTransform = Instantiate(tilePrefab, transform);
+        // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
+        newTileTransform.localPosition = new Vector3(xPos, 0.0001f, zPos);
+        MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
+        newTile.initTile(this);
+        return newTile;
+    }
+
+
+    // Removes a tile game object
+    private void destroyTile(MapTile tile)
+    {
+        tile.walls.clear();
+        Destroy(tile.gameObject);
     }
 
 
