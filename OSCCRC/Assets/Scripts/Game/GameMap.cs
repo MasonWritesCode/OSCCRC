@@ -84,25 +84,27 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Creates a map tile
+    // Creates a map tile. The position is map-relative.
     // The returned object should only be destroyed by calling the destroyTile function
     public MapTile createTile(float xPos, float zPos)
     {
         Transform tilePrefab = m_gameResources.objects["Tile"];
+        Transform newTileTransform = Instantiate(tilePrefab, transform);
         // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
-        Transform newTileTransform = Instantiate(tilePrefab, new Vector3(xPos, 0.0001f, zPos), tilePrefab.rotation, transform);
+        newTileTransform.localPosition = new Vector3(xPos, 0.0001f, zPos);
         MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
         newTile.initTile(this);
         return newTile;
     }
 
 
-    // Creates a wall game object
+    // Creates a wall game object The position is map-relative.
     // The returned object should only be destroyed by calling the destroyWall function
     public Transform createWall(float xPos, float zPos, Directions.Direction direction)
     {
         Transform wallPrefab = m_gameResources.objects["Wall"];
-        Transform newWall = Instantiate(wallPrefab, new Vector3(xPos, 0, zPos), wallPrefab.rotation, transform);
+        Transform newWall = Instantiate(wallPrefab, transform);
+        newWall.localPosition = new Vector3(xPos, 0, zPos);
 
         if (direction == Directions.Direction.North)
         {
@@ -126,12 +128,13 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Creates a mouse object and returns its transform
+    // Creates a mouse object and returns its transform. The position is map-relative.
     // The returned object should only be destroyed with the destroyMouse function
     public Transform placeMouse(float xPos, float zPos, Directions.Direction direction)
     {
         Transform mousePrefab = m_gameResources.objects["Mouse"];
-        Transform newMouse = Instantiate(mousePrefab, new Vector3(xPos, 0, zPos), mousePrefab.rotation, transform);
+        Transform newMouse = Instantiate(mousePrefab, transform);
+        newMouse.localPosition = new Vector3(xPos, 0, zPos);
         Directions.rotate(ref newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
 
@@ -144,12 +147,13 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Creates a cat object and returns its transform
+    // Creates a cat object and returns its transform. The position is map-relative.
     // The returned object should only be destroyed with the destroyCat function
     public Transform placeCat(float xPos, float zPos, Directions.Direction direction)
     {
         Transform catPrefab = m_gameResources.objects["Cat"];
-        Transform newCat = Instantiate(catPrefab, new Vector3(xPos, 0, zPos), catPrefab.rotation, transform);
+        Transform newCat = Instantiate(catPrefab, transform);
+        newCat.localPosition = new Vector3(xPos, 0, zPos);
         Directions.rotate(ref newCat, direction);
         newCat.GetComponent<GridMovement>().direction = direction;
 
@@ -200,8 +204,8 @@ public class GameMap : MonoBehaviour
     // Location is a map-relative position.
     public void pingLocation(Vector3 location, float timeInSeconds)
     {
-        location = transform.TransformPoint(location);
-        Transform pingRing = Instantiate(ringPrefab, new Vector3(location.x, 5.0f, location.z), ringPrefab.rotation, transform);
+        Transform pingRing = Instantiate(ringPrefab, transform);
+        pingRing.localPosition = new Vector3(location.x, 5.0f, location.z);
         Destroy(pingRing.gameObject, timeInSeconds);
     }
 
@@ -274,11 +278,11 @@ public class GameMap : MonoBehaviour
 
                     if (movingObj == MapTile.TileImprovement.Mouse)
                     {
-                        placeMouse(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
+                        placeMouse(tile.transform.localPosition.x, tile.transform.localPosition.z, tile.movingObjDirection);
                     }
                     else if (movingObj == MapTile.TileImprovement.Cat)
                     {
-                        placeCat(tile.transform.position.x, tile.transform.position.z, tile.movingObjDirection);
+                        placeCat(tile.transform.localPosition.x, tile.transform.localPosition.z, tile.movingObjDirection);
                     }
                 }
                 else
