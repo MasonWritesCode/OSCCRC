@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 public class Menu_BackLevel : MonoBehaviour, IPointerClickHandler
 {
+    public GameObject typeMenu;
+    public GameObject levelMenu;
     public AudioSource audioData;
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -13,11 +15,8 @@ public class Menu_BackLevel : MonoBehaviour, IPointerClickHandler
         {
             audioData.Play(0);
 
-            GameObject levelSelect = transform.parent.gameObject;
-            GameObject typeSelect = GameObject.FindWithTag("Menu").transform.Find("TypeFolder").gameObject;
-
-            levelSelect.SetActive(false);
-            typeSelect.SetActive(true);
+            levelMenu.SetActive(false);
+            typeMenu.SetActive(true);
         }
     }
 }

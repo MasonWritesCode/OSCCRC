@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 public class Menu_New : MonoBehaviour, IPointerClickHandler
 {
+    public GameObject typeMenu;
+    public GameObject levelMenu;
     public AudioSource audioData;
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -13,13 +15,10 @@ public class Menu_New : MonoBehaviour, IPointerClickHandler
         {
             audioData.Play(0);
 
-            GameObject typeSelect = transform.parent.gameObject;
-            GameObject levelSelect = GameObject.FindWithTag("Menu").transform.Find("LevelFolder").gameObject;
+            typeMenu.SetActive(false);
+            levelMenu.SetActive(true);
 
-            typeSelect.SetActive(false);
-            levelSelect.SetActive(true);
-
-            Menu_Panel panelScript = levelSelect.transform.Find("MapsList").GetComponent<Menu_Panel>();
+            Menu_Panel panelScript = levelMenu.GetComponent<Menu_Panel>();
             panelScript.folder = Menu_Panel.Folder.New;
         }
     }
