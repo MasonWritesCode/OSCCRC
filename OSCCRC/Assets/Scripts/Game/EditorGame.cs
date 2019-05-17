@@ -21,22 +21,8 @@ public class EditorGame : IGameMode
         m_gameMap.mouseDestroyed += checkGameEnd;
         m_gameMap.catDestroyed += checkGameEnd;
 
-        m_numMice = 0;
-
         // We need to count the number of mice so that we know if a puzzle has been solved
-        float tileSize = m_gameMap.tileSize;
-        for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
-        {
-            for (int h = m_gameMap.mapHeight - 1; h >= 0; --h)
-            {
-                MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
-                if (tile.movingObject == MapTile.TileImprovement.Mouse)
-                {
-                    ++m_numMice;
-                }
-            }
-        }
-        m_currentMice = m_numMice;
+        countMice();
 
         saveAutosave(ref m_pauseSaveData);
 
@@ -104,7 +90,7 @@ public class EditorGame : IGameMode
             m_paused = true;
             m_playing = true;
             loadAutosave(m_pauseSaveData);
-            m_currentMice = m_numMice;
+            countMice();
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
@@ -180,6 +166,28 @@ public class EditorGame : IGameMode
                 }
             }
         }
+    }
+
+
+    // Updates the count of the number of mice on the map
+    private void countMice()
+    {
+        m_numMice = 0;
+
+        float tileSize = m_gameMap.tileSize;
+        for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
+        {
+            for (int h = m_gameMap.mapHeight - 1; h >= 0; --h)
+            {
+                MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
+                if (tile.movingObject == MapTile.TileImprovement.Mouse)
+                {
+                    ++m_numMice;
+                }
+            }
+        }
+
+        m_currentMice = m_numMice;
     }
 
 
