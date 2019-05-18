@@ -25,6 +25,8 @@ public abstract class GridMovement : MonoBehaviour {
         m_rigidbody = GetComponent<Rigidbody>();
         m_interpolationMode = m_rigidbody.interpolation;
 
+        m_tile = m_map.tileAt(m_transform.localPosition);
+
         m_animator = GetComponent<Animator>();
         if (m_animator)
         {
@@ -44,6 +46,15 @@ public abstract class GridMovement : MonoBehaviour {
                  || m_gameController.gameState.mainState == GameState.State.Ended_Unpaused
                 )
             || m_gameController.gameState.hasState(GameState.TagState.Suspended)
+           )
+        {
+            return;
+        }
+
+        if(m_tile.walls.north &&
+           m_tile.walls.south &&
+           m_tile.walls.east &&
+           m_tile.walls.west
            )
         {
             return;
