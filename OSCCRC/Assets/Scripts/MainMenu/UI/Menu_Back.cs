@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Menu_Prev : MonoBehaviour, IPointerClickHandler
+public class Menu_Back : MonoBehaviour, IPointerClickHandler
 {
+    public GameObject mainMenu;
+    public GameObject typeMenu;
     public AudioSource audioData;
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -13,9 +15,8 @@ public class Menu_Prev : MonoBehaviour, IPointerClickHandler
         {
             audioData.Play(0);
 
-            Menu_Panel mapList = transform.parent.Find("MapsList").GetComponent<Menu_Panel>();
-
-            mapList.page = mapList.page - 1;
+            typeMenu.SetActive(false);
+            mainMenu.SetActive(true);
         }
     }
 }

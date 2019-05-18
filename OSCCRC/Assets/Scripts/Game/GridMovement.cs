@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // This class controls the behavior of moving objects such as Cats and Mice.
+// As an abstract class, one should Instantiate a Mouse or Cat object directly instead.
 
-public class GridMovement : MonoBehaviour {
+public abstract class GridMovement : MonoBehaviour {
 
     [Range(0, 255)] public float speed;
 
     public Directions.Direction direction;
-    public bool isCat;
     public MapTile tile { get { return m_tile; } }
+
+
+    // Runs interactions with the specified tile improvement
+    protected abstract void interactWithImprovement(MapTile.TileImprovement improvement);
 
 
     void Start () {
@@ -35,7 +39,10 @@ public class GridMovement : MonoBehaviour {
 
 
 	void FixedUpdate() {
-        if (   m_gameController.gameState.mainState != GameState.State.Started_Unpaused
+        if (   !(
+                    m_gameController.gameState.mainState == GameState.State.Started_Unpaused
+                 || m_gameController.gameState.mainState == GameState.State.Ended_Unpaused
+                )
             || m_gameController.gameState.hasState(GameState.TagState.Suspended)
            )
         {
@@ -65,35 +72,13 @@ public class GridMovement : MonoBehaviour {
     // Wraps the transform to the other side of the map if necessary
     private void applyMapWrap()
     {
-        bool willWrap = false;
-        Vector3 pos = m_transform.localPosition;
+        Vector3 wrappedPos = m_map.wrapCoord(m_transform.localPosition);
 
-        if (pos.x <= -(m_map.tileSize / 2)) // West -> East
-        {
-            pos.x += m_map.mapWidth * m_map.tileSize;
-            willWrap = true;
-        }
-        else if (pos.x >= (m_map.mapWidth - 0.5f) * m_map.tileSize) // East -> West
-        {
-            pos.x -= m_map.mapWidth * m_map.tileSize;
-            willWrap = true;
-        }
-        if (pos.z <= -(m_map.tileSize / 2)) // South -> North
-        {
-            pos.z += m_map.mapHeight * m_map.tileSize;
-            willWrap = true;
-        }
-        else if (pos.z >= (m_map.mapHeight - 0.5f) * m_map.tileSize) // North -> South
-        {
-            pos.z -= m_map.mapHeight * m_map.tileSize;
-            willWrap = true;
-        }
-
-        if (willWrap)
+        if (wrappedPos != m_transform.localPosition)
         {
             // We don't want to interpolate a "warp", so temporarily disable it
             m_rigidbody.interpolation = RigidbodyInterpolation.None;
-            m_transform.localPosition = pos;
+            m_transform.localPosition = wrappedPos;
             m_rigidbody.interpolation = m_interpolationMode;
         }
     }
@@ -104,47 +89,7 @@ public class GridMovement : MonoBehaviour {
     {
         m_tile = tile;
 
-        //check for goals and holes
-        if (tile.improvement == MapTile.TileImprovement.Goal)
-        {
-            if (isCat)
-            {
-                m_map.destroyCat(transform);
-            }
-            else
-            {
-                m_map.destroyMouse(transform);
-            }
-
-            return;
-        }
-        else if (tile.improvement == MapTile.TileImprovement.Hole)
-        {
-            if (isCat)
-            {
-                m_map.destroyCat(transform);
-            }
-            else
-            {
-                m_map.destroyMouse(transform);
-            }
-
-            return;
-        }
-
-        //checking for arrows
-        if (tile.improvement == MapTile.TileImprovement.Direction)
-        {
-            if (isCat && direction == Directions.getOppositeDir(tile.improvementDirection))
-            {
-                direction = tile.improvementDirection;
-                tile.damageTile();
-            }
-            else
-            {
-                direction = tile.improvementDirection;
-            }
-        }
+        interactWithImprovement(tile.improvement);
 
         //Checking for walls
         if (tile.walls.north && direction == Directions.Direction.North)
@@ -228,10 +173,7 @@ public class GridMovement : MonoBehaviour {
         m_remainingDistance = m_map.tileSize;
 
         // We only want to check for wrapping per update when we are on a tile that is at the edge
-        m_isOnEdgeTile = m_transform.localPosition.x < (m_map.tileSize / 2)
-                         || m_transform.localPosition.x > (m_map.mapWidth - 1.5f) * m_map.tileSize
-                         || m_transform.localPosition.z < (m_map.tileSize / 2)
-                         || m_transform.localPosition.z > (m_map.mapHeight - 1.5f) * m_map.tileSize;
+        m_isOnEdgeTile = m_map.isEdgeTile(tile);
     }
 
 
@@ -261,24 +203,12 @@ public class GridMovement : MonoBehaviour {
     }
 
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (isCat && other.name.Contains("Mouse"))
-        {
-            if (!other.GetComponent<GridMovement>().isCat)
-            {
-                m_map.destroyMouse(other.transform);
-            }
-        }
-    }
-
-
-    private GameController m_gameController;
-    private GameMap m_map;
-    private Transform m_transform;
-    private Rigidbody m_rigidbody;
+    protected GameController m_gameController;
+    protected GameMap m_map;
+    protected Transform m_transform;
+    protected Rigidbody m_rigidbody;
+    protected Animator m_animator;
     private RigidbodyInterpolation m_interpolationMode;
-    private Animator m_animator;
     private MapTile m_tile;
     private float m_remainingDistance;
     private bool m_isOnEdgeTile;

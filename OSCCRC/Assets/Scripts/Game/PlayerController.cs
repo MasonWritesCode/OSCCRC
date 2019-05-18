@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour {
             {
                 Ray tileSelector = m_mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hitObject;
-                if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Player Selectable")))
+                if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Map Selectable")))
                 {
                     MapTile newTile = hitObject.transform.GetComponent<MapTile>();
                     if (newTile != null && newTile != m_currentTile)
@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour {
                 }
             }
 
-            // "Pause" input does not suspend the game in the traditional sense of pause, but puts us into the puzzle-placement state
+            // "Pause" input does not suspend the game in the traditional sense of pause, but toggles the puzzle-placement state
             if (Input.GetButtonDown("Pause"))
             {
                 if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused)

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Menu_BackLevel : MonoBehaviour, IPointerClickHandler
+public class Menu_Custom : MonoBehaviour, IPointerClickHandler
 {
+    public GameObject typeMenu;
+    public GameObject levelMenu;
     public AudioSource audioData;
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -13,11 +15,11 @@ public class Menu_BackLevel : MonoBehaviour, IPointerClickHandler
         {
             audioData.Play(0);
 
-            GameObject levelSelect = transform.parent.gameObject;
-            GameObject typeSelect = GameObject.FindWithTag("Menu").transform.Find("TypeFolder").gameObject;
+            typeMenu.SetActive(false);
+            levelMenu.SetActive(true);
 
-            levelSelect.SetActive(false);
-            typeSelect.SetActive(true);
+            Menu_Panel panelScript = levelMenu.GetComponent<Menu_Panel>();
+            panelScript.folder = Menu_Panel.Folder.Custom;
         }
     }
 }

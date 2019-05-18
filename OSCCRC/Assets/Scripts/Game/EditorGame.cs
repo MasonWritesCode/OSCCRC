@@ -21,26 +21,13 @@ public class EditorGame : IGameMode
         m_gameMap.mouseDestroyed += checkGameEnd;
         m_gameMap.catDestroyed += checkGameEnd;
 
-        m_numMice = 0;
-
         // We need to count the number of mice so that we know if a puzzle has been solved
-        float tileSize = m_gameMap.tileSize;
-        for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
-        {
-            for (int h = m_gameMap.mapHeight - 1; h >= 0; --h)
-            {
-                MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
-                if (tile.movingObject == MapTile.TileImprovement.Mouse)
-                {
-                    ++m_numMice;
-                }
-            }
-        }
-        m_currentMice = m_numMice;
+        countMice();
 
         saveAutosave(ref m_pauseSaveData);
 
         m_paused = true;
+        m_playing = true;
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
@@ -75,7 +62,16 @@ public class EditorGame : IGameMode
     // TODO: Temporary and needs to be addressed
     public void endGame(bool victory)
     {
-        return;
+        if (victory)
+        {
+            m_gameState.mainState = GameState.State.Ended_Unpaused;
+        }
+        else
+        {
+            m_gameState.mainState = GameState.State.Ended_Paused;
+        }
+        // We reset for the player after a period of time when they win or lose by "pressing pause"
+        setStateDelayed(GameState.State.Started_Paused, m_autoResetDelay);
     }
 
 
@@ -92,13 +88,25 @@ public class EditorGame : IGameMode
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
-            loadAutosave(ref m_pauseSaveData);
-            m_currentMice = m_numMice;
+            m_playing = true;
+            loadAutosave(m_pauseSaveData);
+            countMice();
         }
         else if (newState == GameState.State.Started_Unpaused)
         {
             m_paused = false;
+            m_playing = true;
             saveAutosave(ref m_pauseSaveData);
+        }
+        else if (newState == GameState.State.Ended_Paused)
+        {
+            m_paused = true;
+            m_playing = false;
+        }
+        else if (newState == GameState.State.Ended_Unpaused)
+        {
+            m_paused = false;
+            m_playing = false;
         }
     }
 
@@ -106,7 +114,7 @@ public class EditorGame : IGameMode
     private void checkGameEnd(GameObject deadMeat)
     {
         // Mice can only die when paused when loading to reset, in which case we don't need to gameover
-        if (m_paused)
+        if (m_paused || !m_playing)
         {
             return;
         }
@@ -117,11 +125,15 @@ public class EditorGame : IGameMode
             return;
         }
 
-        if (gm.isCat)
+        if (gm is Cat)
         {
             if (gm.tile.improvement == MapTile.TileImprovement.Goal)
             {
+                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
                 Debug.Log("Cat hit goal, you lose.");
+                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
         }
@@ -129,7 +141,11 @@ public class EditorGame : IGameMode
         {
             if (gm.tile.improvement != MapTile.TileImprovement.Goal)
             {
+                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
                 Debug.Log("A mouse was destroyed. Game Over.");
+                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
             else
@@ -137,11 +153,41 @@ public class EditorGame : IGameMode
                 --m_currentMice;
                 if (m_currentMice <= 0)
                 {
+                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
+                    audioData.Play(0);
+
                     Debug.Log("The last mouse hit a goal, you won.");
                     endGame(true);
                 }
+                else
+                {
+                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
+                    audioData.Play(0);
+                }
             }
         }
+    }
+
+
+    // Updates the count of the number of mice on the map
+    private void countMice()
+    {
+        m_numMice = 0;
+
+        float tileSize = m_gameMap.tileSize;
+        for (int w = m_gameMap.mapWidth - 1; w >= 0; --w)
+        {
+            for (int h = m_gameMap.mapHeight - 1; h >= 0; --h)
+            {
+                MapTile tile = m_gameMap.tileAt(h * tileSize, w * tileSize);
+                if (tile.movingObject == MapTile.TileImprovement.Mouse)
+                {
+                    ++m_numMice;
+                }
+            }
+        }
+
+        m_currentMice = m_numMice;
     }
 
 
@@ -165,7 +211,7 @@ public class EditorGame : IGameMode
 
 
     // Loads a save of the map for when going from playtest back to editor
-    private void loadAutosave(ref byte[] saveLocation)
+    private void loadAutosave(byte[] saveLocation)
     {
         using (MemoryStream ms = new MemoryStream(saveLocation))
         {
@@ -177,10 +223,29 @@ public class EditorGame : IGameMode
     }
 
 
+    // Changes the state of m_gameState after the specified delay
+    private void setStateDelayed(GameState.State state, float delayInSeconds)
+    {
+        // We have to rely on a closure to pass data to the timer event as far as I know
+        // Because of this we are spawning a new timer to clear the lambda subscriber
+        // This is very ugly but it will have to do for now
+        m_timer = new Timer();
+        m_timer.timerCompleted += () =>
+        {
+            m_gameState.mainState = state;
+            m_timer = null;
+        };
+        m_timer.startTimer(delayInSeconds);
+    }
+
+
     private int m_numMice = 0;
     private int m_currentMice = 0;
     private GameObject m_saveMenu;
     private bool m_paused;
+    private bool m_playing;
+    private float m_autoResetDelay = 1.5f;
+    private Timer m_timer = null;
     private byte[] m_pauseSaveData;
     private GameMap m_gameMap;
     private GameState m_gameState;

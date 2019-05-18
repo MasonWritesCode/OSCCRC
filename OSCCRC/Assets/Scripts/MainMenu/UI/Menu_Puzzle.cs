@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class Menu_Puzzle : MonoBehaviour, IPointerClickHandler
-{ 
+{
+    public GameObject mainMenu;
+    public GameObject typeMenu;
     public AudioSource audioData;
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -15,11 +17,8 @@ public class Menu_Puzzle : MonoBehaviour, IPointerClickHandler
 
             GlobalData.mode = GameController.GameMode.Puzzle;
 
-            GameObject main = transform.parent.gameObject;
-            GameObject typeSelect = GameObject.FindWithTag("Menu").transform.Find("TypeFolder").gameObject;
-
-            main.SetActive(false);
-            typeSelect.SetActive(true);
+            mainMenu.SetActive(false);
+            typeMenu.SetActive(true);
         }
     }
 }

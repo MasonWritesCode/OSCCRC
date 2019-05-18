@@ -47,7 +47,7 @@ public class Walls
     {
         if (isCreating && m_walls[wallID] == null)
         {
-            m_walls[wallID] = m_map.createWall(m_origin.x, m_origin.z, wallID);
+            m_walls[wallID] = m_map.createWall(m_origin, wallID);
         }
         else if (!isCreating && m_walls[wallID] != null)
         {

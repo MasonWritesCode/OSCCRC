@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// This class allows access to the game's resources that will be used dynamically.
-// It allows for changing resource packs so that different maps can have different assets, or allow users to use custom assets.
+// This class provides access to different assets under the same name. This allows us to create "resource packs" that are associated with a stage.
 
 public class GameResources : MonoBehaviour {
 
-    // Class to potentially allow different texture packs, and make it easier to modify resources with minimal code changes
-
-    // TODO: Since resources aren't created yet, material resource locations aren't assigned. This must be done once materials created.
-
-    public static Dictionary<string, Material> materials = new Dictionary<string, Material>();
-    public static Dictionary<string, Transform> objects  = new Dictionary<string, Transform>();
-    public static string resourcePack { get { return m_resourcePack; } set { loadResources(value); } }
+    public Dictionary<string, Material> materials = new Dictionary<string, Material>();
+    public Dictionary<string, Transform> objects  = new Dictionary<string, Transform>();
+    public string resourcePack { get { return m_resourcePack; } set { loadResources(value); } }
 
 
     // Loads the resources into the interface that are under the name specified by "resourcePack"
-    public static void loadResources(string resourcePack)
+    public void loadResources(string resourcePack)
     {
         if (resourcePack == m_resourcePack)
         {
@@ -49,7 +44,7 @@ public class GameResources : MonoBehaviour {
 
 
     // Returns a resource located at the specified path or the default equivalent if not found
-    private static Object resourceFromDir(string path)
+    private Object resourceFromDir(string path)
     {
         Object resource = Resources.Load(m_resourcePack + path);
 
@@ -60,7 +55,7 @@ public class GameResources : MonoBehaviour {
 
             if (resource == null)
             {
-                Debug.LogWarning("Was not able to find default resource: " + path);
+                Debug.LogError("Was not able to find default resource: " + path);
             }
         }
 
@@ -74,5 +69,5 @@ public class GameResources : MonoBehaviour {
     }
 
 
-    private static string m_resourcePack = string.Empty;
+    private string m_resourcePack = string.Empty;
 }
