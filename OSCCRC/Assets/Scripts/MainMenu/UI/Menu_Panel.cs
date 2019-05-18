@@ -9,6 +9,7 @@ public class Menu_Panel : MonoBehaviour {
     public enum Folder { Unset, Retro, New, Custom };
 
     public RectTransform mapEntryPrefab;
+    public Transform mapsList;
 
     public Folder folder { get { return m_folder; } set { m_folder = value; getFiles(value); page = 0; } }
     public int page { get { return m_pageNum; } set { setPage(value); } }
@@ -42,9 +43,10 @@ public class Menu_Panel : MonoBehaviour {
     // Creates and places a new GameObjects for listing stages
     private void placeEntry(FileInfo file, int place)
     {
-        Transform newEntryObj = Instantiate(mapEntryPrefab, transform);
+        Transform newEntryObj = Instantiate(mapEntryPrefab, mapsList);
         Menu_MapEntry newEntry = newEntryObj.GetComponent<Menu_MapEntry>();
         newEntry.entryID = place;
+        newEntry.parentPanel = this;
 
         m_tempStageInfo.loadStageMetadata(m_folderNames[m_folder] + file.Name.Remove(file.Name.Length - file.Extension.Length));
 

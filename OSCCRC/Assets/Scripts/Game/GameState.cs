@@ -6,7 +6,18 @@ public class GameState
 {
     // The game can currently only have one main state. However, additional states can be applied on top of this.
     // The state enum shows valid main states, and the TagState enum shows additional states that can be tagged on top.
-    public enum State { None, Unstarted, Started_Paused, Started_Unpaused, Ended }
+    /*
+     * States are as follows:
+     * State None             : Default value that can be used when no behavior is desired
+     * State Unstarted        : The game level is getting ready to start, but not yet ready for user input
+     * State Started_Paused   : The game level is started, but no movement occurs because we are waiting for user to finish their input
+     * State Started_Unpaused : The game level is started and simulation is occuring
+     * State Ended_Paused     : The game level is finished, but proceeding with new activities is on hold
+     * State Ended_Unpaused   : The game level is finished
+     * TagState Suspended     : The game is paused/suspended and activity should be halted until it is no longer suspended
+     * TagState InputFocused  : A UI input field is set to recieve user input, and so game controls should avoid reacting to input
+     */
+    public enum State { None, Unstarted, Started_Paused, Started_Unpaused, Ended_Paused, Ended_Unpaused }
     public enum TagState { Suspended, InputFocused }
 
     public delegate void stateChangeEvent(State oldState, State newState);

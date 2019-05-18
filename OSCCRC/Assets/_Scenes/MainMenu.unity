@@ -123,7 +123,6 @@ GameObject:
   - component: {fileID: 29352596}
   - component: {fileID: 29352598}
   - component: {fileID: 29352597}
-  - component: {fileID: 29352599}
   m_Layer: 5
   m_Name: MapsList
   m_TagString: Untagged
@@ -183,19 +182,6 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 29352595}
   m_CullTransparentMesh: 0
---- !u!114 &29352599
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 29352595}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a002ce13c85af844d8596727b0a23e57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mapEntryPrefab: {fileID: 224600544606741478, guid: 8ab3695cd4d7d154ba95c4644a89445e,
-    type: 2}
 --- !u!1 &76835095
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,6 +518,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1038dafebcb1a0d4888cd310e68082cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typeMenu: {fileID: 1770553205}
+  levelMenu: {fileID: 667949546}
   audioData: {fileID: 2029228084}
 --- !u!1 &391367597
 GameObject:
@@ -732,6 +720,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d022f7de0ba3bab4f8b83f98cef8a846, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typeMenu: {fileID: 1770553205}
+  levelMenu: {fileID: 667949546}
   audioData: {fileID: 2029228084}
 --- !u!114 &531181389
 MonoBehaviour:
@@ -1248,6 +1238,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 667949547}
+  - component: {fileID: 667949548}
   m_Layer: 5
   m_Name: LevelFolder
   m_TagString: Untagged
@@ -1277,6 +1268,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &667949548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 667949546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a002ce13c85af844d8596727b0a23e57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapEntryPrefab: {fileID: 224600544606741478, guid: 8ab3695cd4d7d154ba95c4644a89445e,
+    type: 2}
+  mapsList: {fileID: 29352596}
 --- !u!1 &709736392
 GameObject:
   m_ObjectHideFlags: 0
@@ -1499,6 +1504,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0250a1caadd944648a1de5e7752a98fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainMenu: {fileID: 1809919021}
+  typeMenu: {fileID: 1770553205}
   audioData: {fileID: 2029228084}
 --- !u!1 &751158732
 GameObject:
@@ -1624,6 +1631,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba7be3dc793f1844cb58ce1f340fc300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typeMenu: {fileID: 1770553205}
+  levelMenu: {fileID: 667949546}
   audioData: {fileID: 2029228084}
 --- !u!1 &754385378
 GameObject:
@@ -1899,6 +1908,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 926a79dcf1a065c49a8af72f40aea256, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelMenu: {fileID: 667949546}
   audioData: {fileID: 2029228084}
 --- !u!1 &1002023447
 GameObject:
@@ -2024,6 +2034,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63655f650da2315468c1a60ec0132e26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typeMenu: {fileID: 1770553205}
+  levelMenu: {fileID: 667949546}
   audioData: {fileID: 2029228084}
 --- !u!1 &1488952072
 GameObject:
@@ -2546,6 +2558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b847db266f7f2544b5d4f77e24580ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelMenu: {fileID: 667949546}
   audioData: {fileID: 2029228084}
 --- !u!1 &1943406198
 GameObject:
@@ -2821,6 +2834,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d55f8f24f22ef7459d0e80a9d1103f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainMenu: {fileID: 1809919021}
+  typeMenu: {fileID: 1770553205}
   audioData: {fileID: 2029228084}
 --- !u!1 &2029228083
 GameObject:

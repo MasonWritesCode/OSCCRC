@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class Menu_Next : MonoBehaviour, IPointerClickHandler
 {
+    public GameObject levelMenu;
     public AudioSource audioData;
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -13,7 +14,7 @@ public class Menu_Next : MonoBehaviour, IPointerClickHandler
         {
             audioData.Play(0);
 
-            Menu_Panel mapList = transform.parent.Find("MapsList").GetComponent<Menu_Panel>();
+            Menu_Panel mapList = levelMenu.GetComponent<Menu_Panel>();
 
             mapList.page = mapList.page + 1;
         }

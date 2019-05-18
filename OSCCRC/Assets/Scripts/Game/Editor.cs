@@ -12,6 +12,7 @@ public class Editor : MonoBehaviour {
 
 	void Start () {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        m_gameResources = m_gameMap.GetComponent<GameResources>();
         m_gameControl = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         m_gameStage = m_gameControl.GetComponent<GameStage>();
         m_controls = GameObject.FindWithTag("Player").GetComponentInChildren<PlayerController>();
@@ -19,7 +20,7 @@ public class Editor : MonoBehaviour {
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
-        m_placeholderObject = Instantiate(GameResources.objects["Placeholder"]);
+        m_placeholderObject = Instantiate(m_gameResources.objects["Placeholder"]);
         disablePlaceholder();
         m_direction = Directions.Direction.East;
         m_positionOffset = Vector3.zero;
@@ -310,13 +311,16 @@ public class Editor : MonoBehaviour {
                     if (m_movingObjects[selectedTile] != null)
                     {
                         GridMovement gm = m_movingObjects[selectedTile].GetComponent<GridMovement>();
-                        if (gm && !gm.isCat)
+                        if (gm)
                         {
-                            m_gameMap.destroyMouse(m_movingObjects[selectedTile].transform);
-                        }
-                        else if (gm && gm.isCat)
-                        {
-                            m_gameMap.destroyCat(m_movingObjects[selectedTile].transform);
+                            if (gm is Mouse)
+                            {
+                                m_gameMap.destroyMouse(m_movingObjects[selectedTile].transform);
+                            }
+                            else if (gm is Cat)
+                            {
+                                m_gameMap.destroyCat(m_movingObjects[selectedTile].transform);
+                            }
                         }
                     }
                     m_movingObjects.Remove(selectedTile);
@@ -328,11 +332,11 @@ public class Editor : MonoBehaviour {
                 Transform newMovingObj = null;
                 if (selectedTile.movingObject == MapTile.TileImprovement.Mouse)
                 {
-                    newMovingObj = m_gameMap.placeMouse(selectedTile.transform.localPosition.x, selectedTile.transform.localPosition.z, m_direction);
+                    newMovingObj = m_gameMap.placeMouse(selectedTile.transform.localPosition, m_direction);
                 }
                 else if (selectedTile.movingObject == MapTile.TileImprovement.Cat)
                 {
-                    newMovingObj = m_gameMap.placeCat(selectedTile.transform.localPosition.x, selectedTile.transform.localPosition.z, m_direction);
+                    newMovingObj = m_gameMap.placeCat(selectedTile.transform.localPosition, m_direction);
                 }
                 m_movingObjects.Add(selectedTile, newMovingObj);
             }
@@ -387,16 +391,16 @@ public class Editor : MonoBehaviour {
         m_placeholderObject.rotation = Quaternion.identity;
 
         // Select the mesh for the selected object
-        Mesh newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
-        Texture newTex = GameResources.materials["Placeholder"].mainTexture;
+        Mesh newMesh = m_gameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
+        Texture newTex = m_gameResources.materials["Placeholder"].mainTexture;
         if (m_placeholderType == ObjectType.Wall)
         {
-            newMesh = GameResources.objects["Wall"].GetComponent<MeshFilter>().sharedMesh;
+            newMesh = m_gameResources.objects["Wall"].GetComponent<MeshFilter>().sharedMesh;
 
             // Need to set a position offset to show which wall facing is used
             // Easiest way is to spawn a wall and then destroy it. This is wasteful, but only done once per object select.
             // The point of using a mesh is to avoid spawning objects, so this is also messy and bad. It can be changed later.
-            Transform temp = m_gameMap.createWall(0, 0, m_direction);
+            Transform temp = m_gameMap.createWall(Vector3.zero, m_direction);
             m_positionOffset = temp.localPosition;
             m_gameMap.destroyWall(temp);
 
@@ -407,7 +411,7 @@ public class Editor : MonoBehaviour {
             // Mice and cats are currently built from multile game objects, so we have to loop over those objects to create a combined mesh
             if (m_selectedImprovement == MapTile.TileImprovement.Mouse)
             {
-                MeshFilter[] meshFilters = GameResources.objects["Mouse"].GetComponentsInChildren<MeshFilter>();
+                MeshFilter[] meshFilters = m_gameResources.objects["Mouse"].GetComponentsInChildren<MeshFilter>();
                 CombineInstance[] combine = new CombineInstance[meshFilters.Length];
                 for (int i = 0; i < meshFilters.Length; ++i)
                 {
@@ -419,7 +423,7 @@ public class Editor : MonoBehaviour {
             }
             else if (m_selectedImprovement == MapTile.TileImprovement.Cat)
             {
-                MeshFilter[] meshFilters = GameResources.objects["Cat"].GetComponentsInChildren<MeshFilter>();
+                MeshFilter[] meshFilters = m_gameResources.objects["Cat"].GetComponentsInChildren<MeshFilter>();
                 CombineInstance[] combine = new CombineInstance[meshFilters.Length];
                 for (int i = 0; i < meshFilters.Length; ++i)
                 {
@@ -434,7 +438,7 @@ public class Editor : MonoBehaviour {
                 // Here we either spawn the improvement object, or a tile with the improvement texture if there isn't one
                 if (MapTile.improvementObjects.ContainsKey(m_selectedImprovement))
                 {
-                    newMesh = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshFilter>().sharedMesh;
+                    newMesh = m_gameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshFilter>().sharedMesh;
 
                     // Since direction arrow objects are unity quad tiles for now, we have to give them the tile treatment
                     if (m_selectedImprovement == MapTile.TileImprovement.Direction)
@@ -442,18 +446,18 @@ public class Editor : MonoBehaviour {
                         // Tiles have a 90 degree rotation since we are using a Unity quad for now
                         m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
 
-                        newTex = GameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshRenderer>().sharedMaterial.mainTexture;
+                        newTex = m_gameResources.objects[MapTile.improvementObjects[m_selectedImprovement]].GetComponent<MeshRenderer>().sharedMaterial.mainTexture;
                     }
                 }
                 else
                 {
-                    newMesh = GameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
+                    newMesh = m_gameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
                     // Tiles have a 90 degree rotation since we are using a Unity quad for now
                     m_placeholderObject.transform.eulerAngles = new Vector3(90.0f, transform.eulerAngles.x, transform.eulerAngles.z);
 
                     if (MapTile.improvementTextures.ContainsKey(m_selectedImprovement))
                     {
-                        newTex = GameResources.materials[MapTile.improvementTextures[m_selectedImprovement]].mainTexture;
+                        newTex = m_gameResources.materials[MapTile.improvementTextures[m_selectedImprovement]].mainTexture;
                     }
                 }
             }
@@ -492,6 +496,7 @@ public class Editor : MonoBehaviour {
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
     private GameMap m_gameMap;
+    private GameResources m_gameResources;
     private GameStage m_gameStage;
     private PlayerController m_controls;
     private GameController m_gameControl;
