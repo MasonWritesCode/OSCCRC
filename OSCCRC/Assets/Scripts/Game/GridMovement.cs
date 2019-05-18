@@ -49,6 +49,15 @@ public abstract class GridMovement : MonoBehaviour {
             return;
         }
 
+        if(m_map.tileAt(m_transform.localPosition).walls.north &&
+           m_map.tileAt(m_transform.localPosition).walls.south &&
+           m_map.tileAt(m_transform.localPosition).walls.east &&
+           m_map.tileAt(m_transform.localPosition).walls.west
+           )
+        {
+            return;
+        }
+
         float distance = speed * Time.smoothDeltaTime;
         if (distance >= m_remainingDistance)
         {
