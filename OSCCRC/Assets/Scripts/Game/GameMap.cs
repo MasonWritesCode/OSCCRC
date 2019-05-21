@@ -500,7 +500,7 @@ public class GameMap : MonoBehaviour
             // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
             // Material tiling has to be set to (mapsize / 2)
             m_bigTile.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
-            m_bigTile.SetPositionAndRotation(new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f), Quaternion.Euler(90.0f, 0.0f, 0.0f));
+            m_bigTile.localPosition = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
             MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
             bigTileRend.material = m_gameResources.materials["TileTiledColor"];
             bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
