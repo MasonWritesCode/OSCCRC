@@ -2335,6 +2335,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ringPrefab: {fileID: 4215024253298442, guid: 6a7995dd4bb633746b9e28f1962b3554, type: 2}
+  floorPrefab: {fileID: 4932320532232200, guid: 0ea234b8a9d0845499f55c3afccf03cb,
+    type: 2}
 --- !u!114 &1141874403
 MonoBehaviour:
   m_ObjectHideFlags: 0

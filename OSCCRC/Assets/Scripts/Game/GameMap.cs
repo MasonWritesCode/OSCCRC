@@ -20,6 +20,7 @@ public class GameMap : MonoBehaviour
     public float tileSize { get { return m_tileSize; } }
 
     public Transform ringPrefab;
+    public Transform floorPrefab;
 
 
     void Awake()
@@ -422,7 +423,7 @@ public class GameMap : MonoBehaviour
         Transform newTileTransform = Instantiate(tilePrefab, transform);
         // Height is being set to a small value for x_useBigTile, to prevent z-fighting with the big tile. Mathf.Epsilon doesn't seem to be enough for this.
         newTileTransform.localPosition = new Vector3(xPos, 0.0001f, zPos);
-        MapTile newTile = newTileTransform.gameObject.AddComponent<MapTile>();
+        MapTile newTile = newTileTransform.GetComponent<MapTile>();
         newTile.initTile(this);
         return newTile;
     }
@@ -492,20 +493,17 @@ public class GameMap : MonoBehaviour
             // Since most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
             if (m_bigTile == null)
             {
-                Transform tilePrefab = m_gameResources.objects["Tile"];
-                m_bigTile = Instantiate(tilePrefab, Vector3.zero, tilePrefab.rotation, transform);
+                m_bigTile = Instantiate(floorPrefab, transform);
             }
 
             // We need to set the scale to mapsize
             // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
             // Material tiling has to be set to (mapsize / 2)
-            m_bigTile.transform.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
-            m_bigTile.transform.position = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
+            m_bigTile.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
+            m_bigTile.SetPositionAndRotation(new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f), Quaternion.Euler(90.0f, 0.0f, 0.0f));
             MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
             bigTileRend.material = m_gameResources.materials["TileTiledColor"];
             bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
-
-            bigTileRend.enabled = true;
         }
 
         setCameraView(Camera.main);
