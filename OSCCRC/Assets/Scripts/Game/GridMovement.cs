@@ -33,8 +33,6 @@ public abstract class GridMovement : MonoBehaviour {
             m_animator.speed = speed / 2;
         }
 
-        Directions.rotate(ref m_transform, direction);
-
         m_gameController.gameState.stateAdded += onTagStateAdd;
         m_gameController.gameState.stateRemoved += onTagStateRemove;
 	}
@@ -179,7 +177,7 @@ public abstract class GridMovement : MonoBehaviour {
         }
 
         m_transform.localPosition = tile.transform.localPosition;
-        Directions.rotate(ref m_transform, direction);
+        Directions.rotate(m_transform, direction);
 
         m_remainingDistance = m_map.tileSize;
 

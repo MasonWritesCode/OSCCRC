@@ -119,7 +119,7 @@ public class GameMap : MonoBehaviour
         {
             newWall.localPosition += Vector3.left * (m_tileSize / 2);
         }
-        Directions.rotate(ref newWall, direction);
+        Directions.rotate(newWall, direction);
 
         return newWall;
     }
@@ -132,7 +132,7 @@ public class GameMap : MonoBehaviour
         Transform mousePrefab = m_gameResources.objects["Mouse"];
         Transform newMouse = Instantiate(mousePrefab, transform);
         newMouse.localPosition = position;
-        Directions.rotate(ref newMouse, direction);
+        Directions.rotate(newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
 
         if (mousePlaced != null)
@@ -151,7 +151,7 @@ public class GameMap : MonoBehaviour
         Transform catPrefab = m_gameResources.objects["Cat"];
         Transform newCat = Instantiate(catPrefab, transform);
         newCat.localPosition = position;
-        Directions.rotate(ref newCat, direction);
+        Directions.rotate(newCat, direction);
         newCat.GetComponent<GridMovement>().direction = direction;
 
         return newCat;

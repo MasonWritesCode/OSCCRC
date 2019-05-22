@@ -15,7 +15,7 @@ public class MapTile : MonoBehaviour
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
-    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(ref m_tileObject, value); } }
+    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(m_tileObject, value); } }
     public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
     public Walls walls;
 
@@ -177,7 +177,7 @@ public class MapTile : MonoBehaviour
                     // We avoid z-fighting issues for directional tile objects by placing slightly above. Mathf.Epsilon doesn't seem to be enough for this.
                     m_tileObject.localPosition = new Vector3(0.0f, 0.0f, -0.0001f);
                 }
-                Directions.rotate(ref m_tileObject, m_improvementDir);
+                Directions.rotate(m_tileObject, m_improvementDir);
             }
             else
             {

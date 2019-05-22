@@ -463,7 +463,7 @@ public class Editor : MonoBehaviour {
             }
         }
 
-        Directions.rotate(ref m_placeholderObject, m_direction);
+        Directions.rotate(m_placeholderObject, m_direction);
 
         // Assign the new mesh
         MeshFilter phMesh = m_placeholderObject.GetComponent<MeshFilter>();

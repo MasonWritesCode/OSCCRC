@@ -9,29 +9,30 @@ public static class Directions {
 
     public enum Direction { North = 1, East = 2, South = 4, West = 8 };
 
-    // Rotates a transform into the specified cardinal direction
-    public static void rotate(ref Transform transform, Direction dir)
+    // Locally rotates a transform into the specified cardinal direction
+    public static void rotate(Transform transform, Direction dir)
     {
         if (transform == null)
         {
             return;
         }
 
+        Vector3 eulerAngles = transform.localEulerAngles;
         if (dir == Direction.North)
         {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 0.0f, transform.eulerAngles.z);
+            transform.localRotation = Quaternion.Euler(eulerAngles.x, 0.0f, eulerAngles.z);
         }
         else if (dir == Direction.East)
         {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 90.0f, transform.eulerAngles.z);
+            transform.localRotation = Quaternion.Euler(eulerAngles.x, 90.0f, eulerAngles.z);
         }
         else if (dir == Direction.South)
         {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 180.0f, transform.eulerAngles.z);
+            transform.localRotation = Quaternion.Euler(eulerAngles.x, 180.0f, eulerAngles.z);
         }
         else if (dir == Direction.West)
         {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 270.0f, transform.eulerAngles.z);
+            transform.localRotation = Quaternion.Euler(eulerAngles.x, 270.0f, eulerAngles.z);
         }
     }
 
