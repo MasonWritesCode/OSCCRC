@@ -73,4 +73,18 @@ public static class Directions {
 
         return (Direction)(newNum);
     }
+
+    // An IEqualityComparer that avoids boxing to improve performance with a direction as a key
+    public struct DirectionComparer : System.Collections.Generic.IEqualityComparer<Direction>
+    {
+        public bool Equals(Direction a, Direction b)
+        {
+            return a == b;
+        }
+
+        public int GetHashCode(Direction dir)
+        {
+            return (int)dir;
+        }
+    }
 }

@@ -21,10 +21,12 @@ public class Walls
         m_maxHeightIndex = m_map.mapHeight - 1;
         m_maxWidthIndex = m_map.mapWidth - 1;
 
-        m_walls.Add(Directions.Direction.North, null);
-        m_walls.Add(Directions.Direction.East, null);
-        m_walls.Add(Directions.Direction.South, null);
-        m_walls.Add(Directions.Direction.West, null);
+        m_walls = new Dictionary<Directions.Direction, Transform>(4, new Directions.DirectionComparer()){
+            { Directions.Direction.North, null },
+            { Directions.Direction.East, null },
+            { Directions.Direction.South, null },
+            { Directions.Direction.West, null }
+        };
     }
 
 
@@ -116,5 +118,5 @@ public class Walls
     private Vector3 m_origin;
     private GameMap m_map;
     private readonly int m_maxHeightIndex, m_maxWidthIndex;
-    private Dictionary<Directions.Direction, Transform> m_walls = new Dictionary<Directions.Direction, Transform>(4);
+    private Dictionary<Directions.Direction, Transform> m_walls;
 }
