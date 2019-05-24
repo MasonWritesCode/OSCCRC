@@ -9,7 +9,8 @@ public class Menu_Panel : MonoBehaviour {
     public enum Folder { Unset, Retro, New, Custom };
 
     public RectTransform mapEntryPrefab;
-    public Transform mapsList;
+    public RectTransform mapsList;
+    public SceneLoader sceneLoader;
 
     public Folder folder { get { return m_folder; } set { m_folder = value; getFiles(value); page = 0; } }
     public int page { get { return m_pageNum; } set { setPage(value); } }
@@ -27,8 +28,8 @@ public class Menu_Panel : MonoBehaviour {
     public void load(int place)
     {
         FileInfo selectedFile = m_fileList[place + m_startIndex];
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
         GlobalData.currentStagePath = m_folderNames[m_folder] + selectedFile.Name;
+        sceneLoader.loadGameScene();
     }
 
 
