@@ -17,23 +17,26 @@ public static class Directions {
             return;
         }
 
-        Vector3 eulerAngles = transform.localEulerAngles;
+        // We want the rotation amount to be relative, but we want to use absolute axes so we can't use localRotation
+        // So unfortunately we have to grab data from the parent to make the rotation amount local which is slow because eulerAngles access is slow
+        Vector3 newAngles = transform.eulerAngles;
         if (dir == Direction.North)
         {
-            transform.localRotation = Quaternion.Euler(eulerAngles.x, 0.0f, eulerAngles.z);
+            newAngles.y = transform.parent.eulerAngles.y;
         }
-        else if (dir == Direction.East)
+        if (dir == Direction.East)
         {
-            transform.localRotation = Quaternion.Euler(eulerAngles.x, 90.0f, eulerAngles.z);
+            newAngles.y = transform.parent.eulerAngles.y + 90.0f;
         }
         else if (dir == Direction.South)
         {
-            transform.localRotation = Quaternion.Euler(eulerAngles.x, 180.0f, eulerAngles.z);
+            newAngles.y = transform.parent.eulerAngles.y + 180.0f;
         }
         else if (dir == Direction.West)
         {
-            transform.localRotation = Quaternion.Euler(eulerAngles.x, 270.0f, eulerAngles.z);
+            newAngles.y = transform.parent.eulerAngles.y + 270.0f;
         }
+        transform.rotation = Quaternion.Euler(newAngles);
     }
 
     // Gets the cardinal direction opposite of the one specified by "dir"
