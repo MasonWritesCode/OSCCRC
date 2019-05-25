@@ -20,21 +20,18 @@ public static class Directions {
         // We want the rotation amount to be relative, but we want to use absolute axes so we can't use localRotation
         // So unfortunately we have to grab data from the parent to make the rotation amount local which is slow because eulerAngles access is slow
         Vector3 newAngles = transform.eulerAngles;
-        if (dir == Direction.North)
-        {
-            newAngles.y = transform.parent.eulerAngles.y;
-        }
+        newAngles.y = transform.parent ? transform.parent.eulerAngles.y : 0.0f;
         if (dir == Direction.East)
         {
-            newAngles.y = transform.parent.eulerAngles.y + 90.0f;
+            newAngles.y += 90.0f;
         }
         else if (dir == Direction.South)
         {
-            newAngles.y = transform.parent.eulerAngles.y + 180.0f;
+            newAngles.y += 180.0f;
         }
         else if (dir == Direction.West)
         {
-            newAngles.y = transform.parent.eulerAngles.y + 270.0f;
+            newAngles.y += 270.0f;
         }
         transform.rotation = Quaternion.Euler(newAngles);
     }
