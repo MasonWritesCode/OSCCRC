@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4342955680738992}
   - component: {fileID: 33966527002923104}
   - component: {fileID: 23002179243693760}
-  - component: {fileID: 64874906801638914}
   - component: {fileID: 114547190176862076}
   m_Layer: 8
   m_Name: TilePrefab
@@ -84,20 +83,6 @@ MeshFilter:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1203674105888342}
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!64 &64874906801638914
-MeshCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1203674105888342}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_SkinWidth: 0.01
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!114 &114547190176862076
 MonoBehaviour:

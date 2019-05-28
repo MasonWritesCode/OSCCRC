@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
 
 	void Start () {
         m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
         m_fpsScript = m_gameController.GetComponent<FramerateDisplay>();
         m_mainCamera = Camera.main;
 
@@ -35,22 +36,24 @@ public class PlayerController : MonoBehaviour {
             // The mouse hovers over a tile to select it as the one where improvements will be placed
             if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
             {
-                Ray tileSelector = m_mainCamera.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hitObject;
-                if (Physics.Raycast(tileSelector, out hitObject, Mathf.Infinity, 1 << LayerMask.NameToLayer("Map Selectable")))
+                Vector3 mousePosition = m_mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                m_currentTile = m_gameMap.tileAt(m_gameMap.transform.InverseTransformPoint(mousePosition));
+
+                // Move tile highlighter to the mouse position
+                if (m_currentTile == null)
                 {
-                    MapTile newTile = hitObject.transform.GetComponent<MapTile>();
-                    if (newTile != null && newTile != m_currentTile)
+                    if (highlighter.gameObject.activeSelf)
                     {
-                        // Currently using a spotlight to highlight the currently slected tile
-                        highlighter.position = newTile.transform.position + Vector3.up * 2;
-                        m_currentTile = newTile;
+                        highlighter.gameObject.SetActive(false);
                     }
                 }
                 else
                 {
-                    highlighter.position = Vector3.one * -99;
-                    m_currentTile = null;
+                    if (!highlighter.gameObject.activeSelf)
+                    {
+                        highlighter.gameObject.SetActive(true);
+                    }
+                    highlighter.position = m_currentTile.transform.position + Vector3.up * 2;
                 }
             }
 
@@ -132,6 +135,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private GameController m_gameController;
+    private GameMap m_gameMap;
     private FramerateDisplay m_fpsScript;
     private Camera m_mainCamera;
     private MapTile m_currentTile = null;
