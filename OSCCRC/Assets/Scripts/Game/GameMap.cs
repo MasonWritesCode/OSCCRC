@@ -291,9 +291,6 @@ public class GameMap : MonoBehaviour
 
         Profiler.EndSample();
 
-        // We need to call SyncTransforms because we might disable physics when transform movement collisions aren't needed, but raycast collision still is
-        Physics.SyncTransforms();
-
         if (mapLoaded != null)
         {
             mapLoaded();
