@@ -25,12 +25,14 @@ public class Timer {
             return;
         }
 
-        m_timerObj.StartCoroutine(runTimer(timeInSeconds));
-    }
+        // The timer object can be destroyed on scene change (which we want so it stops the timer)
+        // So we have to make sure a new one is created in case it does, so check each timer start
+        if (m_timerObj == null)
+        {
+            m_timerObj = new GameObject("Timer").AddComponent<TimerComponent>();
+        }
 
-    static Timer()
-    {
-        m_timerObj = new GameObject("Timer").AddComponent<TimerComponent>();
+        m_timerObj.StartCoroutine(runTimer(timeInSeconds));
     }
 
     private IEnumerator runTimer(float timeInSeconds)
