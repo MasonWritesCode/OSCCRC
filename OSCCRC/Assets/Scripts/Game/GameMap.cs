@@ -26,7 +26,7 @@ public class GameMap : MonoBehaviour
     void Awake()
     {
         m_gameResources = GetComponent<GameResources>();
-        res = new Vector2(Screen.width, Screen.height);
+        res = new Vector2Int(Screen.width, Screen.height);
     }
 
     void Update()
@@ -513,5 +513,5 @@ public class GameMap : MonoBehaviour
     private MapTile[,] m_mapTiles = null;
     private Transform m_bigTile = null;
     private GameResources m_gameResources;
-    private Vector2 res;
+    private Vector2Int res;
 }
