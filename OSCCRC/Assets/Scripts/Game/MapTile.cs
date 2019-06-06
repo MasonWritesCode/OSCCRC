@@ -34,19 +34,16 @@ public class MapTile : MonoBehaviour
     // If I remember correctly, this is used instead of Start so that parentMap can be passed in
     public void initTile(GameMap parentMap)
     {
-        improvement = TileImprovement.None;
-        movingObject = TileImprovement.None;
+        m_rendererRef = GetComponent<MeshRenderer>();
+        m_gameResources = parentMap.GetComponent<GameResources>();
+
+        m_tileObject = null;
         improvementDirection = Directions.Direction.North;
         movingObjDirection = Directions.Direction.North;
-        m_gameResources = parentMap.GetComponent<GameResources>();
-        walls = new Walls(parentMap, transform.localPosition);
-        m_tileObject = null;
+        improvement = TileImprovement.None;
+        movingObject = TileImprovement.None;
 
-        m_rendererRef = GetComponent<MeshRenderer>();
-        if (m_rendererRef)
-        {
-            m_rendererRef.enabled = !GlobalData.x_useBigTile;
-        }
+        walls = new Walls(parentMap, transform.localPosition);
     }
 
 
@@ -81,12 +78,17 @@ public class MapTile : MonoBehaviour
 
         m_tileDamage = 0;
 
-        // We don't actually want to do an early return when the improvement is the same as current
-        // This is because we might load a different resource pack, and want to re-apply the improvements to get the new version
+        // Doing early return here when the improvement (and material in case of resource pack change) is the same seems to make no difference to load speed
+        // So avoid the added complexity of doing it for now in case it somehow causes an issue later, but leave it as comment in case it becomes useful or I am bad at measuring
         /*
         if (improvement == m_improvement)
         {
-            return;
+            if (   improvementTextures.ContainsKey(improvement)
+                && m_rendererRef.sharedMaterial == m_gameResources.materials[improvementTextures[improvement]]
+               )
+            {
+                return;
+            }
         }
         */
 
@@ -103,60 +105,26 @@ public class MapTile : MonoBehaviour
         }
 
         // Set associated tile texture
-        if (GlobalData.x_useBigTile)
+        if (improvement == TileImprovement.None || materialName == null)
         {
-            if (improvement == TileImprovement.None || materialName == null)
-            {
-                // We disable the renderer here instead of setting to Blank tile material
-                // See GameMap for more info
+            // We disable the renderer here instead of setting to Blank tile material, see GameMap for more info
 
-                if (m_rendererRef)
+            m_rendererRef.enabled = false;
+        }
+        else
+        {
+            if (m_gameResources.materials.ContainsKey(materialName))
+            {
+                m_rendererRef.material = m_gameResources.materials[materialName];
+
+                if (!m_rendererRef.enabled)
                 {
-                    m_rendererRef.enabled = false;
+                    m_rendererRef.enabled = true;
                 }
             }
             else
             {
-                if (m_gameResources.materials.ContainsKey(materialName))
-                {
-                    m_rendererRef.material = m_gameResources.materials[materialName];
-
-                    if (!m_rendererRef.enabled)
-                    {
-                        m_rendererRef.enabled = true;
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Material " + materialName + " was not found!");
-                }
-            }
-        }
-        else
-        {
-            if (improvement == TileImprovement.None || materialName == null)
-            {
-                // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
-                if ((transform.localPosition.x + transform.localPosition.z) % 2 == 0)
-                {
-                    materialName = "Tile";
-                }
-                else
-                {
-                    materialName = "TileAlt";
-                }
-            }
-
-            if (materialName != null)
-            {
-                if (m_gameResources.materials.ContainsKey(materialName))
-                {
-                    GetComponent<MeshRenderer>().material = m_gameResources.materials[materialName];
-                }
-                else
-                {
-                    Debug.LogWarning("Material " + materialName + " was not found!");
-                }
+                Debug.LogWarning("Material " + materialName + " was not found!");
             }
         }
 

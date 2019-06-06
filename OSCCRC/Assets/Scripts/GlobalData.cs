@@ -18,8 +18,4 @@ public static class GlobalData {
     // This is currently disabled by default, because beginning an async load can cause input drops which I consider much worse.
     // This will disable the profiler apparently, so make sure this is false if you want to profile the main menu.
     public static readonly bool d_loadSceneAsync = false;
-
-    // Performance related experiment, code exists in GameMap and MapTile
-    // Added TileTiledColor material, which is included in Resource Pack
-    public static readonly bool x_useBigTile = true;
 }

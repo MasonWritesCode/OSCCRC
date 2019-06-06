@@ -484,24 +484,21 @@ public class GameMap : MonoBehaviour
             }
         }
 
-        if (GlobalData.x_useBigTile)
+        // Here we set a single stretched tile that represents all blank tiles
+        // Since usually most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
+        if (m_bigTile == null)
         {
-            // Here we set a single stretched tile that represents all blank tiles
-            // Since most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
-            if (m_bigTile == null)
-            {
-                m_bigTile = Instantiate(floorPrefab, transform);
-            }
-
-            // We need to set the scale to mapsize
-            // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
-            // Material tiling has to be set to (mapsize / 2)
-            m_bigTile.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
-            m_bigTile.localPosition = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
-            MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
-            bigTileRend.material = m_gameResources.materials["TileTiledColor"];
-            bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
+            m_bigTile = Instantiate(floorPrefab, transform);
         }
+
+        // We need to set the scale to mapsize
+        // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
+        // Material tiling has to be set to (mapsize / 2)
+        m_bigTile.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
+        m_bigTile.localPosition = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
+        MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
+        bigTileRend.material = m_gameResources.materials["TileTiledColor"];
+        bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
 
         setCameraView(Camera.main);
     }
