@@ -675,7 +675,6 @@ GameObject:
   - component: {fileID: 473156100}
   - component: {fileID: 473156099}
   - component: {fileID: 473156098}
-  - component: {fileID: 473156097}
   m_Layer: 5
   m_Name: PlacementsDisplay (UI)
   m_TagString: Untagged
@@ -683,22 +682,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &473156097
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 473156096}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &473156098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1879,7 +1862,6 @@ GameObject:
   - component: {fileID: 996980961}
   - component: {fileID: 996980960}
   - component: {fileID: 996980959}
-  - component: {fileID: 996980958}
   m_Layer: 5
   m_Name: FPSDisplay (UI)
   m_TagString: Untagged
@@ -1887,22 +1869,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &996980958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 996980957}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &996980959
 MonoBehaviour:
   m_ObjectHideFlags: 0
