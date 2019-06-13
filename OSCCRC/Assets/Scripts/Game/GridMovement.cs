@@ -7,7 +7,8 @@ using UnityEngine;
 
 public abstract class GridMovement : MonoBehaviour {
 
-    [Range(0, 255)] public float speed;
+    public static float speedMultiplier { get { return m_speedMultiplier; } set { setSpeedMultiplier(value); } }
+    [Range(0.0f, 255.0f)] public float speed; // Editor set ; Make sure to call updateSpeed if changed during runtime since annoyingly we can't make it a property and be editor set I think
 
     public Directions.Direction direction;
     public MapTile tile { get { return m_tile; } }
@@ -15,6 +16,18 @@ public abstract class GridMovement : MonoBehaviour {
 
     // Runs interactions with the specified tile improvement
     protected abstract void interactWithImprovement(MapTile.TileImprovement improvement);
+
+
+    // Updates a grid mover's speed and animation based on its speed variable and the current global multiplier
+    public void updateSpeed()
+    {
+        m_scaledSpeed = speed * m_speedMultiplier;
+
+        if (m_animator)
+        {
+            m_animator.speed = m_scaledSpeed / 2;
+        }
+    }
 
 
     void Start () {
@@ -25,14 +38,12 @@ public abstract class GridMovement : MonoBehaviour {
         m_rigidbody = GetComponent<Rigidbody>();
         m_interpolationMode = m_rigidbody.interpolation;
 
-        m_tile = m_map.tileAt(m_transform.localPosition);
-
         m_animator = GetComponent<Animator>();
-        if (m_animator)
-        {
-            m_animator.speed = speed / 2;
-        }
 
+        m_tile = m_map.tileAt(m_transform.localPosition);
+        updateSpeed();
+
+        multiplierChange += updateSpeed;
         m_gameController.gameState.stateAdded += onTagStateAdd;
         m_gameController.gameState.stateRemoved += onTagStateRemove;
 	}
@@ -58,7 +69,7 @@ public abstract class GridMovement : MonoBehaviour {
             return;
         }
 
-        float distance = speed * Time.smoothDeltaTime;
+        float distance = m_scaledSpeed * Time.smoothDeltaTime;
         if (distance >= m_remainingDistance)
         {
             // We should reach the center of destination tile. So re-center, get new remaining movement distance, and get new heading
@@ -74,6 +85,28 @@ public abstract class GridMovement : MonoBehaviour {
         if (m_isOnEdgeTile)
         {
             applyMapWrap();
+        }
+    }
+
+
+    // Sets a new global speed multiplier for grid movers
+    private static void setSpeedMultiplier(float newVal)
+    {
+        // Enforce a range of 0.5 to 10.0 for speed for now
+        if (newVal > 10.0f)
+        {
+            newVal = 10.0f;
+        }
+        else if (newVal < 0.5f)
+        {
+            newVal = 0.5f;
+        }
+
+        m_speedMultiplier = newVal;
+
+        if (multiplierChange != null)
+        {
+            multiplierChange();
         }
     }
 
@@ -211,6 +244,10 @@ public abstract class GridMovement : MonoBehaviour {
         }
     }
 
+    private delegate void voidEvent();
+    private static event voidEvent multiplierChange;
+
+    private static float m_speedMultiplier = 1.0f;
 
     protected GameController m_gameController;
     protected GameMap m_map;
@@ -219,6 +256,7 @@ public abstract class GridMovement : MonoBehaviour {
     protected Animator m_animator;
     private RigidbodyInterpolation m_interpolationMode;
     private MapTile m_tile;
+    private float m_scaledSpeed;
     private float m_remainingDistance;
     private bool m_isOnEdgeTile;
 }

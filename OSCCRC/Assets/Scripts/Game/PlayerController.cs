@@ -132,6 +132,19 @@ public class PlayerController : MonoBehaviour {
                 fpsDisplay.enabled = false;
             }
         }
+
+        // For now, we use a button press to toggle double movement speed
+        if (Input.GetButtonDown("SpeedToggle"))
+        {
+            if (GridMovement.speedMultiplier > 1.0f)
+            {
+                GridMovement.speedMultiplier = 1.0f;
+            }
+            else
+            {
+                GridMovement.speedMultiplier = 2.0f;
+            }
+        }
     }
 
     private GameController m_gameController;
