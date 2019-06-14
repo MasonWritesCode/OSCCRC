@@ -6,40 +6,31 @@ using UnityEngine;
 
 public class Cat : GridMovement {
 
-    /*
-    void Awake()
-    {
-        speed = 4.4444f;
-        direction = Directions.Direction.North;
-    }
-    */
-
     // Cats can destroy mice, so they check for a collision
     void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<Mouse>() != null)
+        Mouse mouseComponent = other.GetComponent<Mouse>();
+        if (mouseComponent != null)
         {
-            m_map.destroyMouse(other.transform);
+            m_gameController.destroyMover(mouseComponent);
         }
     }
 
     // Runs interactions with the specified tile improvement
     protected override void interactWithImprovement(MapTile.TileImprovement improvement)
     {
-        //check for goals and holes
         if (tile.improvement == MapTile.TileImprovement.Goal)
         {
-            m_map.destroyCat(transform);
+            m_gameController.destroyMover(this);
 
             return;
         }
         else if (tile.improvement == MapTile.TileImprovement.Hole)
         {
-            m_map.destroyCat(transform);
+            m_gameController.destroyMover(this);
 
             return;
         }
-        //checking for arrows
         else if (tile.improvement == MapTile.TileImprovement.Direction)
         {
             if (direction == Directions.getOppositeDir(tile.improvementDirection))

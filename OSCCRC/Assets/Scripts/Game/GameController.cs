@@ -13,6 +13,7 @@ public class GameController : MonoBehaviour {
     public GameState gameState { get { return m_gameState; } }
     public Canvas completeDisplay;
 
+
     // Checks if a player is allowed to place the desired improvement, and does so if they can
     public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
     {
@@ -29,6 +30,14 @@ public class GameController : MonoBehaviour {
             }
         }
     }
+
+
+    // Removes a grid mover from the game
+    public void destroyMover(GridMovement mover)
+    {
+        m_game.destroyMover(mover);
+    }
+
 
     // Begins a new game of the specified mode
     // Only call this after a new GameStage has just been loaded

@@ -9,11 +9,7 @@ using UnityEngine.Profiling;
 public class GameMap : MonoBehaviour
 {
     public delegate void voidEvent();
-    public delegate void objectEvent(GameObject caller);
     public event voidEvent mapLoaded;
-    public event objectEvent mouseDestroyed;
-    public event objectEvent mousePlaced;
-    public event objectEvent catDestroyed;
 
     public int mapHeight { get { return m_mapHeight; } }
     public int mapWidth { get { return m_mapWidth; } }
@@ -126,7 +122,7 @@ public class GameMap : MonoBehaviour
 
 
     // Creates a mouse object and returns its transform. The position is map-relative.
-    // The returned object should only be destroyed with the destroyMouse function
+    // The returned object should only be destroyed with the destroyMouse function instead of Unity's destroy
     public Transform placeMouse(Vector3 position, Directions.Direction direction)
     {
         Transform mousePrefab = m_gameResources.objects["Mouse"];
@@ -135,17 +131,12 @@ public class GameMap : MonoBehaviour
         Directions.rotate(newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
 
-        if (mousePlaced != null)
-        {
-            mousePlaced(newMouse.gameObject);
-        }
-
         return newMouse;
     }
 
 
     // Creates a cat object and returns its transform. The position is map-relative.
-    // The returned object should only be destroyed with the destroyCat function
+    // The returned object should only be destroyed with the destroyCat function instead of Unity's destroy
     public Transform placeCat(Vector3 position, Directions.Direction direction)
     {
         Transform catPrefab = m_gameResources.objects["Cat"];
@@ -166,25 +157,19 @@ public class GameMap : MonoBehaviour
 
 
     // Removes a mouse game object with transform "mouse"
+    // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
     public void destroyMouse(Transform mouse)
     {
-        if (mouseDestroyed != null)
-        {
-            mouseDestroyed(mouse.gameObject);
-        }
-        mouse.gameObject.SetActive(false);
+        //mouse.gameObject.SetActive(false);
         Destroy(mouse.gameObject);
     }
 
 
     // Removes a cat game object with transform "cat"
+    // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
     public void destroyCat(Transform cat)
     {
-        if (catDestroyed != null)
-        {
-            catDestroyed(cat.gameObject);
-        }
-        cat.gameObject.SetActive(false);
+        //cat.gameObject.SetActive(false);
         Destroy(cat.gameObject);
     }
 

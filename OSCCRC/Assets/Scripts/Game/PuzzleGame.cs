@@ -43,9 +43,6 @@ public class PuzzleGame : IGameMode {
         m_placements = new AvailablePlacements(m_originalPlacements);
         m_currentMice = m_numMice;
 
-        m_gameMap.mouseDestroyed += checkGameEnd;
-        m_gameMap.catDestroyed += checkGameEnd;
-
         saveAutosave(ref m_resetSaveData);
         m_pauseSaveData = (byte[]) m_resetSaveData.Clone();
 
@@ -83,8 +80,6 @@ public class PuzzleGame : IGameMode {
     // Ends a puzzle game
     public void endGame()
     {
-        m_gameMap.mouseDestroyed -= checkGameEnd;
-        m_gameMap.catDestroyed -= checkGameEnd;
         m_gameState.mainStateChange -= onStateChange;
     }
 
@@ -144,6 +139,72 @@ public class PuzzleGame : IGameMode {
     }
 
 
+    // Checks if a grid mover should be destroyed, and checks for game over
+    public void destroyMover(GridMovement deadMeat)
+    {
+        if (!deadMeat || !deadMeat.tile)
+        {
+            return;
+        }
+
+        if (m_paused || !m_playing)
+        {
+            if (deadMeat is Cat)
+            {
+                m_gameMap.destroyCat(deadMeat.transform);
+            }
+            else if (deadMeat is Mouse)
+            {
+                m_gameMap.destroyMouse(deadMeat.transform);
+            }
+            return;
+        }
+
+        if (deadMeat is Cat)
+        {
+            if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
+            {
+                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
+                Debug.Log("Cat hit goal, you lose.");
+                m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
+                endGame(false);
+            }
+        }
+        else
+        {
+            if (deadMeat.tile.improvement != MapTile.TileImprovement.Goal)
+            {
+                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
+                Debug.Log("A mouse was destroyed. Game Over.");
+                m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
+                endGame(false);
+            }
+            else
+            {
+                --m_currentMice;
+                m_gameMap.destroyMouse(deadMeat.transform);
+                if (m_currentMice <= 0)
+                {
+                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
+                    audioData.Play(0);
+
+                    Debug.Log("The last mouse hit a goal, you won.");
+                    endGame(true);
+                }
+                else
+                {
+                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
+                    audioData.Play(0);
+                }
+            }
+        }
+    }
+
+
     private void onStateChange(GameState.State oldState, GameState.State newState)
     {
         if (newState == GameState.State.Started_Paused)
@@ -168,64 +229,6 @@ public class PuzzleGame : IGameMode {
         {
             m_paused = false;
             m_playing = false;
-        }
-    }
-
-
-    private void checkGameEnd(GameObject deadMeat)
-    {
-        // Mice can only die when paused when loading to reset, in which case we don't need to gameover
-        if (m_paused || !m_playing)
-        {
-            return;
-        }
-
-        GridMovement gm = deadMeat.GetComponent<GridMovement>();
-        if (!gm || !gm.tile)
-        {
-            return;
-        }
-
-        if (gm is Cat)
-        {
-            if (gm.tile.improvement == MapTile.TileImprovement.Goal)
-            {
-                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
-                audioData.Play(0);
-
-                Debug.Log("Cat hit goal, you lose.");
-                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
-                endGame(false);
-            }
-        }
-        else
-        {
-            if (gm.tile.improvement != MapTile.TileImprovement.Goal)
-            {
-                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
-                audioData.Play(0);
-
-                Debug.Log("A mouse was destroyed. Game Over.");
-                m_gameMap.pingLocation(gm.transform.localPosition, m_autoResetDelay);
-                endGame(false);
-            }
-            else
-            {
-                --m_currentMice;
-                if (m_currentMice <= 0)
-                {
-                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
-                    audioData.Play(0);
-
-                    Debug.Log("The last mouse hit a goal, you won.");
-                    endGame(true);
-                }
-                else
-                {
-                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
-                    audioData.Play(0);
-                }
-            }
         }
     }
 
