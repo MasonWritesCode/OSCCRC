@@ -55,7 +55,7 @@ public class Menu_Panel : MonoBehaviour {
 
         RectTransform rt = newEntry.GetComponent<RectTransform>();
 
-        int myHeight = 25;
+        int myHeight = 26;
         int myWidth = 560;
         int m_XAxis = 0;
         int m_YAxis = 165 - ((myHeight + 5) * place);
