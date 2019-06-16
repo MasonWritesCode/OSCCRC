@@ -78,7 +78,7 @@ public abstract class GridMovement : MonoBehaviour {
         }
 
         // Now move the distance we need to move
-        m_transform.Translate(Vector3.forward * distance);
+        m_transform.Translate(m_dirVec * distance, Space.World);
         m_remainingDistance -= distance;
 
         // Wrap around to tile on opposite side of map if necessary
@@ -212,6 +212,10 @@ public abstract class GridMovement : MonoBehaviour {
         m_transform.localPosition = tile.transform.localPosition;
         Directions.rotate(m_transform, direction);
 
+        // The direction we choose to move in world space is the relative direction vector of parent (which we will assume is the gamemap for now)
+        // We can't use the transform's forward because we want to allow for a rotated transform to work as a grid mover
+        m_dirVec = m_map.transform.TransformVector(Directions.toDirectionVector(direction));
+
         m_remainingDistance = m_map.tileSize;
 
         // We only want to check for wrapping per update when we are on a tile that is at the edge
@@ -259,4 +263,5 @@ public abstract class GridMovement : MonoBehaviour {
     private float m_scaledSpeed;
     private float m_remainingDistance;
     private bool m_isOnEdgeTile;
+    private Vector3 m_dirVec;
 }

@@ -17,8 +17,8 @@ public static class Directions {
             return;
         }
 
-        // We want the rotation amount to be relative, but we want to use absolute axes so we can't use localRotation
-        // So unfortunately we have to grab data from the parent to make the rotation amount local which is slow because eulerAngles access is slow
+        // We want the rotation degree to be relative to parent, but we want to use absolute axes so we can't use localRotation
+        // So unfortunately we have to grab data from the parent to make the rotation degree local which is slow because eulerAngles access is slow
         Vector3 newAngles = transform.eulerAngles;
         newAngles.y = transform.parent ? transform.parent.eulerAngles.y : 0.0f;
         if (dir == Direction.East)
@@ -72,6 +72,25 @@ public static class Directions {
         }
 
         return (Direction)(newNum);
+    }
+
+    // Returns the vector representing this direction
+    public static Vector3 toDirectionVector(Direction dir)
+    {
+        switch (dir)
+        {
+            case Direction.North:
+                return new Vector3(0.0f, 0.0f, 1.0f);
+            case Direction.East:
+                return new Vector3(1.0f, 0.0f, 0.0f);
+            case Direction.South:
+                return new Vector3(0.0f, 0.0f, -1.0f);
+            case Direction.West:
+                return new Vector3(-1.0f, 0.0f, 0.0f);
+            default:
+                return new Vector3(0.0f, 0.0f, 1.0f);
+        }
+
     }
 
     // An IEqualityComparer that avoids boxing to improve performance with a direction as a key
