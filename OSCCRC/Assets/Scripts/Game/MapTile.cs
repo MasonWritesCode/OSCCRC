@@ -15,7 +15,7 @@ public class MapTile : MonoBehaviour
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
-    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(m_tileObject, value); } }
+    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { if (m_improvementDir != value) { Directions.rotate(m_tileObject, value, m_mapTransform); m_improvementDir = value; } } }
     public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
     public Walls walls;
 
@@ -36,6 +36,7 @@ public class MapTile : MonoBehaviour
     {
         m_rendererRef = GetComponent<MeshRenderer>();
         m_gameResources = parentMap.GetComponent<GameResources>();
+        m_mapTransform = parentMap.transform; // We need this to rotate tile objects relative to map instead of relative to tile (which is currently rotated differently)
 
         m_tileObject = null;
         improvementDirection = Directions.Direction.North;
@@ -80,6 +81,7 @@ public class MapTile : MonoBehaviour
 
         // Doing early return here when the improvement (and material in case of resource pack change) is the same seems to make no difference to load speed
         // So avoid the added complexity of doing it for now in case it somehow causes an issue later, but leave it as comment in case it becomes useful or I am bad at measuring
+        // Note: This would also need to be changed to check if the material changed on the tileobject as well, since I forgot to do that
         /*
         if (improvement == m_improvement)
         {
@@ -145,7 +147,8 @@ public class MapTile : MonoBehaviour
                     // We avoid z-fighting issues for directional tile objects by placing slightly above. Mathf.Epsilon doesn't seem to be enough for this.
                     m_tileObject.localPosition = new Vector3(0.0f, 0.0f, -0.0001f);
                 }
-                Directions.rotate(m_tileObject, m_improvementDir);
+
+                Directions.rotate(m_tileObject, m_improvementDir, m_mapTransform);
             }
             else
             {
@@ -161,6 +164,7 @@ public class MapTile : MonoBehaviour
     private Directions.Direction m_improvementDir;
     private Directions.Direction m_movingDir;
     private Transform m_tileObject;
+    private Transform m_mapTransform;
     private int m_tileDamage;
     private MeshRenderer m_rendererRef;
     private GameResources m_gameResources;

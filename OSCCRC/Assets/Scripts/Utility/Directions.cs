@@ -9,31 +9,43 @@ public static class Directions {
 
     public enum Direction { North = 1, East = 2, South = 4, West = 8 };
 
-    // Locally rotates a transform into the specified cardinal direction
-    public static void rotate(Transform transform, Direction dir)
+    // Rotates a transform into the specified cardinal direction, local to relativeTo or its parent if not specified
+    public static void rotate(Transform transform, Direction dir, Transform relativeTo = null)
     {
         if (transform == null)
         {
             return;
         }
 
-        // We want the rotation degree to be relative to parent, but we want to use absolute axes so we can't use localRotation
-        // So unfortunately we have to grab data from the parent to make the rotation degree local which is slow because eulerAngles access is slow
-        Vector3 newAngles = transform.eulerAngles;
-        newAngles.y = transform.parent ? transform.parent.eulerAngles.y : 0.0f;
-        if (dir == Direction.East)
+        // We rotate the vector so that eulerAngles.y is the rotation about a fixed global axis, then we assign our value and then undo our previous rotation
+        // We use eulerAngles so that we can assign a degree value without having to worry about the current rotation in that direction and avoid touching rotation about other axes
+        if (relativeTo == null && transform.parent)
         {
-            newAngles.y += 90.0f;
+            relativeTo = transform.parent;
         }
-        else if (dir == Direction.South)
+        Vector3 relVec = Vector3.forward;
+        if (relativeTo != null)
         {
-            newAngles.y += 180.0f;
+            relVec = relativeTo.forward;
         }
-        else if (dir == Direction.West)
+        Quaternion rot = Quaternion.FromToRotation(relVec, Vector3.forward);
+        Vector3 newAngles = (rot * transform.rotation).eulerAngles;
+        switch (dir)
         {
-            newAngles.y += 270.0f;
+            case Direction.East:
+                newAngles.y = 90.0f;
+                break;
+            case Direction.South:
+                newAngles.y = 180.0f;
+                break;
+            case Direction.West:
+                newAngles.y = 270.0f;
+                break;
+            default:
+                newAngles.y = 0.0f;
+                break;
         }
-        transform.rotation = Quaternion.Euler(newAngles);
+        transform.rotation = Quaternion.Inverse(rot) * Quaternion.Euler(newAngles);
     }
 
     // Gets the cardinal direction opposite of the one specified by "dir"
