@@ -20,7 +20,7 @@ public class Editor : MonoBehaviour {
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
-        m_placeholderObject = Instantiate(m_gameResources.objects["Placeholder"]);
+        m_placeholderObject = Instantiate(m_gameResources.objects["Placeholder"], m_gameMap.transform);
         disablePlaceholder();
         m_direction = Directions.Direction.East;
         m_positionOffset = Vector3.zero;
@@ -204,17 +204,17 @@ public class Editor : MonoBehaviour {
         {
             // Moves the placement preview
             // Follow mouse precisely unless there is a tile to snap to
-            if (selectedTile != null)
+            if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
             {
-                m_placeholderObject.position = selectedTile.transform.position + m_positionOffset;
-            }
-            else if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
-            {
-                Ray posRay = m_mainCamera.ScreenPointToRay(Input.mousePosition);
-                float distance;
-                if (m_floorPlane.Raycast(posRay, out distance))
+                if (selectedTile == null)
                 {
-                    m_placeholderObject.position = posRay.GetPoint(distance) + m_positionOffset;
+                    Vector3 mousePos = m_mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                    // We should use game map height as the height, but we weren't doing it before and I wont bother for now
+                    m_placeholderObject.position = new Vector3(mousePos.x, 0.0f, mousePos.z) + m_positionOffset;
+                }
+                else
+                {
+                    m_placeholderObject.localPosition = selectedTile.transform.localPosition + m_positionOffset;
                 }
             }
 
@@ -388,7 +388,7 @@ public class Editor : MonoBehaviour {
 
         // We need to reset rotation since not all prefabs whose mesh we use have same rotation
         // We wouldn't have to do this if we made our own quad model for tiles (quads stand vertically by default)
-        m_placeholderObject.rotation = Quaternion.identity;
+        m_placeholderObject.localRotation = Quaternion.identity;
 
         // Select the mesh for the selected object
         Mesh newMesh = m_gameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
@@ -463,7 +463,7 @@ public class Editor : MonoBehaviour {
             }
         }
 
-        Directions.rotate(ref m_placeholderObject, m_direction);
+        Directions.rotate(m_placeholderObject, m_direction);
 
         // Assign the new mesh
         MeshFilter phMesh = m_placeholderObject.GetComponent<MeshFilter>();
@@ -501,5 +501,4 @@ public class Editor : MonoBehaviour {
     private PlayerController m_controls;
     private GameController m_gameControl;
     private Camera m_mainCamera;
-    private readonly Plane m_floorPlane = new Plane(Vector3.up, Vector3.zero);
 }

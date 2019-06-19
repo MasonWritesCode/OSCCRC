@@ -7,7 +7,7 @@ public class AvailablePlacements
 {
     public AvailablePlacements()
     {
-        counts = new Dictionary<Directions.Direction, int>{
+        counts = new Dictionary<Directions.Direction, int>(4, new Directions.DirectionComparer()){
                 { Directions.Direction.North, 0 },
                 { Directions.Direction.East, 0 },
                 { Directions.Direction.South, 0 },

@@ -31,7 +31,7 @@ public class GameState
     {
         m_mainState = startState;
 
-        m_additionalStates = new HashSet<TagState>();
+        m_additionalStates = new HashSet<TagState>(new TagStateComparer());
     }
 
 
@@ -98,6 +98,21 @@ public class GameState
             TagState[] stateList = new TagState[m_additionalStates.Count];
             m_additionalStates.CopyTo(stateList);
             return stateList;
+        }
+    }
+
+
+    // An IEqualityComparer that avoids boxing to remove allocations and improve performance with tagstate sets
+    public struct TagStateComparer : IEqualityComparer<TagState>
+    {
+        public bool Equals(TagState a, TagState b)
+        {
+            return a == b;
+        }
+
+        public int GetHashCode(TagState dir)
+        {
+            return (int)dir;
         }
     }
 

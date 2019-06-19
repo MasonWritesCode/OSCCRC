@@ -9,30 +9,43 @@ public static class Directions {
 
     public enum Direction { North = 1, East = 2, South = 4, West = 8 };
 
-    // Rotates a transform into the specified cardinal direction
-    public static void rotate(ref Transform transform, Direction dir)
+    // Rotates a transform into the specified cardinal direction, local to relativeTo or its parent if not specified
+    public static void rotate(Transform transform, Direction dir, Transform relativeTo = null)
     {
         if (transform == null)
         {
             return;
         }
 
-        if (dir == Direction.North)
+        // We rotate the vector so that eulerAngles.y is the rotation about a fixed global axis, then we assign our value and then undo our previous rotation
+        // We use eulerAngles so that we can assign a degree value without having to worry about the current rotation in that direction and avoid touching rotation about other axes
+        if (relativeTo == null && transform.parent)
         {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 0.0f, transform.eulerAngles.z);
+            relativeTo = transform.parent;
         }
-        else if (dir == Direction.East)
+        Vector3 relVec = Vector3.forward;
+        if (relativeTo != null)
         {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 90.0f, transform.eulerAngles.z);
+            relVec = relativeTo.forward;
         }
-        else if (dir == Direction.South)
+        Quaternion rot = Quaternion.FromToRotation(relVec, Vector3.forward);
+        Vector3 newAngles = (rot * transform.rotation).eulerAngles;
+        switch (dir)
         {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 180.0f, transform.eulerAngles.z);
+            case Direction.East:
+                newAngles.y = 90.0f;
+                break;
+            case Direction.South:
+                newAngles.y = 180.0f;
+                break;
+            case Direction.West:
+                newAngles.y = 270.0f;
+                break;
+            default:
+                newAngles.y = 0.0f;
+                break;
         }
-        else if (dir == Direction.West)
-        {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 270.0f, transform.eulerAngles.z);
-        }
+        transform.rotation = Quaternion.Inverse(rot) * Quaternion.Euler(newAngles);
     }
 
     // Gets the cardinal direction opposite of the one specified by "dir"
@@ -71,5 +84,38 @@ public static class Directions {
         }
 
         return (Direction)(newNum);
+    }
+
+    // Returns the vector representing this direction
+    public static Vector3 toDirectionVector(Direction dir)
+    {
+        switch (dir)
+        {
+            case Direction.North:
+                return Vector3.forward;
+            case Direction.East:
+                return Vector3.right;
+            case Direction.South:
+                return Vector3.back;
+            case Direction.West:
+                return Vector3.left;
+            default:
+                return Vector3.forward;
+        }
+
+    }
+
+    // An IEqualityComparer that avoids boxing to improve performance with a direction as a key
+    public struct DirectionComparer : System.Collections.Generic.IEqualityComparer<Direction>
+    {
+        public bool Equals(Direction a, Direction b)
+        {
+            return a == b;
+        }
+
+        public int GetHashCode(Direction dir)
+        {
+            return (int)dir;
+        }
     }
 }

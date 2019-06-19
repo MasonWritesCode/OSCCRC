@@ -12,9 +12,10 @@ public static class GlobalData {
     // Development Related Values:
 
     // Disables vsync so that performance can properly be measured
-    public static bool d_uncapFrames = false;
+    public static readonly bool d_uncapFrames = false;
 
-    // Performance related experiment, code exists in GameMap and MapTile
-    // Added TileTiledColor material, which is included in Resource Pack
-    public static bool x_useBigTile = true;
+    // Begins loading of Game scene once main menu is shown where the slowdown is less noticible.
+    // This is currently disabled by default, because beginning an async load can cause input drops which I consider much worse.
+    // This will disable the profiler apparently, so make sure this is false if you want to profile the main menu.
+    public static readonly bool d_loadSceneAsync = false;
 }

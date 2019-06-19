@@ -15,7 +15,7 @@ public class MapTile : MonoBehaviour
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
-    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { m_improvementDir = value; Directions.rotate(ref m_tileObject, value); } }
+    public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { if (m_improvementDir != value) { Directions.rotate(m_tileObject, value, m_mapTransform); m_improvementDir = value; } } }
     public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
     public Walls walls;
 
@@ -34,19 +34,17 @@ public class MapTile : MonoBehaviour
     // If I remember correctly, this is used instead of Start so that parentMap can be passed in
     public void initTile(GameMap parentMap)
     {
-        improvement = TileImprovement.None;
-        movingObject = TileImprovement.None;
+        m_rendererRef = GetComponent<MeshRenderer>();
+        m_gameResources = parentMap.GetComponent<GameResources>();
+        m_mapTransform = parentMap.transform; // We need this to rotate tile objects relative to map instead of relative to tile (which is currently rotated differently)
+
+        m_tileObject = null;
         improvementDirection = Directions.Direction.North;
         movingObjDirection = Directions.Direction.North;
-        m_gameResources = parentMap.GetComponent<GameResources>();
-        walls = new Walls(parentMap, transform.localPosition);
-        m_tileObject = null;
+        improvement = TileImprovement.None;
+        movingObject = TileImprovement.None;
 
-        m_rendererRef = GetComponent<MeshRenderer>();
-        if (m_rendererRef)
-        {
-            m_rendererRef.enabled = !GlobalData.x_useBigTile;
-        }
+        walls = new Walls(parentMap, transform.localPosition);
     }
 
 
@@ -81,12 +79,18 @@ public class MapTile : MonoBehaviour
 
         m_tileDamage = 0;
 
-        // We don't actually want to do an early return when the improvement is the same as current
-        // This is because we might load a different resource pack, and want to re-apply the improvements to get the new version
+        // Doing early return here when the improvement (and material in case of resource pack change) is the same seems to make no difference to load speed
+        // So avoid the added complexity of doing it for now in case it somehow causes an issue later, but leave it as comment in case it becomes useful or I am bad at measuring
+        // Note: This would also need to be changed to check if the material changed on the tileobject as well, since I forgot to do that
         /*
         if (improvement == m_improvement)
         {
-            return;
+            if (   improvementTextures.ContainsKey(improvement)
+                && m_rendererRef.sharedMaterial == m_gameResources.materials[improvementTextures[improvement]]
+               )
+            {
+                return;
+            }
         }
         */
 
@@ -103,60 +107,26 @@ public class MapTile : MonoBehaviour
         }
 
         // Set associated tile texture
-        if (GlobalData.x_useBigTile)
+        if (improvement == TileImprovement.None || materialName == null)
         {
-            if (improvement == TileImprovement.None || materialName == null)
-            {
-                // We disable the renderer here instead of setting to Blank tile material
-                // See GameMap for more info
+            // We disable the renderer here instead of setting to Blank tile material, see GameMap for more info
 
-                if (m_rendererRef)
+            m_rendererRef.enabled = false;
+        }
+        else
+        {
+            if (m_gameResources.materials.ContainsKey(materialName))
+            {
+                m_rendererRef.material = m_gameResources.materials[materialName];
+
+                if (!m_rendererRef.enabled)
                 {
-                    m_rendererRef.enabled = false;
+                    m_rendererRef.enabled = true;
                 }
             }
             else
             {
-                if (m_gameResources.materials.ContainsKey(materialName))
-                {
-                    m_rendererRef.material = m_gameResources.materials[materialName];
-
-                    if (!m_rendererRef.enabled)
-                    {
-                        m_rendererRef.enabled = true;
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Material " + materialName + " was not found!");
-                }
-            }
-        }
-        else
-        {
-            if (improvement == TileImprovement.None || materialName == null)
-            {
-                // Since improvement textures aren't overlayed, we don't always want the same texture on an empty tile, so that we get a grid-like pattern
-                if ((transform.localPosition.x + transform.localPosition.z) % 2 == 0)
-                {
-                    materialName = "Tile";
-                }
-                else
-                {
-                    materialName = "TileAlt";
-                }
-            }
-
-            if (materialName != null)
-            {
-                if (m_gameResources.materials.ContainsKey(materialName))
-                {
-                    GetComponent<MeshRenderer>().material = m_gameResources.materials[materialName];
-                }
-                else
-                {
-                    Debug.LogWarning("Material " + materialName + " was not found!");
-                }
+                Debug.LogWarning("Material " + materialName + " was not found!");
             }
         }
 
@@ -177,7 +147,8 @@ public class MapTile : MonoBehaviour
                     // We avoid z-fighting issues for directional tile objects by placing slightly above. Mathf.Epsilon doesn't seem to be enough for this.
                     m_tileObject.localPosition = new Vector3(0.0f, 0.0f, -0.0001f);
                 }
-                Directions.rotate(ref m_tileObject, m_improvementDir);
+
+                Directions.rotate(m_tileObject, m_improvementDir, m_mapTransform);
             }
             else
             {
@@ -193,6 +164,7 @@ public class MapTile : MonoBehaviour
     private Directions.Direction m_improvementDir;
     private Directions.Direction m_movingDir;
     private Transform m_tileObject;
+    private Transform m_mapTransform;
     private int m_tileDamage;
     private MeshRenderer m_rendererRef;
     private GameResources m_gameResources;
