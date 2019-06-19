@@ -51,14 +51,19 @@ public class Menu_Panel : MonoBehaviour {
 
         m_tempStageInfo.loadStageMetadata(m_folderNames[m_folder] + file.Name.Remove(file.Name.Length - file.Extension.Length));
 
-        newEntry.setName(m_tempStageInfo.stageName);
+        string entryName = m_tempStageInfo.stageName;
+        if (CompletionTracker.isCompleted(m_folderNames[m_folder] + file.Name))
+        {
+            entryName = entryName + " (Completed)";
+        }
+        newEntry.setName(entryName);
 
         RectTransform rt = newEntry.GetComponent<RectTransform>();
 
         int myHeight = 26;
         int myWidth = 560;
         int m_XAxis = 0;
-        int m_YAxis = 165 - ((myHeight + 5) * place);
+        int m_YAxis = 160 - ((myHeight + 5) * place);
 
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, myHeight);
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, myWidth);

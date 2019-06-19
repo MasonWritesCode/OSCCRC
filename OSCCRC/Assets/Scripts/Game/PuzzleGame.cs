@@ -90,6 +90,7 @@ public class PuzzleGame : IGameMode {
         if (victory)
         {
             m_gameState.mainState = GameState.State.Ended_Unpaused;
+            CompletionTracker.markCompleted(GlobalData.currentStagePath);
         }
         else
         {
