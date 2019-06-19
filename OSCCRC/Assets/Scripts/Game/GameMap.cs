@@ -23,18 +23,9 @@ public class GameMap : MonoBehaviour
     {
         m_gameResources = GetComponent<GameResources>();
         m_transform = transform;
-        res = new Vector2Int(Screen.width, Screen.height);
+        m_mainCamera = Camera.main.GetComponent<CameraController>();
     }
 
-    void Update()
-    {
-        if (res.x != Screen.width || res.y != Screen.height)
-        {
-            setCameraView(Camera.main);
-            res.x = Screen.width;
-            res.y = Screen.height;
-        }
-    }
 
     // Returns the maptile info of the tile that the current GameMap-local coordinate is inside of
     public MapTile tileAt(Vector3 point)
@@ -162,6 +153,11 @@ public class GameMap : MonoBehaviour
     public void destroyMouse(Transform mouse)
     {
         //mouse.gameObject.SetActive(false);
+        if (m_mainCamera.isAttached && mouse.GetComponentInChildren<Camera>())
+        {
+            m_mainCamera.setCameraOrthographic();
+            m_mainCamera.setCameraView(this);
+        }
         Destroy(mouse.gameObject);
     }
 
@@ -171,6 +167,11 @@ public class GameMap : MonoBehaviour
     public void destroyCat(Transform cat)
     {
         //cat.gameObject.SetActive(false);
+        if (m_mainCamera.isAttached && cat.GetComponentInChildren<Camera>())
+        {
+            m_mainCamera.setCameraOrthographic();
+            m_mainCamera.setCameraView(this);
+        }
         Destroy(cat.gameObject);
     }
 
@@ -420,28 +421,6 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Sets the position of camera "cam" to be able to see the entire map
-    private void setCameraView(Camera cam)
-    {
-        // Currently this is set up for an orthographic camera.
-        // We want to center the camera within non-ui space. This space is currently the rightmost 80% of the screen.
-
-        // Increasing adds more empty space around the map, effectively controlling how zoomed in it is.
-        const float mapPaddingRatio = 0.05f;
-
-        // We want to get the camera width and height necessary for fitting the map. Then we decide on an orthographic size that fits.
-        float neededHeight = mapHeight * tileSize * (1.0f + mapPaddingRatio);
-        float neededWidth = mapWidth * tileSize * (1.0f + mapPaddingRatio);
-        float newOrthographicSize = Mathf.Max(neededHeight / 2.0f, neededWidth / (cam.aspect * 2.0f * 0.8f));
-        cam.orthographicSize = newOrthographicSize;
-
-        // Now we position the resized map. The width must also subtract half of the screen space devoted to UI
-        // (I'm not sure why, but our UI offset calculation seems to be slightly off, so I am adding a -0.5f to it which seems to work)
-        float UIOffset = (newOrthographicSize * cam.aspect * 0.2f) - 0.5f;
-        cam.transform.position = new Vector3(((mapWidth - 1) / 2) - UIOffset, 50.0f, (mapHeight - 1) / 2);
-    }
-
-
     // Generates a new rectangular map of the specified width and height
     private void generateMap(int height, int width)
     {
@@ -486,7 +465,7 @@ public class GameMap : MonoBehaviour
         bigTileRend.material = m_gameResources.materials["TileTiledColor"];
         bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
 
-        setCameraView(Camera.main);
+        m_mainCamera.setCameraView(this);
     }
 
 
@@ -497,5 +476,5 @@ public class GameMap : MonoBehaviour
     private Transform m_bigTile = null;
     private Transform m_transform;
     private GameResources m_gameResources;
-    private Vector2Int res;
+    private CameraController m_mainCamera;
 }

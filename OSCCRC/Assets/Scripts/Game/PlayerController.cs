@@ -145,7 +145,40 @@ public class PlayerController : MonoBehaviour {
                 GridMovement.speedMultiplier = 2.0f;
             }
         }
+
+        // First person easter egg thing
+        if (Input.GetButtonDown("FPSToggle"))
+        {
+            toggleFPSMode();
+        }
     }
+
+
+    private void toggleFPSMode()
+    {
+        CameraController cam = m_mainCamera.GetComponent<CameraController>();
+
+        if (cam.isAttached)
+        {
+            cam.setCameraOrthographic();
+            cam.setCameraView(m_gameMap);
+        }
+        else
+        {
+            // We randomly select which grid mover to follow
+            System.Random rng = new System.Random();
+            GridMovement[] gms = m_gameMap.GetComponentsInChildren<GridMovement>();
+
+            if (gms.Length == 0)
+            {
+                return;
+            }
+
+            Transform gm = gms[rng.Next(gms.Length)].transform;
+            cam.setCameraFollow(gm);
+        }
+    }
+
 
     private GameController m_gameController;
     private GameMap m_gameMap;
