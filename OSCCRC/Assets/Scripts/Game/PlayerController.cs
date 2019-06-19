@@ -146,6 +146,12 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
+        // Moonwalking easter egg thing
+        if (Input.GetButtonDown("MoonwalkToggle"))
+        {
+            GridMovement.moonwalkEnabled = !GridMovement.moonwalkEnabled;
+        }
+
         // First person easter egg thing
         if (Input.GetButtonDown("FPSToggle"))
         {

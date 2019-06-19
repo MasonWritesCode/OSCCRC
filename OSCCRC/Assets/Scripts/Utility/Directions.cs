@@ -92,15 +92,15 @@ public static class Directions {
         switch (dir)
         {
             case Direction.North:
-                return new Vector3(0.0f, 0.0f, 1.0f);
+                return Vector3.forward;
             case Direction.East:
-                return new Vector3(1.0f, 0.0f, 0.0f);
+                return Vector3.right;
             case Direction.South:
-                return new Vector3(0.0f, 0.0f, -1.0f);
+                return Vector3.back;
             case Direction.West:
-                return new Vector3(-1.0f, 0.0f, 0.0f);
+                return Vector3.left;
             default:
-                return new Vector3(0.0f, 0.0f, 1.0f);
+                return Vector3.forward;
         }
 
     }

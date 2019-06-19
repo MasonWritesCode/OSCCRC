@@ -8,6 +8,7 @@ using UnityEngine;
 public abstract class GridMovement : MonoBehaviour {
 
     public static float speedMultiplier { get { return m_speedMultiplier; } set { setSpeedMultiplier(value); } }
+    public static bool moonwalkEnabled { get { return m_moonwalkEnabled; } set { m_moonwalkEnabled = value; } }
     [Range(0.0f, 255.0f)] public float speed; // Editor set ; Make sure to call updateSpeed if changed during runtime since annoyingly we can't make it a property and be editor set I think
 
     public Directions.Direction direction;
@@ -210,7 +211,14 @@ public abstract class GridMovement : MonoBehaviour {
         }
 
         m_transform.localPosition = tile.transform.localPosition;
-        Directions.rotate(m_transform, direction);
+        if (m_moonwalkEnabled)
+        {
+            Directions.rotate(m_transform, Directions.getOppositeDir(direction));
+        }
+        else
+        {
+            Directions.rotate(m_transform, direction);
+        }
 
         // The direction we choose to move in world space is the relative direction vector of parent (which we will assume is the gamemap for now)
         // We can't use the transform's forward because we want to allow for a rotated transform to work as a grid mover
@@ -252,6 +260,7 @@ public abstract class GridMovement : MonoBehaviour {
     private static event voidEvent multiplierChange;
 
     private static float m_speedMultiplier = 1.0f;
+    private static bool m_moonwalkEnabled = false;
 
     protected GameController m_gameController;
     protected GameMap m_map;
