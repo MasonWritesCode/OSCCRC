@@ -89,13 +89,13 @@ public class PuzzleGame : IGameMode {
     {
         if (victory)
         {
-            m_gameState.mainState = GameState.State.Ended_Unpaused;
+            m_gameState.mainState = GameState.State.Ended_Victory;
             CompletionTracker.markCompleted(GlobalData.currentStagePath);
         }
         else
         {
             // We reset for the player after a period of time when they fail by "pressing pause"
-            m_gameState.mainState = GameState.State.Ended_Paused;
+            m_gameState.mainState = GameState.State.Ended_Failure;
             setStateDelayed(GameState.State.Started_Paused, m_autoResetDelay);
         }
     }
@@ -208,6 +208,7 @@ public class PuzzleGame : IGameMode {
 
     private void onStateChange(GameState.State oldState, GameState.State newState)
     {
+        // TODO: Stop timer
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
@@ -221,12 +222,12 @@ public class PuzzleGame : IGameMode {
             m_playing = true;
             saveAutosave(ref m_pauseSaveData);
         }
-        else if (newState == GameState.State.Ended_Paused)
+        else if (newState == GameState.State.Ended_Failure)
         {
             m_paused = true;
             m_playing = false;
         }
-        else if (newState == GameState.State.Ended_Unpaused)
+        else if (newState == GameState.State.Ended_Victory)
         {
             m_paused = false;
             m_playing = false;
@@ -285,7 +286,10 @@ public class PuzzleGame : IGameMode {
         m_timer = new Timer();
         m_timer.timerCompleted += () =>
         {
-            m_gameState.mainState = state;
+            if (m_gameState.mainState != state)
+            {
+                m_gameState.mainState = state;
+            }
             m_timer = null;
         };
         m_timer.startTimer(delayInSeconds);

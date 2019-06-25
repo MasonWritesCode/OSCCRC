@@ -177,9 +177,15 @@ public class GameMap : MonoBehaviour
 
 
     // Draws a ring around the specified location on the map for the specified length of time to draw the user's attention.
-    // Location is a map-relative position.
+    // Only one ring will be shown at a time for now, which is the most recent. Location is a map-relative position.
     public void pingLocation(Vector3 location, float timeInSeconds)
     {
+        Transform prevRing = m_transform.Find("Ring(Clone)");
+        if (prevRing != null)
+        {
+            Destroy(prevRing.gameObject);
+        }
+
         Transform pingRing = Instantiate(ringPrefab, m_transform);
         pingRing.localPosition = new Vector3(location.x, 5.0f, location.z);
         Destroy(pingRing.gameObject, timeInSeconds);
@@ -199,7 +205,7 @@ public class GameMap : MonoBehaviour
         GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>();
         for (int i = 0; i < deadMeat.Length; ++i)
         {
-            deadMeat[i].gameObject.SetActive(false);
+            //deadMeat[i].gameObject.SetActive(false);
             if (deadMeat[i] is Mouse)
             {
                 destroyMouse(deadMeat[i].transform);
@@ -208,6 +214,14 @@ public class GameMap : MonoBehaviour
             {
                 destroyCat(deadMeat[i].transform);
             }
+        }
+
+        // Remove ping ring
+        // If there is a nice way to find them all we can support multiple rings, but to be simple require one and use find for now
+        Transform ring = m_transform.Find("Ring(Clone)");
+        if (ring != null)
+        {
+            Destroy(ring.gameObject);
         }
 
         // Create a new map if necessary

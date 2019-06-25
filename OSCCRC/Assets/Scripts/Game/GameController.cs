@@ -195,7 +195,7 @@ public class GameController : MonoBehaviour {
     // Does actions when a user completes a stage
     private void onLevelComplete(GameState.State stateOld, GameState.State stateNew)
     {
-        if (stateNew == GameState.State.Ended_Unpaused)
+        if (stateNew == GameState.State.Ended_Victory)
         {
             // This should be moved into PuzzleGame in some way or another at some point
             //   when we figure out how we want to store the display reference to the mode without it being a monobehavior
