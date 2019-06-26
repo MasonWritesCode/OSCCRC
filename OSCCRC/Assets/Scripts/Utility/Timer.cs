@@ -7,6 +7,9 @@ using UnityEngine;
 //
 // Currently, each instance can only run a single timer at once and it cannot be canceled. The timer does not repeat, it has to be invoked again to run again.
 // Basic functionality is to use startTimer(float timeInSeconds) on an instance to have that instance start its timer.
+//
+// We should enhance this class with pauseTimer, getRemainingTime functions and shouldRepeat, isScaledTime, isRunning properties
+// Some of these may require the class to be changed in implementation
 
 public class Timer {
 
@@ -17,6 +20,8 @@ public class Timer {
     public delegate void voidEvent();
     public event voidEvent timerCompleted;
 
+
+    // Starts the timer with the specified length
     public void startTimer(float timeInSeconds)
     {
         if (m_timerRunning)
@@ -32,8 +37,20 @@ public class Timer {
             m_timerObj = new GameObject("Timer").AddComponent<TimerComponent>();
         }
 
-        m_timerObj.StartCoroutine(runTimer(timeInSeconds));
+        coroutineInstance = m_timerObj.StartCoroutine(runTimer(timeInSeconds));
     }
+
+
+    // Stops the timer if it is started
+    public void stopTimer()
+    {
+        if (m_timerRunning)
+        {
+            m_timerObj.StopCoroutine(coroutineInstance);
+            m_timerRunning = false;
+        }
+    }
+
 
     private IEnumerator runTimer(float timeInSeconds)
     {
@@ -47,7 +64,9 @@ public class Timer {
         }
     }
 
+
     private bool m_timerRunning = false;
+    private Coroutine coroutineInstance;
     private static TimerComponent m_timerObj = null;
 
     // We can't add a Monobehavior directly, so we create an empty wrapper
