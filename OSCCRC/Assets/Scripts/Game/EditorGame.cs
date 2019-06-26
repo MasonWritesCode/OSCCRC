@@ -146,7 +146,11 @@ public class EditorGame : IGameMode
 
     private void onStateChange(GameState.State oldState, GameState.State newState)
     {
-        // TODO: Stop timer
+        if (m_timer != null)
+        {
+            m_timer.stopTimer();
+        }
+
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
