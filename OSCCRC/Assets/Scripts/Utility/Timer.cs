@@ -8,7 +8,7 @@ using UnityEngine;
 // Currently, each instance can only run a single timer at once and it cannot be canceled. The timer does not repeat, it has to be invoked again to run again.
 // Basic functionality is to use startTimer(float timeInSeconds) on an instance to have that instance start its timer.
 //
-// We should enhance this class with pauseTimer, getRemainingTime functions and shouldRepeat, isScaledTime, isRunning properties
+// We should enhance this class with pauseTimer/unpauseTimer, getRemainingTime functions and shouldRepeat, isRunning properties
 // Some of these may require the class to be changed in implementation
 
 public class Timer {
@@ -19,6 +19,10 @@ public class Timer {
 
     public delegate void voidEvent();
     public event voidEvent timerCompleted;
+
+
+    // Whether the timer should use scaled time or not. Must be set before starting the timer. Defaults to true.
+    public bool isScaledTime { get { return m_isScaledTime; } set { m_isScaledTime = value; } }
 
 
     // Starts the timer with the specified length
@@ -55,7 +59,14 @@ public class Timer {
     private IEnumerator runTimer(float timeInSeconds)
     {
         m_timerRunning = true;
-        yield return new WaitForSeconds(timeInSeconds);
+        if (m_isScaledTime)
+        {
+            yield return new WaitForSeconds(timeInSeconds);
+        }
+        else
+        {
+            yield return new WaitForSecondsRealtime(timeInSeconds);
+        }
 
         m_timerRunning = false;
         if (timerCompleted != null)
@@ -66,6 +77,7 @@ public class Timer {
 
 
     private bool m_timerRunning = false;
+    private bool m_isScaledTime = true;
     private Coroutine coroutineInstance;
     private static TimerComponent m_timerObj = null;
 
