@@ -142,6 +142,7 @@ public class Editor : MonoBehaviour {
                 newDir = Directions.nextClockwiseDir(m_direction);
                 if (newType == ObjectType.None)
                 {
+                    // For now, we set a type to force an update of the placeholder object
                     newType = m_placeholderType;
                 }
                 if (newImprovement == MapTile.TileImprovement.None)
@@ -154,6 +155,7 @@ public class Editor : MonoBehaviour {
                 newDir = Directions.nextCounterClockwiseDir(m_direction);
                 if (newType == ObjectType.None)
                 {
+                    // For now, we set a type to force an update of the placeholder object
                     newType = m_placeholderType;
                 }
                 if (newImprovement == MapTile.TileImprovement.None)
@@ -202,9 +204,9 @@ public class Editor : MonoBehaviour {
 
         if (m_placeholderObject.gameObject.activeSelf)
         {
-            // Moves the placement preview
+            // Moves the placement preview. We need to update position on type change too in case m_positionOffset changes.
             // Follow mouse precisely unless there is a tile to snap to
-            if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
+            if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0 || newType != ObjectType.None)
             {
                 if (selectedTile == null)
                 {
