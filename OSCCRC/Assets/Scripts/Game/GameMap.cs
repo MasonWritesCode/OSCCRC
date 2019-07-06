@@ -205,7 +205,6 @@ public class GameMap : MonoBehaviour
         GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>();
         for (int i = 0; i < deadMeat.Length; ++i)
         {
-            //deadMeat[i].gameObject.SetActive(false);
             if (deadMeat[i] is Mouse)
             {
                 destroyMouse(deadMeat[i].transform);
@@ -217,7 +216,7 @@ public class GameMap : MonoBehaviour
         }
 
         // Remove ping ring
-        // If there is a nice way to find them all we can support multiple rings, but to be simple require one and use find for now
+        // If there is a nice way to find them all we might consider supporting multiple rings, but to be simple require one and use find for now
         Transform ring = m_transform.Find("Ring(Clone)");
         if (ring != null)
         {

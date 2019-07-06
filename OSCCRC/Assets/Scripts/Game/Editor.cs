@@ -242,7 +242,6 @@ public class Editor : MonoBehaviour {
     {
         disablePlaceholder();
         m_gameStage.loadStage(saveName);
-        mapMovingObjToTile(m_gameMap);
 
         // We need to re-start the game after loading a new map I think
         // We probably should get rid of this loadSave function and force people to load a map through the main menu
@@ -353,10 +352,14 @@ public class Editor : MonoBehaviour {
     {
         m_movingObjects.Clear();
 
-        GridMovement[] movingObjs = map.GetComponentsInChildren<GridMovement>();
+        GridMovement[] movingObjs = map.GetComponentsInChildren<GridMovement>(false);
         for (int i = 0; i < movingObjs.Length; ++i)
         {
-            m_movingObjects.Add(map.tileAt(movingObjs[i].transform.localPosition), movingObjs[i].transform);
+            // Even though we don't grab inactive objects, destroyed objects will still be grabbed. This filters out destroyed objects.
+            if (movingObjs[i].isActiveAndEnabled)
+            {
+                m_movingObjects.Add(map.tileAt(movingObjs[i].transform.localPosition), movingObjs[i].transform);
+            }
         }
     }
 
