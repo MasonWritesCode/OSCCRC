@@ -13,7 +13,7 @@ public class GameStage : MonoBehaviour {
     public string fileName { get { return m_fileName; } }
     // Maybe add a game mode? Probably will later just in case it gets used.
     public string musicTrack { get { return m_musicTrack; } set { m_musicTrack = value; } }
-    public string resourcePackName { get { return m_resourcePack; } set { m_resourcePack = value; } }
+    public string resourcePackName { get { return m_resourcePack; } }
 
 
     // Get information of a stage without actually loading it.
@@ -37,9 +37,9 @@ public class GameStage : MonoBehaviour {
                 return;
             }
 
-            stageName = fin.ReadLine();
-            musicTrack = fin.ReadLine();
-            resourcePackName = fin.ReadLine();
+            m_stageName = fin.ReadLine();
+            m_musicTrack = fin.ReadLine();
+            m_resourcePack = fin.ReadLine();
         }
     }
 
@@ -67,9 +67,9 @@ public class GameStage : MonoBehaviour {
 
             GameObject gameMap = GameObject.FindWithTag("Map");
 
-            stageName = fin.ReadLine();
-            musicTrack = fin.ReadLine();
-            resourcePackName = fin.ReadLine();
+            m_stageName = fin.ReadLine();
+            m_musicTrack = fin.ReadLine();
+            m_resourcePack = fin.ReadLine();
             gameMap.GetComponent<GameResources>().loadResources(resourcePackName);
 
             // Now load the map itself
@@ -95,10 +95,11 @@ public class GameStage : MonoBehaviour {
 
             fout.WriteLine(stageName);
             fout.WriteLine(musicTrack);
-            fout.WriteLine(resourcePackName);
 
             // Now save the map itself
             GameMap gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+            m_resourcePack = gameMap.GetComponent<GameResources>().resourcePack;
+            fout.WriteLine(m_resourcePack);
             gameMap.exportMap(fout);
         }
     }
