@@ -42,6 +42,7 @@ public abstract class GridMovement : MonoBehaviour {
         m_animator = GetComponent<Animator>();
 
         m_tile = m_map.tileAt(m_transform.localPosition);
+        m_dirVec = m_map.transform.TransformVector(Directions.toDirectionVector(direction));
         updateSpeed();
 
         multiplierChange += updateSpeed;
@@ -131,7 +132,9 @@ public abstract class GridMovement : MonoBehaviour {
     private void setToTile(MapTile tile)
     {
         m_tile = tile;
+        Directions.Direction prevDir = direction;
 
+        // May modify our direction
         interactWithImprovement(tile.improvement);
 
         //Checking for walls
@@ -211,18 +214,21 @@ public abstract class GridMovement : MonoBehaviour {
         }
 
         m_transform.localPosition = tile.transform.localPosition;
-        if (m_moonwalkEnabled)
+        if (direction != prevDir)
         {
-            Directions.rotate(m_transform, Directions.getOppositeDir(direction));
-        }
-        else
-        {
-            Directions.rotate(m_transform, direction);
-        }
+            if (m_moonwalkEnabled)
+            {
+                Directions.rotate(m_transform, Directions.getOppositeDir(direction));
+            }
+            else
+            {
+                Directions.rotate(m_transform, direction);
+            }
 
-        // The direction we choose to move in world space is the relative direction vector of parent (which we will assume is the gamemap for now)
-        // We can't use the transform's forward because we want to allow for a rotated transform to work as a grid mover
-        m_dirVec = m_map.transform.TransformVector(Directions.toDirectionVector(direction));
+            // The direction we choose to move in world space is the relative direction vector of parent (which we will assume is the gamemap for now)
+            // We can't use the transform's forward because we want to allow for a rotated transform to work as a grid mover
+            m_dirVec = m_map.transform.TransformVector(Directions.toDirectionVector(direction));
+        }
 
         m_remainingDistance = m_map.tileSize;
 
