@@ -233,10 +233,10 @@ public class GameMap : MonoBehaviour
         }
         else
         {
-            // We need to manually make sure we update the bigTile texture in case the resource pack changed
-            if (m_bigTile != null)
+            // We need to manually make sure we update the floor texture in case the resource pack changed
+            if (m_floor != null)
             {
-                m_bigTile.GetComponent<MeshRenderer>().material = m_gameResources.materials["TileTiledColor"];
+                m_floor.GetComponent<MeshRenderer>().material = m_gameResources.materials["TileTiledColor"];
             }
         }
 
@@ -464,17 +464,17 @@ public class GameMap : MonoBehaviour
 
         // Here we set a single stretched tile that represents all blank tiles
         // Since usually most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
-        if (m_bigTile == null)
+        if (m_floor == null)
         {
-            m_bigTile = Instantiate(floorPrefab, m_transform);
+            m_floor = Instantiate(floorPrefab, m_transform);
         }
 
         // We need to set the scale to mapsize
         // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
         // Material tiling has to be set to (mapsize / 2)
-        m_bigTile.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
-        m_bigTile.localPosition = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
-        MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
+        m_floor.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
+        m_floor.localPosition = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
+        MeshRenderer bigTileRend = m_floor.GetComponent<MeshRenderer>();
         bigTileRend.material = m_gameResources.materials["TileTiledColor"];
         bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
 
@@ -486,7 +486,7 @@ public class GameMap : MonoBehaviour
     private int m_mapWidth = 0;
     private float m_tileSize = 1;
     private MapTile[,] m_mapTiles = null;
-    private Transform m_bigTile = null;
+    private Transform m_floor = null;
     private Transform m_transform;
     private GameResources m_gameResources;
     private CameraController m_mainCamera;
