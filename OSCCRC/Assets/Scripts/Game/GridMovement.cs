@@ -42,7 +42,7 @@ public abstract class GridMovement : MonoBehaviour {
         m_animator = GetComponent<Animator>();
 
         m_tile = m_map.tileAt(m_transform.localPosition);
-        m_dirVec = m_map.transform.TransformVector(Directions.toDirectionVector(direction));
+        m_dirVec = m_map.transform.TransformVector(Directions.toVector(direction));
         updateSpeed();
 
         multiplierChange += updateSpeed;
@@ -227,7 +227,7 @@ public abstract class GridMovement : MonoBehaviour {
 
             // The direction we choose to move in world space is the relative direction vector of parent (which we will assume is the gamemap for now)
             // We can't use the transform's forward because we want to allow for a rotated transform to work as a grid mover
-            m_dirVec = m_map.transform.TransformVector(Directions.toDirectionVector(direction));
+            m_dirVec = m_map.transform.TransformVector(Directions.toVector(direction));
         }
 
         m_remainingDistance = m_map.tileSize;

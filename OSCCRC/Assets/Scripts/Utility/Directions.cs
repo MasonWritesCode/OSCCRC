@@ -101,7 +101,7 @@ public static class Directions {
 
 
     // Returns the vector representing this direction
-    public static Vector3 toDirectionVector(Direction dir)
+    public static Vector3 toVector(Direction dir)
     {
         switch (dir)
         {
