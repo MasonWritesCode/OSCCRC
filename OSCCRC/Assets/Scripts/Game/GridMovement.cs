@@ -37,7 +37,10 @@ public abstract class GridMovement : MonoBehaviour {
 
         m_transform = GetComponent<Transform>();
         m_rigidbody = GetComponent<Rigidbody>();
-        m_interpolationMode = m_rigidbody.interpolation;
+        if (m_rigidbody)
+        {
+            m_interpolationMode = m_rigidbody.interpolation;
+        }
 
         m_animator = GetComponent<Animator>();
 
@@ -118,7 +121,7 @@ public abstract class GridMovement : MonoBehaviour {
     {
         Vector3 wrappedPos = m_map.wrapCoord(m_transform.localPosition);
 
-        if (wrappedPos != m_transform.localPosition)
+        if (m_rigidbody && wrappedPos != m_transform.localPosition)
         {
             // We don't want to interpolate a "warp", so temporarily disable it
             m_rigidbody.interpolation = RigidbodyInterpolation.None;
