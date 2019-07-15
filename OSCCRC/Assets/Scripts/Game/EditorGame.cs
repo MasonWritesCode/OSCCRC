@@ -106,7 +106,6 @@ public class EditorGame : IGameMode
                 AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
-                Debug.Log("Cat hit goal, you lose.");
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
@@ -118,7 +117,6 @@ public class EditorGame : IGameMode
                 AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
-                Debug.Log("A mouse was destroyed. Game Over.");
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
@@ -131,7 +129,6 @@ public class EditorGame : IGameMode
                     AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
                     audioData.Play(0);
 
-                    Debug.Log("The last mouse hit a goal, you won.");
                     endGame(true);
                 }
                 else
