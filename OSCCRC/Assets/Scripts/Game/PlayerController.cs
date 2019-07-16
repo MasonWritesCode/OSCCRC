@@ -20,7 +20,10 @@ public class PlayerController : MonoBehaviour {
         // We will need to differentiate the inputs of players if we add multiplayer.
         // I don't know how that will work yet, but just assign a playerID of 1 to the player controls for now
         playerID = 1;
-	}
+
+        // We want to immediately update the highlighter position
+        selectTile();
+    }
 
 
 	void Update () {
@@ -36,25 +39,7 @@ public class PlayerController : MonoBehaviour {
             // The mouse hovers over a tile to select it as the one where improvements will be placed
             if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
             {
-                Vector3 mousePosition = m_mainCamera.ScreenToWorldPoint(Input.mousePosition);
-                m_currentTile = m_gameMap.tileAt(m_gameMap.transform.InverseTransformPoint(mousePosition));
-
-                // Move tile highlighter to the mouse position
-                if (m_currentTile == null)
-                {
-                    if (highlighter.gameObject.activeSelf)
-                    {
-                        highlighter.gameObject.SetActive(false);
-                    }
-                }
-                else
-                {
-                    if (!highlighter.gameObject.activeSelf)
-                    {
-                        highlighter.gameObject.SetActive(true);
-                    }
-                    highlighter.position = m_currentTile.transform.position + Vector3.up * 2;
-                }
+                selectTile();
             }
 
             if (m_currentTile != null)
@@ -160,6 +145,32 @@ public class PlayerController : MonoBehaviour {
     }
 
 
+    // Updates the current tile and positions the highlighter accordingly
+    private void selectTile()
+    {
+        Vector3 mousePosition = m_mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        m_currentTile = m_gameMap.tileAt(m_gameMap.transform.InverseTransformPoint(mousePosition));
+
+        // Move tile highlighter to the mouse position
+        if (m_currentTile == null)
+        {
+            if (highlighter.gameObject.activeSelf)
+            {
+                highlighter.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            if (!highlighter.gameObject.activeSelf)
+            {
+                highlighter.gameObject.SetActive(true);
+            }
+            highlighter.position = m_currentTile.transform.position + Vector3.up * 2;
+        }
+    }
+
+
+    // Toggles between first person and normal camera modes
     private void toggleFPSMode()
     {
         CameraController cam = m_mainCamera.GetComponent<CameraController>();
