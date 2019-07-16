@@ -4,6 +4,7 @@ using UnityEngine;
 
 // This class controls the behavior of moving objects such as Cats and Mice.
 // As an abstract class, one should Instantiate a Mouse or Cat object directly instead.
+// Currently assumes that the map isn't rotated after GridMovement's start is called, and that all GridMovement are children of game map as are MapTiles.
 
 public abstract class GridMovement : MonoBehaviour {
 
@@ -22,7 +23,8 @@ public abstract class GridMovement : MonoBehaviour {
     // Updates a grid mover's speed and animation based on its speed variable and the current global multiplier
     public void updateSpeed()
     {
-        m_scaledSpeed = speed * m_speedMultiplier;
+        // We require a positive speed for now
+        m_scaledSpeed = Mathf.Abs(speed * m_speedMultiplier);
 
         if (m_animator)
         {
@@ -75,11 +77,20 @@ public abstract class GridMovement : MonoBehaviour {
         }
 
         float distance = m_scaledSpeed * Time.smoothDeltaTime;
-        if (distance >= m_remainingDistance)
+        while (distance >= m_remainingDistance)
         {
             // We should reach the center of destination tile. So re-center, get new remaining movement distance, and get new heading
+            // Assumes tile and grid movers are children of game map.
             distance -= m_remainingDistance;
-            setToTile(m_map.tileAt(m_transform.localPosition));
+            Vector3 newTilePos = m_transform.localPosition + (m_dirVec * m_remainingDistance);
+            if (m_isOnEdgeTile)
+            {
+                setToTile(m_map.tileAt(m_map.wrapCoord(newTilePos)));
+            }
+            else
+            {
+                setToTile(m_map.tileAt(newTilePos));
+            }
         }
 
         // Now move the distance we need to move
@@ -97,16 +108,6 @@ public abstract class GridMovement : MonoBehaviour {
     // Sets a new global speed multiplier for grid movers
     private static void setSpeedMultiplier(float newVal)
     {
-        // Enforce a range of 0.5 to 10.0 for speed for now
-        if (newVal > 10.0f)
-        {
-            newVal = 10.0f;
-        }
-        else if (newVal < 0.5f)
-        {
-            newVal = 0.5f;
-        }
-
         m_speedMultiplier = newVal;
 
         if (multiplierChange != null)
@@ -217,6 +218,7 @@ public abstract class GridMovement : MonoBehaviour {
         }
 
         m_transform.localPosition = tile.transform.localPosition;
+        // This if statement assumes that the game map isn't rotated after grid mover is placed causing rotation to not update until direction changes
         if (direction != prevDir)
         {
             if (m_moonwalkEnabled)
