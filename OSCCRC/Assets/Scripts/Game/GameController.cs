@@ -48,13 +48,17 @@ public class GameController : MonoBehaviour {
             m_game.endGame();
         }
 
-        if (newMode == GameMode.Puzzle)
+        switch (newMode)
         {
-            m_game = new PuzzleGame(m_gameState);
-        }
-        else if (newMode == GameMode.Editor)
-        {
-            m_game = new EditorGame(m_gameState);
+            case GameMode.Puzzle:
+                m_game = new PuzzleGame(m_gameState);
+                break;
+            case GameMode.Editor:
+                m_game = new EditorGame(m_gameState);
+                break;
+            case GameMode.Multiplayer:
+                m_game = new CompetitiveGame(m_gameState);
+                break;
         }
 
         Editor editor = GetComponent<Editor>();
