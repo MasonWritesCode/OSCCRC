@@ -4,7 +4,7 @@
 
 public class PlayerController : MonoBehaviour {
 
-    [Range(1, 4)] public int playerID;
+    [Range(0, 3)] public int playerID;
     public Transform highlighter;
     public Canvas pauseDisplay;
     public Canvas fpsDisplay;
@@ -16,10 +16,6 @@ public class PlayerController : MonoBehaviour {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
         m_fpsScript = m_gameController.GetComponent<FramerateDisplay>();
         m_mainCamera = Camera.main;
-
-        // We will need to differentiate the inputs of players if we add multiplayer.
-        // I don't know how that will work yet, but just assign a playerID of 1 to the player controls for now
-        playerID = 1;
 
         // We want to immediately update the highlighter position
         selectTile();
@@ -46,19 +42,19 @@ public class PlayerController : MonoBehaviour {
             {
                 if (Input.GetButtonDown("Up"))
                 {
-                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North, playerID);
                 }
                 else if (Input.GetButtonDown("Right"))
                 {
-                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East, playerID);
                 }
                 else if (Input.GetButtonDown("Down"))
                 {
-                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South, playerID);
                 }
                 else if (Input.GetButtonDown("Left"))
                 {
-                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West);
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West, playerID);
                 }
             }
 

@@ -71,7 +71,7 @@ public class EditorGame : IGameMode
 
 
     // Places a tile if it is in the stage's list of available placements
-    public void placeDirection(MapTile tile, Directions.Direction dir)
+    public void placeDirection(MapTile tile, Directions.Direction dir, int player)
     {
         // We only place tiles in edit mode (handled by Editor.cs), not during play
         return;

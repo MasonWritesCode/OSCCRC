@@ -102,7 +102,7 @@ public class PuzzleGame : IGameMode {
 
 
     // Places a tile if it is in the stage's list of available placements
-    public void placeDirection(MapTile tile, Directions.Direction dir)
+    public void placeDirection(MapTile tile, Directions.Direction dir, int player)
     {
         if (!m_paused || !m_playing)
         {

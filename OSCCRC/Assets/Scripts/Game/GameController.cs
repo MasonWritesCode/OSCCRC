@@ -8,14 +8,14 @@ using UnityEngine.EventSystems;
 
 public class GameController : MonoBehaviour {
 
-    public enum GameMode { None, Editor, Puzzle, Multiplayer };
+    public enum GameMode { None, Editor, Puzzle, Competitive };
     public GameMode mode { get { return m_mode; } }
     public GameState gameState { get { return m_gameState; } }
     public Canvas completeDisplay;
 
 
     // Checks if a player is allowed to place the desired improvement, and does so if they can
-    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
+    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North, int player = 0)
     {
         if (m_gameState.hasState(GameState.TagState.Suspended))
         {
@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour {
         {
             if (tile.improvement == MapTile.TileImprovement.None || tile.improvement == MapTile.TileImprovement.Direction)
             {
-                m_game.placeDirection(tile, dir);
+                m_game.placeDirection(tile, dir, player);
             }
         }
     }
@@ -56,7 +56,7 @@ public class GameController : MonoBehaviour {
             case GameMode.Editor:
                 m_game = new EditorGame(m_gameState);
                 break;
-            case GameMode.Multiplayer:
+            case GameMode.Competitive:
                 m_game = new CompetitiveGame(m_gameState);
                 break;
         }

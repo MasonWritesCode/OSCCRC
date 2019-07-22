@@ -31,7 +31,7 @@ public class CompetitiveGame : IGameMode
     }
 
 
-    public void placeDirection(MapTile tile, Directions.Direction dir)
+    public void placeDirection(MapTile tile, Directions.Direction dir, int player)
     {
         // TODO
         return;
