@@ -17,6 +17,7 @@ public class MapTile : MonoBehaviour
     public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
     public Directions.Direction improvementDirection { get { return m_improvementDir;  } set { if (m_improvementDir != value) { Directions.rotate(m_tileObject, value, m_mapTransform); m_improvementDir = value; } } }
     public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
+    public int owner { get { return m_owner; } set { if (m_owner != value) { m_owner = value; setTileImprovement(m_improvement); } } }
     public Walls walls;
 
 
@@ -97,13 +98,22 @@ public class MapTile : MonoBehaviour
         string materialName = null;
         string objectName = null;
 
+        // Anything that doesn't have a player specific version should be placed as player 0
         if (improvementTextures.ContainsKey(improvement))
         {
             materialName = improvementTextures[improvement];
+            if (m_owner != 0)
+            {
+                materialName += m_owner;
+            }
         }
         if (improvementObjects.ContainsKey(improvement))
         {
             objectName = improvementObjects[improvement];
+            if (m_owner != 0)
+            {
+                materialName += m_owner;
+            }
         }
 
         // Set associated tile texture
@@ -163,6 +173,7 @@ public class MapTile : MonoBehaviour
     private TileImprovement m_movingObject;
     private Directions.Direction m_improvementDir;
     private Directions.Direction m_movingDir;
+    private int m_owner;
     private Transform m_tileObject;
     private Transform m_mapTransform;
     private int m_tileDamage;

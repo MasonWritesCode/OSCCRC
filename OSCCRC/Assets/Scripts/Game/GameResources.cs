@@ -31,11 +31,17 @@ public class GameResources : MonoBehaviour {
         materials.Add("TileTiledColor", resourceFromDir(currentDir + "TileTiledColor") as Material);
         materials.Add("Hole", resourceFromDir(currentDir + "Hole") as Material);
         materials.Add("Goal", resourceFromDir(currentDir + "Goal") as Material);
+        materials.Add("Goal1", resourceFromDir(currentDir + "Goal1") as Material);
+        materials.Add("Goal2", resourceFromDir(currentDir + "Goal2") as Material);
+        materials.Add("Goal3", resourceFromDir(currentDir + "Goal3") as Material);
         materials.Add("Placeholder", resourceFromDir(currentDir + "ObjectPlace") as Material);
 
         currentDir = "/Prefabs/";
         objects.Add("Tile", (resourceFromDir(currentDir + "TilePrefab") as GameObject).transform);
         objects.Add("DirectionArrow", (resourceFromDir(currentDir + "DirectionArrow") as GameObject).transform);
+        objects.Add("DirectionArrow1", (resourceFromDir(currentDir + "DirectionArrow1") as GameObject).transform);
+        objects.Add("DirectionArrow2", (resourceFromDir(currentDir + "DirectionArrow2") as GameObject).transform);
+        objects.Add("DirectionArrow3", (resourceFromDir(currentDir + "DirectionArrow3") as GameObject).transform);
         objects.Add("Wall", (resourceFromDir(currentDir + "WallPrefab") as GameObject).transform);
         objects.Add("Mouse", (resourceFromDir(currentDir + "Mouse") as GameObject).transform);
         objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
