@@ -27,6 +27,8 @@ public class MapTile : MonoBehaviour
         improvementTextures.Add(TileImprovement.None, "Tile");
         improvementTextures.Add(TileImprovement.Hole, "Hole");
         improvementTextures.Add(TileImprovement.Goal, "Goal");
+        improvementTextures.Add(TileImprovement.Spawner, "Spawner");
+
         improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
     }
 

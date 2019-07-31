@@ -34,6 +34,7 @@ public class GameResources : MonoBehaviour {
         materials.Add("Goal1", resourceFromDir(currentDir + "Goal1") as Material);
         materials.Add("Goal2", resourceFromDir(currentDir + "Goal2") as Material);
         materials.Add("Goal3", resourceFromDir(currentDir + "Goal3") as Material);
+        materials.Add("Spawner", resourceFromDir(currentDir + "Spawner") as Material);
         materials.Add("Placeholder", resourceFromDir(currentDir + "ObjectPlace") as Material);
 
         currentDir = "/Prefabs/";
