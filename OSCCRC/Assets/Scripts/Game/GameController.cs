@@ -48,6 +48,15 @@ public class GameController : MonoBehaviour {
             m_game.endGame();
         }
 
+        if (GlobalData.d_forceCompetitiveTest)
+        {
+            GameStage stage = GetComponent<GameStage>();
+            stage.loadStage("Internal/compTest1");
+            m_game = new CompetitiveGame(m_gameState);
+            m_game.startGame();
+            return;
+        }
+
         switch (newMode)
         {
             case GameMode.Puzzle:

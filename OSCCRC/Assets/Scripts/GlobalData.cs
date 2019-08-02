@@ -18,4 +18,7 @@ public static class GlobalData {
     // This is currently disabled by default, because beginning an async load can cause input drops which I consider much worse.
     // This will disable the profiler apparently, so make sure this is false if you want to profile the main menu.
     public static readonly bool d_loadSceneAsync = false;
+
+    // Makes the game always open the competitive test map in competitive mode
+    public static readonly bool d_forceCompetitiveTest = false;
 }

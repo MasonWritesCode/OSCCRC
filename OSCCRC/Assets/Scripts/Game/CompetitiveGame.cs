@@ -30,6 +30,10 @@ public class CompetitiveGame : IGameMode
                 }
             }
         }
+        if (m_spawnTiles.Count == 0)
+        {
+            Debug.LogError("No spawn tiles found. Competitive mode opened on non-competitive map");
+        }
 
         // TODO: Countdown delay to start
 
