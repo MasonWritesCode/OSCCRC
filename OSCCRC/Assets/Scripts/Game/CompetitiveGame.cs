@@ -35,6 +35,9 @@ public class CompetitiveGame : IGameMode
             Debug.LogError("No spawn tiles found. Competitive mode opened on non-competitive map");
         }
 
+        m_scoreDisplay = GameObject.Find("CompetitiveDisplay (UI)");
+        m_scoreDisplay.GetComponent<Canvas>().enabled = true;
+
         // TODO: Countdown delay to start
 
         // We always start with one cat?
@@ -144,6 +147,7 @@ public class CompetitiveGame : IGameMode
 
     private GameState m_gameState;
     private GameMap m_gameMap;
+    private GameObject m_scoreDisplay;
     private List<MapTile> m_spawnTiles = new List<MapTile>();
     private Player[] m_players = new Player[4];
     private System.Random m_rng = new System.Random();
