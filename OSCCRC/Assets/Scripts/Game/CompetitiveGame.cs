@@ -10,6 +10,11 @@ public class CompetitiveGame : IGameMode
     public CompetitiveGame(GameState gameStateRef)
     {
         m_gameState = gameStateRef;
+
+        for (int i = 0; i < m_players.Length; ++i)
+        {
+            m_players[i] = new Player();
+        }
     }
 
     // Begins a puzzle game
@@ -38,13 +43,22 @@ public class CompetitiveGame : IGameMode
         m_scoreDisplay = GameObject.Find("CompetitiveDisplay (UI)");
         m_scoreDisplay.GetComponent<Canvas>().enabled = true;
 
-        // TODO: Countdown delay to start
+        m_gameState.mainState = GameState.State.Started_Paused;
 
-        // We always start with one cat?
-        spawnCat();
+        m_startCountdown.timerCompleted += () => {
+            m_gameState.mainState = GameState.State.Started_Unpaused;
 
-        // Begin mice spawn
-        activateMiceSpawn();
+            m_gameTimer.timerCompleted += () => { Debug.Log("Game ended, but ending not implemented yet."); };
+            m_gameTimer.timerUpdate += incrementGameTimer;
+            m_gameTimer.startTimerWithUpdate(180.0f, 1.0f);
+
+            // We always start with one cat? Might need a delayed entrance?
+            spawnCat();
+
+            // Begin regular mice spawning
+            activateMiceSpawn();
+        };
+        m_startCountdown.startTimer(3.0f);
     }
 
 
@@ -64,9 +78,9 @@ public class CompetitiveGame : IGameMode
 
     public void placeDirection(MapTile tile, Directions.Direction dir, int playerID)
     {
-        if (tile.improvement != MapTile.TileImprovement.None)
+        if (tile.improvement != MapTile.TileImprovement.None || m_gameState.mainState != GameState.State.Started_Unpaused)
         {
-            // Players cannot change an already placed tile
+            // Players cannot change an already placed tile or place before game starts
             return;
         }
 
@@ -88,7 +102,7 @@ public class CompetitiveGame : IGameMode
         Timer ptimer = new Timer();
         ptimer.timerCompleted += () =>
         {
-            // TODO: Start blinking or whatever at 1 second remaining. Would have the timer start a new timer?
+            // TODO: Start blinking or whatever at 1 second remaining. Make this an update timer for this.
             tile.improvement = MapTile.TileImprovement.None;
         };
         ptimer.startTimer(10.0f);
@@ -108,7 +122,6 @@ public class CompetitiveGame : IGameMode
         // We create a new cat whenever one dies
         if (deadMeat is Cat)
         {
-            // TODO: This needs to be delayed by death animation once we have a death animation
             spawnCat();
         }
     }
@@ -131,8 +144,15 @@ public class CompetitiveGame : IGameMode
     // Spawns a cat at a random spawner
     private void spawnCat()
     {
-        MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
-        m_gameMap.placeCat(spawn.transform.localPosition, spawn.improvementDirection);
+        // We create a new timer to clear the lambda subscriber for now
+        m_catSpawnTimer = new Timer();
+
+        m_catSpawnTimer.timerCompleted += () => {
+            MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
+            m_gameMap.placeCat(spawn.transform.localPosition, spawn.improvementDirection);
+            m_catSpawnTimer = null;
+        };
+        m_catSpawnTimer.startTimer(2.0f);
     }
 
 
@@ -145,11 +165,21 @@ public class CompetitiveGame : IGameMode
     }
 
 
+    private void incrementGameTimer()
+    {
+        // TODO
+        return;
+    }
+
+
     private GameState m_gameState;
     private GameMap m_gameMap;
     private GameObject m_scoreDisplay;
     private List<MapTile> m_spawnTiles = new List<MapTile>();
     private Player[] m_players = new Player[4];
     private System.Random m_rng = new System.Random();
-    private Timer m_miceSpawnTimer = new Timer();
+    private Timer m_catSpawnTimer = null;
+    private Timer m_miceSpawnTimer = null;
+    private Timer m_gameTimer = new Timer();
+    private Timer m_startCountdown = new Timer();
 }
