@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 // This is an interface between the game controller and the 4 player Competitive game mode.
 // This mode requires being passed information about the game state.
@@ -40,16 +41,24 @@ public class CompetitiveGame : IGameMode
             Debug.LogError("No spawn tiles found. Competitive mode opened on non-competitive map");
         }
 
-        m_scoreDisplay = GameObject.Find("CompetitiveDisplay (UI)");
-        m_scoreDisplay.GetComponent<Canvas>().enabled = true;
+        m_compDisplay = GameObject.Find("CompetitiveDisplay (UI)");
+        m_compDisplay.GetComponent<Canvas>().enabled = true;
+        m_timerText = m_compDisplay.transform.Find("Timer").GetComponentInChildren<Text>();
 
         m_gameState.mainState = GameState.State.Started_Paused;
 
+        // Go ahead and set the time
+        m_remainingTime = 181;
+        tickGameTimer();
+
+        // TODO: Show stuff right before game starts
         m_startCountdown.timerCompleted += () => {
             m_gameState.mainState = GameState.State.Started_Unpaused;
 
+            // TODO: Maybe flashy animation on timer to show it has started?
+
             m_gameTimer.timerCompleted += () => { Debug.Log("Game ended, but ending not implemented yet."); };
-            m_gameTimer.timerUpdate += incrementGameTimer;
+            m_gameTimer.timerUpdate += tickGameTimer;
             m_gameTimer.startTimerWithUpdate(180.0f, 1.0f);
 
             beginNormalSpawn();
@@ -60,14 +69,12 @@ public class CompetitiveGame : IGameMode
 
     public void resetGame()
     {
-        // TODO
-        return;
+        Debug.LogWarning("Competitive Mode was told to reset but does not support resetting");
     }
 
 
     public void endGame()
     {
-        // TODO
         return;
     }
 
@@ -195,16 +202,20 @@ public class CompetitiveGame : IGameMode
     }
 
 
-    private void incrementGameTimer()
+    private void tickGameTimer()
     {
-        // TODO
-        return;
+        if (m_remainingTime > 0)
+        {
+            --m_remainingTime;
+        }
+        m_timerText.text = string.Format("{0}:{1:00}", m_remainingTime / 60, m_remainingTime % 60);
     }
 
 
     private GameState m_gameState;
     private GameMap m_gameMap;
-    private GameObject m_scoreDisplay;
+    private GameObject m_compDisplay;
+    private Text m_timerText;
     private List<MapTile> m_spawnTiles = new List<MapTile>();
     private Player[] m_players = new Player[4];
     private System.Random m_rng = new System.Random();
@@ -213,4 +224,5 @@ public class CompetitiveGame : IGameMode
     private Timer m_spawnFrequencyTimer = null;
     private Timer m_gameTimer = new Timer();
     private Timer m_startCountdown = new Timer();
+    private int m_remainingTime;
 }
