@@ -52,11 +52,7 @@ public class CompetitiveGame : IGameMode
             m_gameTimer.timerUpdate += incrementGameTimer;
             m_gameTimer.startTimerWithUpdate(180.0f, 1.0f);
 
-            // We always start with one cat? Might need a delayed entrance?
-            spawnCat();
-
-            // Begin regular mice spawning
-            activateMiceSpawn();
+            beginNormalSpawn();
         };
         m_startCountdown.startTimer(3.0f);
     }
@@ -119,6 +115,15 @@ public class CompetitiveGame : IGameMode
     {
         // TODO: Score
 
+        if (deadMeat is Cat)
+        {
+            m_gameMap.destroyCat(deadMeat.transform);
+        }
+        else
+        {
+            m_gameMap.destroyMouse(deadMeat.transform);
+        }
+
         // We create a new cat whenever one dies
         if (deadMeat is Cat)
         {
@@ -156,12 +161,37 @@ public class CompetitiveGame : IGameMode
     }
 
 
-    // Set each spawner to begin spawning mice
-    // I don't know how frequently mice are supposed to spawn, so it will be random averaging 3 seconds for now
-    private void activateMiceSpawn()
+    // Spawns a mouse at a random spawner
+    private void spawnMouse()
     {
-        // TODO
-        return;
+        // We create a new timer to clear the lambda subscriber for now
+        m_mouseSpawnTimer = new Timer();
+
+        m_mouseSpawnTimer.timerCompleted += () => {
+            MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
+            m_gameMap.placeMouse(spawn.transform.localPosition, spawn.improvementDirection);
+            m_mouseSpawnTimer = null;
+        };
+        m_mouseSpawnTimer.startTimer(2.0f);
+    }
+
+
+    // Set each spawner to begin spawning mice and spawn in a cat, the normal case without special mice effects
+    // I don't know how frequently mice are supposed to spawn, so it will be random averaging 3 seconds per spawner for now
+    private void beginNormalSpawn()
+    {
+        // We always start with one cat? Might need a delayed entrance?
+        spawnCat();
+
+        m_spawnFrequencyTimer = new Timer();
+        m_spawnFrequencyTimer.timerUpdate += () => {
+            // 1/18 chance 6 times per second for EV of 3 seconds, per spawner
+            if (m_rng.Next(18) < m_spawnTiles.Count)
+            {
+                spawnMouse();
+            }
+        };
+        m_spawnFrequencyTimer.startTimerWithUpdate(180.0f, 0.1667f);
     }
 
 
@@ -179,7 +209,8 @@ public class CompetitiveGame : IGameMode
     private Player[] m_players = new Player[4];
     private System.Random m_rng = new System.Random();
     private Timer m_catSpawnTimer = null;
-    private Timer m_miceSpawnTimer = null;
+    private Timer m_mouseSpawnTimer = null;
+    private Timer m_spawnFrequencyTimer = null;
     private Timer m_gameTimer = new Timer();
     private Timer m_startCountdown = new Timer();
 }
