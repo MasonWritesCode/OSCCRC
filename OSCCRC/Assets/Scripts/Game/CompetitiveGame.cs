@@ -11,11 +11,6 @@ public class CompetitiveGame : IGameMode
     public CompetitiveGame(GameState gameStateRef)
     {
         m_gameState = gameStateRef;
-
-        for (int i = 0; i < m_players.Length; ++i)
-        {
-            m_players[i] = new Player();
-        }
     }
 
     // Begins a puzzle game
@@ -45,6 +40,12 @@ public class CompetitiveGame : IGameMode
         m_compDisplay.GetComponent<Canvas>().enabled = true;
         m_timerText = m_compDisplay.transform.Find("Timer").GetComponentInChildren<Text>();
 
+        for (int i = 0; i < m_players.Length; ++i)
+        {
+            m_players[i] = new Player(m_compDisplay.transform.Find("Score" + i).GetComponentInChildren<Text>());
+            m_players[i].playerName = "Player " + i;
+        }
+
         m_gameState.mainState = GameState.State.Started_Paused;
 
         // Go ahead and set the time
@@ -57,6 +58,7 @@ public class CompetitiveGame : IGameMode
 
             // TODO: Maybe flashy animation on timer to show it has started?
 
+            // TODO: Ending, figure out player with highest score and show their player name
             m_gameTimer.timerCompleted += () => { Debug.Log("Game ended, but ending not implemented yet."); };
             m_gameTimer.timerUpdate += tickGameTimer;
             m_gameTimer.startTimerWithUpdate(180.0f, 1.0f);
@@ -120,14 +122,28 @@ public class CompetitiveGame : IGameMode
 
     public void destroyMover(GridMovement deadMeat)
     {
-        // TODO: Score
-
         if (deadMeat is Cat)
         {
+            if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
+            {
+                int owner = deadMeat.tile.owner;
+                // Here we don't want to use integer division, because we don't want to round down.
+                m_players[owner].score = m_players[owner].score * 2 / 3;
+            }
+
             m_gameMap.destroyCat(deadMeat.transform);
         }
         else
         {
+            if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
+            {
+                int owner = deadMeat.tile.owner;
+                if (m_players[owner].score < 999)
+                {
+                    m_players[owner].score += 1;
+                }
+            }
+
             m_gameMap.destroyMouse(deadMeat.transform);
         }
 
@@ -148,8 +164,17 @@ public class CompetitiveGame : IGameMode
 
     private class Player
     {
+        public Player(Text textObj)
+        {
+            scoreText = textObj;
+        }
+
         public Queue<Placement> placements = new Queue<Placement>();
-        public int score = 0;
+        public int score { get { return m_score; } set { m_score = value; scoreText.text = string.Format("{0:000}", value); } }
+        public Text scoreText = null;
+        public string playerName = "Player";
+
+        private int m_score = 0;
     }
 
 
@@ -198,7 +223,7 @@ public class CompetitiveGame : IGameMode
                 spawnMouse();
             }
         };
-        m_spawnFrequencyTimer.startTimerWithUpdate(180.0f, 0.1667f);
+        m_spawnFrequencyTimer.startTimerWithUpdate((float)m_remainingTime, 0.1667f);
     }
 
 
