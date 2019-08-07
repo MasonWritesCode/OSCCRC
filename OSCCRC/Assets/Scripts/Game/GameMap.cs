@@ -248,6 +248,11 @@ public class GameMap : MonoBehaviour
 
                 int tileFlags = int.Parse(fin.ReadLine());
 
+                if ((tileFlags >> 3 & 1) == 1)
+                {
+                    tile.owner = int.Parse(fin.ReadLine());
+                }
+
                 if ((tileFlags >> 0 & 1) == 1)
                 {
                     MapTile.TileImprovement tileImprovement = (MapTile.TileImprovement)int.Parse(fin.ReadLine());
@@ -326,10 +331,14 @@ public class GameMap : MonoBehaviour
                 //                   \ \ / /  | | | TileImprovement
                 //                      |     | | MovingObject
                 //                      |     | HasWalls
-                //                      |     Reserved-For-Future-Use    
+                //                      |     Owner is not default  
                 //                      WallsFlags(w,s,e,n)
                 int tileFlags = 0;
 
+                if (tile.owner != 0)
+                {
+                    tileFlags |= 1 << 3;
+                }
                 if (tile.improvement != MapTile.TileImprovement.None)
                 {
                     tileFlags |= 1 << 0;
@@ -362,6 +371,10 @@ public class GameMap : MonoBehaviour
                 fout.WriteLine(tileFlags);
 
                 // Write remaining data if necessary
+                if ((tileFlags >> 3 & 1) == 1)
+                {
+                    fout.WriteLine(tile.owner);
+                }
                 if ((tileFlags >> 0 & 1) == 1)
                 {
                     fout.WriteLine((int)tile.improvement);
