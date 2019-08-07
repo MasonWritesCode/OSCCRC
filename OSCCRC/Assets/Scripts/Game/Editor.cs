@@ -137,6 +137,12 @@ public class Editor : MonoBehaviour {
                 newImprovement = MapTile.TileImprovement.None;
             }
 
+            if (Input.GetKeyDown(KeyCode.Backslash))
+            {
+                // Owner cycle from 0 to 3
+                targetOwner = (++targetOwner) % 4;
+            }
+
             if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
             {
                 newDir = Directions.nextClockwiseDir(m_direction);
@@ -258,6 +264,8 @@ public class Editor : MonoBehaviour {
         }
         else if (m_placeholderType == ObjectType.Improvement)
         {
+            selectedTile.owner = targetOwner;
+
             // We have to do special actions to handle movingObject gameobjects, since MapTiles do not keep track of attached moving objects
             // To do this cleanly, we have to do this last, after determining if we need to
             bool isCreatingMovingObj = false;
@@ -267,6 +275,7 @@ public class Editor : MonoBehaviour {
                 if (selectedTile.movingObject == m_selectedImprovement && selectedTile.movingObjDirection == m_direction)
                 {
                     selectedTile.movingObject = MapTile.TileImprovement.None;
+                    selectedTile.owner = 0;
                 }
                 else
                 {
@@ -290,6 +299,7 @@ public class Editor : MonoBehaviour {
                    )
                 {
                     selectedTile.improvement = MapTile.TileImprovement.None;
+                    selectedTile.owner = 0;
                 }
                 else
                 {
@@ -498,6 +508,7 @@ public class Editor : MonoBehaviour {
     private ObjectType m_placeholderType;
     private Directions.Direction m_direction;
     private Vector3 m_positionOffset; // Used for wall facing
+    private int targetOwner = 0;
 
     private Dictionary<MapTile, Transform> m_movingObjects = new Dictionary<MapTile, Transform>();
     private GameMap m_gameMap;
