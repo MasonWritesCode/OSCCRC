@@ -51,7 +51,7 @@ public class GameController : MonoBehaviour {
         if (GlobalData.d_forceCompetitiveTest)
         {
             GameStage stage = GetComponent<GameStage>();
-            stage.loadStage("Internal/compTest1");
+            stage.loadStage("Competitive/4Player_001");
             m_game = new CompetitiveGame(m_gameState);
             m_game.startGame();
             return;

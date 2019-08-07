@@ -16,8 +16,8 @@ public class Editor_SaveButton : MonoBehaviour, IPointerClickHandler
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            string savePath = transform.parent.GetComponentInChildren<Text>().text;
-            string stageName = transform.parent.Find("Stage").GetComponentInChildren<Text>().text;
+            string savePath = transform.parent.GetComponent<InputField>().text;
+            string stageName = transform.parent.Find("Stage").GetComponent<InputField>().text;
 
             Debug.Log(savePath);
             Debug.Log(stageName);

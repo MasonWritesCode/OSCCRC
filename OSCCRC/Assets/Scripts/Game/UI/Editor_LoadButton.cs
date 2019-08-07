@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class Editor_LoadButton : MonoBehaviour, IPointerClickHandler
 {
@@ -17,7 +16,7 @@ public class Editor_LoadButton : MonoBehaviour, IPointerClickHandler
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            string loadPath = transform.parent.GetComponentInChildren<Text>().text;
+            string loadPath = transform.parent.GetComponent<InputField>().text;
 
             m_editor.loadSave(loadPath);
 
