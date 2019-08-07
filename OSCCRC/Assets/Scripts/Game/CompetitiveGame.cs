@@ -59,7 +59,7 @@ public class CompetitiveGame : IGameMode
             // TODO: Maybe flashy animation on timer to show it has started?
 
             // TODO: Ending, figure out player with highest score and show their player name
-            m_gameTimer.timerCompleted += () => { Debug.Log("Game ended, but ending not implemented yet."); };
+            m_gameTimer.timerCompleted += finishGame;
             m_gameTimer.timerUpdate += tickGameTimer;
             m_gameTimer.startTimerWithUpdate(180.0f, 1.0f);
 
@@ -75,6 +75,7 @@ public class CompetitiveGame : IGameMode
     }
 
 
+    // Ends a competitive game
     public void endGame()
     {
         return;
@@ -227,6 +228,7 @@ public class CompetitiveGame : IGameMode
     }
 
 
+    // Passes a second and updates the timer display
     private void tickGameTimer()
     {
         if (m_remainingTime > 0)
@@ -234,6 +236,33 @@ public class CompetitiveGame : IGameMode
             --m_remainingTime;
         }
         m_timerText.text = string.Format("{0}:{1:00}", m_remainingTime / 60, m_remainingTime % 60);
+    }
+
+
+    // Game finishes with a victor
+    private void finishGame()
+    {
+        int victor = 0;
+        for (int i = 1; i < m_players.Length; ++i)
+        {
+            if (m_players[i].score >= m_players[victor].score)
+            {
+                victor = i;
+            }
+        }
+
+        // Detect for game draw. If there is draw, use Ended_Failure state
+        // TODO: UI instead of debug log
+        if (victor != 0 && m_players[0].score == m_players[victor].score)
+        {
+            m_gameState.mainState = GameState.State.Ended_Failure;
+            Debug.Log("The game ended in a draw.");
+        }
+        else
+        {
+            m_gameState.mainState = GameState.State.Ended_Victory;
+            Debug.Log(m_players[victor].playerName + " wins!");
+        }
     }
 
 
