@@ -114,7 +114,7 @@ public class MapTile : MonoBehaviour
             objectName = improvementObjects[improvement];
             if (m_owner != 0)
             {
-                materialName += m_owner;
+                objectName += m_owner;
             }
         }
 
