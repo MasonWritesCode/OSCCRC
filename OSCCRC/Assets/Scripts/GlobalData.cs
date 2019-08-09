@@ -20,5 +20,5 @@ public static class GlobalData {
     public static readonly bool d_loadSceneAsync = false;
 
     // Makes the game always open the competitive test map in competitive mode
-    public static readonly bool d_forceCompetitiveTest = false;
+    public static readonly bool d_forceCompetitiveTest = true;
 }

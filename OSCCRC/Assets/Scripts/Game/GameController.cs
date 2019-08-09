@@ -48,15 +48,6 @@ public class GameController : MonoBehaviour {
             m_game.endGame();
         }
 
-        if (GlobalData.d_forceCompetitiveTest)
-        {
-            GameStage stage = GetComponent<GameStage>();
-            stage.loadStage("Competitive/4Player_001");
-            m_game = new CompetitiveGame(m_gameState);
-            m_game.startGame();
-            return;
-        }
-
         switch (newMode)
         {
             case GameMode.Puzzle:
@@ -70,6 +61,14 @@ public class GameController : MonoBehaviour {
                 break;
         }
 
+        if (GlobalData.d_forceCompetitiveTest)
+        {
+            GameStage stage = GetComponent<GameStage>();
+            stage.loadStage("Competitive/4Player_001");
+            newMode = GameMode.Competitive;
+            m_game = new CompetitiveGame(m_gameState);
+        }
+
         Editor editor = GetComponent<Editor>();
         if (editor)
         {
@@ -80,6 +79,16 @@ public class GameController : MonoBehaviour {
             else if (newMode != GameMode.Editor && editor.enabled)
             {
                 editor.enabled = false;
+            }
+        }
+
+        GameObject players = GameObject.FindWithTag("Player");
+        if (players)
+        {
+            // We enable the other players for 4 player modes
+            for (int i = 1; i < players.transform.childCount; ++i)
+            {
+                players.transform.GetChild(i).gameObject.SetActive(newMode == GameMode.Competitive);
             }
         }
 
