@@ -16,6 +16,7 @@ public class GameMap : MonoBehaviour
     public float tileSize { get { return m_tileSize; } }
 
     public Transform ringPrefab;
+    public Transform blinkPrefab;
     public Transform floorPrefab;
 
 
@@ -217,6 +218,15 @@ public class GameMap : MonoBehaviour
         Transform pingRing = Instantiate(ringPrefab, m_transform);
         pingRing.localPosition = new Vector3(location.x, 5.0f, location.z);
         Destroy(pingRing.gameObject, timeInSeconds);
+    }
+
+
+    // Makes a tile appear to blink. For now, is not removed when loading a new map
+    public void blinkTile(MapTile tile, float durationInSeconds)
+    {
+        Transform blinker = Instantiate(blinkPrefab, m_transform);
+        blinker.localPosition = tile.transform.localPosition + (Vector3.up * 0.0002f);
+        Destroy(blinker.gameObject, durationInSeconds);
     }
 
 

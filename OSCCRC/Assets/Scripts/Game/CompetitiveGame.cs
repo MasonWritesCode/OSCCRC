@@ -105,12 +105,15 @@ public class CompetitiveGame : IGameMode
         tile.improvement = MapTile.TileImprovement.Direction;
 
         Timer ptimer = new Timer();
+        ptimer.timerUpdate += () =>
+        {
+            m_gameMap.blinkTile(tile, 1.0f);
+        };
         ptimer.timerCompleted += () =>
         {
-            // TODO: Start blinking or whatever at 1 second remaining. Make this an update timer for this.
             tile.improvement = MapTile.TileImprovement.None;
         };
-        ptimer.startTimer(10.0f);
+        ptimer.startTimerWithUpdate(10.0f, 9.0f);
 
         Placement newPlacement;
         newPlacement.tile = tile;

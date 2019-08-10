@@ -4046,6 +4046,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ringPrefab: {fileID: 4215024253298442, guid: 6a7995dd4bb633746b9e28f1962b3554, type: 3}
+  blinkPrefab: {fileID: 7841949834415883678, guid: f30a33747806353418a0ca05af76b59f,
+    type: 3}
   floorPrefab: {fileID: 4932320532232200, guid: 0ea234b8a9d0845499f55c3afccf03cb,
     type: 3}
 --- !u!114 &1141874403
