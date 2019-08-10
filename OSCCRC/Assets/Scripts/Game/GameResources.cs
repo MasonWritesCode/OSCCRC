@@ -46,6 +46,7 @@ public class GameResources : MonoBehaviour {
         objects.Add("Wall", (resourceFromDir(currentDir + "WallPrefab") as GameObject).transform);
         objects.Add("Mouse", (resourceFromDir(currentDir + "Mouse") as GameObject).transform);
         objects.Add("BigMouse", (resourceFromDir(currentDir + "BigMouse") as GameObject).transform);
+        objects.Add("SpecialMouse", (resourceFromDir(currentDir + "SpecialMouse") as GameObject).transform);
         objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
         objects.Add("Placeholder", (resourceFromDir(currentDir + "Placeholder") as GameObject).transform);
     }

@@ -141,6 +141,20 @@ public class GameMap : MonoBehaviour
     }
 
 
+    // Creates a special mouse object and returns its transform. The position is map-relative.
+    // The returned object should only be destroyed with the destroyMouse function instead of Unity's destroy
+    public Transform placeSpecialMouse(Vector3 position, Directions.Direction direction)
+    {
+        Transform mousePrefab = m_gameResources.objects["SpecialMouse"];
+        Transform newMouse = Instantiate(mousePrefab, m_transform);
+        newMouse.localPosition = position;
+        Directions.rotate(newMouse, direction);
+        newMouse.GetComponent<GridMovement>().direction = direction;
+
+        return newMouse;
+    }
+
+
     // Creates a cat object and returns its transform. The position is map-relative.
     // The returned object should only be destroyed with the destroyCat function instead of Unity's destroy
     public Transform placeCat(Vector3 position, Directions.Direction direction)
