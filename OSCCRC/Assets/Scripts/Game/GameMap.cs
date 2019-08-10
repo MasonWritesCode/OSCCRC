@@ -127,6 +127,20 @@ public class GameMap : MonoBehaviour
     }
 
 
+    // Creates a big mouse object and returns its transform. The position is map-relative.
+    // The returned object should only be destroyed with the destroyMouse function instead of Unity's destroy
+    public Transform placeBigMouse(Vector3 position, Directions.Direction direction)
+    {
+        Transform mousePrefab = m_gameResources.objects["BigMouse"];
+        Transform newMouse = Instantiate(mousePrefab, m_transform);
+        newMouse.localPosition = position;
+        Directions.rotate(newMouse, direction);
+        newMouse.GetComponent<GridMovement>().direction = direction;
+
+        return newMouse;
+    }
+
+
     // Creates a cat object and returns its transform. The position is map-relative.
     // The returned object should only be destroyed with the destroyCat function instead of Unity's destroy
     public Transform placeCat(Vector3 position, Directions.Direction direction)
@@ -148,7 +162,7 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Removes a mouse game object with transform "mouse"
+    // Removes a Mouse game object with transform "mouse"
     // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
     public void destroyMouse(Transform mouse)
     {
@@ -162,7 +176,7 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Removes a cat game object with transform "cat"
+    // Removes a Cat game object with transform "cat"
     // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
     public void destroyCat(Transform cat)
     {

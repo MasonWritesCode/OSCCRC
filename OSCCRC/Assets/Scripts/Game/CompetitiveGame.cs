@@ -58,7 +58,6 @@ public class CompetitiveGame : IGameMode
 
             // TODO: Maybe flashy animation on timer to show it has started?
 
-            // TODO: Ending, figure out player with highest score and show their player name
             m_gameTimer.timerCompleted += finishGame;
             m_gameTimer.timerUpdate += tickGameTimer;
             m_gameTimer.startTimerWithUpdate(180.0f, 1.0f);
@@ -134,15 +133,23 @@ public class CompetitiveGame : IGameMode
 
             m_gameMap.destroyCat(deadMeat.transform);
         }
-        else
+        else if (deadMeat is Mouse)
         {
             if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
             {
                 int owner = deadMeat.tile.owner;
-                if (m_players[owner].score < 999)
+                int newScore = m_players[owner].score;
+
+                if (deadMeat is BigMouse)
                 {
-                    m_players[owner].score += 1;
+                    newScore += 50;
                 }
+                else
+                {
+                    newScore += 1;
+                }
+
+                m_players[owner].score = Mathf.Min(newScore, 999);
             }
 
             m_gameMap.destroyMouse(deadMeat.transform);
@@ -209,6 +216,14 @@ public class CompetitiveGame : IGameMode
     }
 
 
+    // Spawns a 50 point mouse at a random spawner
+    private void spawnBigMouse()
+    {
+        MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
+        m_gameMap.placeBigMouse(spawn.transform.localPosition, spawn.improvementDirection);
+    }
+
+
     // Set each spawner to begin spawning mice and spawn in a cat, the normal case without special mice effects
     // I don't know how frequently mice are supposed to spawn, so it will be random averaging 3 seconds per spawner for now
     private void beginNormalSpawn()
@@ -221,7 +236,15 @@ public class CompetitiveGame : IGameMode
             // 1/18 chance 6 times per second for EV of 3 seconds, per spawner
             if (m_rng.Next(18) < m_spawnTiles.Count)
             {
-                spawnMouse();
+                // 1 in 100 chance to spawn a 50 point mouse for now
+                if (m_rng.Next(100) == 0)
+                {
+                    spawnBigMouse();
+                }
+                else
+                {
+                    spawnMouse();
+                }
             }
         };
         m_spawnFrequencyTimer.startTimerWithUpdate((float)m_remainingTime, 0.1667f);
