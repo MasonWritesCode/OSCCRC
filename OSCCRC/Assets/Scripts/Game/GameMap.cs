@@ -224,8 +224,8 @@ public class GameMap : MonoBehaviour
     // Makes a tile appear to blink. For now, is not removed when loading a new map
     public void blinkTile(MapTile tile, float durationInSeconds)
     {
-        Transform blinker = Instantiate(blinkPrefab, m_transform);
-        blinker.localPosition = tile.transform.localPosition + (Vector3.up * 0.0002f);
+        Transform blinker = Instantiate(blinkPrefab, tile.transform);
+        blinker.localPosition = Vector3.forward * -0.0002f;
         Destroy(blinker.gameObject, durationInSeconds);
     }
 

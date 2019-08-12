@@ -97,6 +97,7 @@ public class CompetitiveGame : IGameMode
         if (player.placements.Count >= maxPlacements)
         {
             Placement tileToClear = player.placements.Dequeue();
+            tileToClear.timer.stopTimer();
             tileToClear.tile.improvement = MapTile.TileImprovement.None;
         }
 
