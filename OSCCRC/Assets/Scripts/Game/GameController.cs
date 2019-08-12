@@ -120,7 +120,7 @@ public class GameController : MonoBehaviour {
             Application.targetFrameRate = -1;
         }
 
-        Cursor.visible = false;
+        //Cursor.visible = false;
 
         m_eventSystem = EventSystem.current;
         m_wasInputFocused = false;
