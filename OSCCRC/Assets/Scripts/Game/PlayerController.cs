@@ -5,6 +5,7 @@
 public class PlayerController : MonoBehaviour {
 
     [Range(0, 3)] public int playerID;
+    public RectTransform cursor;
     public Transform highlighter;
     public Canvas pauseDisplay;
     public Canvas fpsDisplay;
@@ -16,6 +17,9 @@ public class PlayerController : MonoBehaviour {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
         m_fpsScript = m_gameController.GetComponent<FramerateDisplay>();
         m_mainCamera = Camera.main;
+        cursor.gameObject.SetActive(true);
+
+        m_cursorPos = Vector3.zero;
 
         // We want to immediately update the highlighter position
         selectTile();
@@ -32,9 +36,16 @@ public class PlayerController : MonoBehaviour {
         // We want to ignore some inputs while the game is suspended
         if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
         {
-            // The mouse hovers over a tile to select it as the one where improvements will be placed
             if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
             {
+                m_cursorPos = m_mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                cursor.position = Input.mousePosition;
+                selectTile();
+            }
+            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+            {
+                m_cursorPos += new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
+                cursor.position = m_mainCamera.WorldToScreenPoint(m_cursorPos);
                 selectTile();
             }
 
@@ -144,8 +155,7 @@ public class PlayerController : MonoBehaviour {
     // Updates the current tile and positions the highlighter accordingly
     private void selectTile()
     {
-        Vector3 mousePosition = m_mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        m_currentTile = m_gameMap.tileAt(m_gameMap.transform.InverseTransformPoint(mousePosition));
+        m_currentTile = m_gameMap.tileAt(m_gameMap.transform.InverseTransformPoint(m_cursorPos));
 
         // Move tile highlighter to the mouse position
         if (m_currentTile == null)
@@ -198,4 +208,5 @@ public class PlayerController : MonoBehaviour {
     private FramerateDisplay m_fpsScript;
     private Camera m_mainCamera;
     private MapTile m_currentTile = null;
+    private Vector3 m_cursorPos;
 }

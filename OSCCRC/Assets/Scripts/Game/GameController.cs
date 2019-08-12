@@ -86,7 +86,7 @@ public class GameController : MonoBehaviour {
         if (players)
         {
             // We enable the other players for 4 player modes
-            for (int i = 1; i < players.transform.childCount; ++i)
+            for (int i = 1; i < players.transform.childCount - 1; ++i)
             {
                 players.transform.GetChild(i).gameObject.SetActive(newMode == GameMode.Competitive);
             }
@@ -119,6 +119,8 @@ public class GameController : MonoBehaviour {
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = -1;
         }
+
+        Cursor.visible = false;
 
         m_eventSystem = EventSystem.current;
         m_wasInputFocused = false;

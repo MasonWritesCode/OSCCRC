@@ -5,6 +5,7 @@ using UnityEngine;
 public class AIController : MonoBehaviour
 {
     [Range(0, 3)] public int playerID;
+    public RectTransform cursor;
     public Transform highlighter;
     public MapTile currentTile { get { return m_currentTile; } }
 
@@ -13,6 +14,8 @@ public class AIController : MonoBehaviour
     {
         m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        m_mainCamera = Camera.main;
+        cursor.gameObject.SetActive(true);
 
         m_rng = new System.Random(playerID);
         m_cursorPos = Vector3.zero;
@@ -67,6 +70,7 @@ public class AIController : MonoBehaviour
             {
                 m_cursorPos = Vector3.MoveTowards(m_cursorPos, targetPos, speed * (Time.time - prevTime) * Time.timeScale);
                 prevTime = Time.time;
+                cursor.position = m_mainCamera.WorldToScreenPoint(m_cursorPos);
                 selectTile();
                 yield return null;
             }
@@ -98,6 +102,7 @@ public class AIController : MonoBehaviour
     private GameController m_gameController;
     private GameMap m_gameMap;
     private MapTile m_currentTile = null;
+    private Camera m_mainCamera;
     private Vector3 m_cursorPos;
 
     private System.Random m_rng;
