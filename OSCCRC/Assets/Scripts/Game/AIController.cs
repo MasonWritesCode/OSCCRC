@@ -55,7 +55,7 @@ public class AIController : MonoBehaviour
     // An AI behavior for testing. Just randomly places tiles around
     private IEnumerator AIBehavior_Dummy()
     {
-        const float speed = 2.0f;
+        const float speed = 5.0f;
         bool active = true;
 
         while (active)
@@ -94,7 +94,7 @@ public class AIController : MonoBehaviour
             m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, direction, playerID);
 
             // We wait before starting again
-            yield return new WaitForSeconds(3.0f);
+            yield return new WaitForSeconds(1.5f);
         }
     }
 
