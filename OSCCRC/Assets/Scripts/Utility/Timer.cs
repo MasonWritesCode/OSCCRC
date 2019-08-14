@@ -8,7 +8,7 @@ using UnityEngine;
 // Currently, each instance can only run a single timer at once and it cannot be canceled. The timer does not repeat, it has to be invoked again to run again.
 // Basic functionality is to use startTimer(float timeInSeconds) on an instance to have that instance start its timer.
 //
-// We should enhance this class with pauseTimer/unpauseTimer functions and remainingTime, shouldRepeat, isRunning properties
+// We should enhance this class with pauseTimer/unpauseTimer functions and remainingTime, shouldRepeat properties
 // Some of these may require the class to be changed in implementation
 
 public class Timer {
@@ -24,6 +24,9 @@ public class Timer {
 
     // Whether the timer should use scaled time or not. Must be set before starting the timer. Defaults to true.
     public bool isScaledTime { get { return m_isScaledTime; } set { m_isScaledTime = value; } }
+
+    // Whether the timer is currently running.
+    public bool isRunning { get { return m_timerRunning; } }
 
 
     // Starts the timer with the specified duration
