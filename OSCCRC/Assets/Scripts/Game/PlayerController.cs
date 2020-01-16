@@ -19,7 +19,8 @@ public class PlayerController : MonoBehaviour {
         m_mainCamera = Camera.main;
         cursor.gameObject.SetActive(true);
 
-        m_cursorPos = Vector3.zero;
+        m_cursorPos = Input.mousePresent ? m_mainCamera.ScreenToWorldPoint(Input.mousePosition) : Vector3.zero;
+        cursor.position = m_mainCamera.WorldToScreenPoint(m_cursorPos);
 
         // We want to immediately update the highlighter position
         selectTile();

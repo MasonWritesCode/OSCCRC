@@ -120,7 +120,7 @@ public class GameController : MonoBehaviour {
             Application.targetFrameRate = -1;
         }
 
-        //Cursor.visible = false;
+        Cursor.visible = false;
 
         m_eventSystem = EventSystem.current;
         m_wasInputFocused = false;
@@ -154,7 +154,6 @@ public class GameController : MonoBehaviour {
         {
             InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
             isInputFocused = field != null && field.isFocused;
-            
         }
 
         if (isInputFocused != m_wasInputFocused) // focus changed, so change input focus state
@@ -192,6 +191,8 @@ public class GameController : MonoBehaviour {
     // We have to make sure we restore the time scale when the scene changes
     void OnDestroy()
     {
+        Cursor.visible = true;
+
         Time.timeScale = m_timeScaleHolder;
     }
 
@@ -201,6 +202,8 @@ public class GameController : MonoBehaviour {
     {
         if (state == GameState.TagState.Suspended)
         {
+            Cursor.visible = true;
+
             m_timeScaleHolder = Time.timeScale;
             Time.timeScale = 0.0f;
         }
@@ -212,6 +215,8 @@ public class GameController : MonoBehaviour {
     {
         if (state == GameState.TagState.Suspended)
         {
+            Cursor.visible = false;
+
             Time.timeScale = m_timeScaleHolder;
         }
     }
