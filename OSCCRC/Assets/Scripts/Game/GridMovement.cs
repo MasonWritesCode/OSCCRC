@@ -67,10 +67,10 @@ public abstract class GridMovement : MonoBehaviour {
             return;
         }
 
-        if(m_tile.walls.north &&
-           m_tile.walls.south &&
-           m_tile.walls.east &&
-           m_tile.walls.west
+        if ( m_tile.walls.north &&
+             m_tile.walls.south &&
+             m_tile.walls.east  &&
+             m_tile.walls.west
            )
         {
             return;
@@ -138,82 +138,26 @@ public abstract class GridMovement : MonoBehaviour {
         m_tile = tile;
         Directions.Direction prevDir = direction;
 
-        // May modify our direction
+        // May modify our direction, but with less priority than walls
         interactWithImprovement(tile.improvement);
 
-        //Checking for walls
-        if (tile.walls.north && direction == Directions.Direction.North)
+        // Checking for walls
+        if (tile.walls[direction])
         {
-            if (tile.walls.east)
+            if (tile.walls[Directions.nextClockwiseDir(direction)])
             {
-                if (tile.walls.west)
+                if (tile.walls[Directions.nextCounterClockwiseDir(direction)])
                 {
-                    direction = Directions.Direction.South;
+                    direction = Directions.getOppositeDir(direction);
                 }
                 else
                 {
-                    direction = Directions.Direction.West;
+                    direction = Directions.nextCounterClockwiseDir(direction);
                 }
             }
             else
             {
-                direction = Directions.Direction.East;
-            }
-        }
-        else if (tile.walls.south && direction == Directions.Direction.South)
-        {
-            if (tile.walls.west)
-            {
-                if (tile.walls.east)
-                {
-                    direction = Directions.Direction.North;
-                }
-                else
-                {
-                    direction = Directions.Direction.East;
-                }
-
-            }
-            else
-            {
-                direction = Directions.Direction.West;
-            }
-        }
-        else if (tile.walls.east && direction == Directions.Direction.East)
-        {
-            if (tile.walls.south)
-            {
-                if (tile.walls.north)
-                {
-                    direction = Directions.Direction.West;
-                }
-                else
-                {
-                    direction = Directions.Direction.North;
-                }
-            }
-            else
-            {
-                direction = Directions.Direction.South;
-            }
-        }
-        else if (tile.walls.west && direction == Directions.Direction.West)
-        {
-            if (tile.walls.north)
-            {
-                if (tile.walls.south)
-                {
-                    direction = Directions.Direction.East;
-                }
-                else
-                {
-                    direction = Directions.Direction.South;
-                }
-
-            }
-            else
-            {
-                direction = Directions.Direction.North;
+                direction = Directions.nextClockwiseDir(direction);
             }
         }
 
