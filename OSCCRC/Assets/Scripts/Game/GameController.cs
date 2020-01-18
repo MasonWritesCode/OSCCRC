@@ -61,14 +61,6 @@ public class GameController : MonoBehaviour {
                 break;
         }
 
-        if (GlobalData.d_forceCompetitiveTest)
-        {
-            GameStage stage = GetComponent<GameStage>();
-            stage.loadStage("Competitive/4Player_001");
-            newMode = GameMode.Competitive;
-            m_game = new CompetitiveGame(m_gameState);
-        }
-
         Editor editor = GetComponent<Editor>();
         if (editor)
         {

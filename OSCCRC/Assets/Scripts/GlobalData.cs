@@ -19,6 +19,4 @@ public static class GlobalData {
     // This will disable the profiler apparently, so make sure this is false if you want to profile the main menu.
     public static readonly bool d_loadSceneAsync = false;
 
-    // Makes the game always open the competitive test map in competitive mode
-    public static readonly bool d_forceCompetitiveTest = false;
 }

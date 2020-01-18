@@ -6,7 +6,7 @@ using System.IO;
 
 public class Menu_Panel : MonoBehaviour {
 
-    public enum Folder { Unset, Retro, New, Custom };
+    public enum Folder { Unset, Competitive, Retro, New, Custom };
 
     public RectTransform mapEntryPrefab;
     public RectTransform mapsList;
@@ -17,6 +17,7 @@ public class Menu_Panel : MonoBehaviour {
 
     void Awake()
     {
+        m_folderNames.Add(Folder.Competitive, "Competitive/");
         m_folderNames.Add(Folder.Retro, "Retro/");
         m_folderNames.Add(Folder.New, "New/");
         m_folderNames.Add(Folder.Custom, "Custom/");
@@ -115,7 +116,7 @@ public class Menu_Panel : MonoBehaviour {
     private int m_pageNum = 0;
     private int m_startIndex = 0;
     private Folder m_folder = Folder.Unset;
-    private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(3);
+    private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(4);
     private FileInfo[] m_fileList;
     private GameStage m_tempStageInfo;
 }

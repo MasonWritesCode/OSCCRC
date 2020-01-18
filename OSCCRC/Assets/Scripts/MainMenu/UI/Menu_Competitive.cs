@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Menu_Back : MonoBehaviour, IPointerClickHandler
+public class Menu_Competitive : MonoBehaviour, IPointerClickHandler
 {
     public GameObject mainMenu;
     public GameObject levelMenu;
-    public GameObject typeMenu;
     public AudioSource audioData;
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -16,9 +15,13 @@ public class Menu_Back : MonoBehaviour, IPointerClickHandler
         {
             audioData.Play(0);
 
-            levelMenu.SetActive(false);
-            typeMenu.SetActive(false);
-            mainMenu.SetActive(true);
+            GlobalData.mode = GameController.GameMode.Competitive; 
+
+            mainMenu.SetActive(false);
+            levelMenu.SetActive(true);
+
+            Menu_Panel panelScript = levelMenu.GetComponent<Menu_Panel>();
+            panelScript.folder = Menu_Panel.Folder.Competitive;
         }
     }
 }
