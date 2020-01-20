@@ -16,7 +16,7 @@ public class Menu_MapEntry : MonoBehaviour, IPointerClickHandler {
 
     public void setName(string name)
     {
-        Text t = transform.Find("LevelName").GetComponent<Text>();
+        Text t = GetComponentInChildren<Text>();
         t.text = name;
     }
 
