@@ -17,6 +17,7 @@ public class CompetitiveGame : IGameMode
     public void startGame()
     {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        m_audioParent = GameObject.FindWithTag("Audio").GetComponent<Transform>();
 
         // We need to get a reference to all spawners so we can spawn with them
         float tileSize = m_gameMap.tileSize;
@@ -130,17 +131,25 @@ public class CompetitiveGame : IGameMode
         {
             if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
             {
+                AudioSource audioData = m_audioParent.Find("CatGoalSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
                 int owner = deadMeat.tile.owner;
                 // Here we don't want to use integer division, because we don't want to round down.
                 m_players[owner].score = m_players[owner].score * 2 / 3;
             }
 
             m_gameMap.destroyCat(deadMeat.transform);
+            // We create a new cat whenever one dies
+            spawnCat();
         }
         else if (deadMeat is Mouse)
         {
             if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
             {
+                AudioSource audioData = m_audioParent.Find("MouseGoalSound").GetComponent<AudioSource>();
+                audioData.Play(0);
+
                 int owner = deadMeat.tile.owner;
                 int newScore = m_players[owner].score;
 
@@ -158,11 +167,10 @@ public class CompetitiveGame : IGameMode
 
             m_gameMap.destroyMouse(deadMeat.transform);
         }
-
-        // We create a new cat whenever one dies
-        if (deadMeat is Cat)
+        else
         {
-            spawnCat();
+            AudioSource audioData = m_audioParent.Find("MouseDiedSound").GetComponent<AudioSource>();
+            audioData.Play(0);
         }
     }
 
@@ -306,4 +314,5 @@ public class CompetitiveGame : IGameMode
     private Timer m_gameTimer = new Timer();
     private Timer m_startCountdown = new Timer();
     private int m_remainingTime;
+    private Transform m_audioParent;
 }

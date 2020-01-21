@@ -17,6 +17,7 @@ public class EditorGame : IGameMode
     public void startGame()
     {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        m_audioParent = GameObject.FindWithTag("Audio").GetComponent<Transform>();
 
         // We need to count the number of mice so that we know if a puzzle has been solved
         countMice();
@@ -103,7 +104,7 @@ public class EditorGame : IGameMode
         {
             if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
+                AudioSource audioData = m_audioParent.Find("CatGoalSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
@@ -114,7 +115,7 @@ public class EditorGame : IGameMode
         {
             if (deadMeat.tile.improvement != MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
+                AudioSource audioData = m_audioParent.Find("MouseDiedSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
@@ -126,14 +127,14 @@ public class EditorGame : IGameMode
                 m_gameMap.destroyMouse(deadMeat.transform);
                 if (m_currentMice <= 0)
                 {
-                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
+                    AudioSource audioData = m_audioParent.Find("SuccessSound").GetComponent<AudioSource>();
                     audioData.Play(0);
 
                     endGame(true);
                 }
                 else
                 {
-                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
+                    AudioSource audioData = m_audioParent.Find("MouseGoalSound").GetComponent<AudioSource>();
                     audioData.Play(0);
                 }
             }
@@ -257,4 +258,5 @@ public class EditorGame : IGameMode
     private byte[] m_pauseSaveData;
     private GameMap m_gameMap;
     private GameState m_gameState;
+    private Transform m_audioParent;
 }

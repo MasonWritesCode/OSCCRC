@@ -18,6 +18,7 @@ public class PuzzleGame : IGameMode {
     public void startGame()
     {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        m_audioParent = GameObject.FindWithTag("Audio").GetComponent<Transform>();
 
         m_numMice = 0;
         // We need to remove all direction tiles, and count them up into a placements object
@@ -165,7 +166,7 @@ public class PuzzleGame : IGameMode {
         {
             if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
+                AudioSource audioData = m_audioParent.Find("CatGoalSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
@@ -176,7 +177,7 @@ public class PuzzleGame : IGameMode {
         {
             if (deadMeat.tile.improvement != MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
+                AudioSource audioData = m_audioParent.Find("MouseDiedSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
@@ -188,14 +189,14 @@ public class PuzzleGame : IGameMode {
                 m_gameMap.destroyMouse(deadMeat.transform);
                 if (m_currentMice <= 0)
                 {
-                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
+                    AudioSource audioData = m_audioParent.Find("SuccessSound").GetComponent<AudioSource>();
                     audioData.Play(0);
 
                     endGame(true);
                 }
                 else
                 {
-                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
+                    AudioSource audioData = m_audioParent.Find("MouseGoalSound").GetComponent<AudioSource>();
                     audioData.Play(0);
                 }
             }
@@ -310,4 +311,5 @@ public class PuzzleGame : IGameMode {
     private byte[] m_resetSaveData;
     private GameMap m_gameMap;
     private GameState m_gameState;
+    private Transform m_audioParent;
 }
