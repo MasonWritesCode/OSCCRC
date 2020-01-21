@@ -82,27 +82,29 @@ public class Menu_Panel : MonoBehaviour {
     // Displays a page of the file list
     private void setPage(int pageNum)
     {
-        if (pageNum < 0)
-        {
-            m_pageNum = 0;
-        }
-        else
-        {
-            m_pageNum = pageNum;
-        }
-
-        m_startIndex = m_pageNum * m_numEntries;
-        // If we navigate past all the entries, we want to stay filled with the last entries
-        if (m_startIndex > (m_fileList.Length - m_numEntries) && m_fileList.Length > m_numEntries)
-        {
-            m_startIndex = m_fileList.Length - m_numEntries;
-            m_pageNum--;
-        }
-
         Menu_MapEntry[] entries = GetComponentsInChildren<Menu_MapEntry>();
         for (int i = 0; i < entries.Length; ++i)
         {
             removeEntry(entries[i]);
+        }
+
+        // If we don't have more than a page's worth of entries, we force the page to be 0
+        if (m_fileList.Length <= m_numEntries)
+        {
+            m_pageNum = 0;
+            m_startIndex = 0;
+        }
+        else
+        {
+            m_pageNum = System.Math.Max(pageNum, 0);
+            m_startIndex = m_pageNum * m_numEntries;
+
+            // If we navigate past all the entries, we want to stay filled with the last entries
+            if (m_startIndex > (m_fileList.Length - m_numEntries) && m_fileList.Length > m_numEntries)
+            {
+                m_startIndex = m_fileList.Length - m_numEntries;
+                m_pageNum--;
+            }
         }
 
         for (int i = 0; i < m_numEntries && i < m_fileList.Length; ++i)
@@ -112,7 +114,7 @@ public class Menu_Panel : MonoBehaviour {
     }
 
 
-    private const int m_numEntries = 10;
+    private const int m_numEntries = 10; // Number of entries displayed at any given time
     private int m_pageNum = 0;
     private int m_startIndex = 0;
     private Folder m_folder = Folder.Unset;
