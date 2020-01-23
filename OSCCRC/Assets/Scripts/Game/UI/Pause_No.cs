@@ -12,8 +12,10 @@ public class Pause_No : MonoBehaviour, IPointerClickHandler
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            audioData = GameObject.Find("ClickSound").GetComponent<AudioSource>();
-            audioData.Play(0);
+            if (audioData != null)
+            {
+                audioData.Play(0);
+            }
 
             GameController m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
 

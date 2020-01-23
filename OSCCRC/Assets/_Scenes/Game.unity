@@ -3283,7 +3283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 951996f504865a145b61bf71606569f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioData: {fileID: 0}
+  audioData: {fileID: 1351209075}
   pauseDisplay: {fileID: 1519803097}
 --- !u!1 &903401643
 GameObject:
@@ -5388,7 +5388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa04d3ac3721cd443a32c74837ca1206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioData: {fileID: 0}
+  audioData: {fileID: 1351209075}
 --- !u!1 &1356459081
 GameObject:
   m_ObjectHideFlags: 0
@@ -5760,6 +5760,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0b637b26bd86c74cb8b17575847ad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pathInput: {fileID: 1003681452}
+  stageNameInput: {fileID: 607877375}
 --- !u!1 &1386484947
 GameObject:
   m_ObjectHideFlags: 0
@@ -6966,6 +6968,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ae0237b85fcae141bf7907cf9a267a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pathInput: {fileID: 1003681452}
+  stageNameInput: {fileID: 607877375}
 --- !u!1 &1666566963
 GameObject:
   m_ObjectHideFlags: 0

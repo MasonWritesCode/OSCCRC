@@ -20,6 +20,7 @@ public class Complete_Next : MonoBehaviour, IPointerClickHandler
 
             GlobalData.mode = GameController.GameMode.None;
 
+            // Get the path of our current stage, because we only want the same game mode
             string [] splitFilePath = GlobalData.currentStagePath.Split(new char[] {'/'});
             string curStageName = splitFilePath[splitFilePath.Length - 1];
             string curStagePath = "";
@@ -28,9 +29,17 @@ public class Complete_Next : MonoBehaviour, IPointerClickHandler
                 curStagePath += splitFilePath[i] + "/";
             }
 
-            DirectoryInfo di = new DirectoryInfo(Application.streamingAssetsPath + "/Maps/" + curStagePath);
-            m_fileList = di.GetFiles("*.stage");
+            try
+            {
+                DirectoryInfo di = new DirectoryInfo(Application.streamingAssetsPath + "/Maps/" + curStagePath);
+                m_fileList = di.GetFiles("*.stage");
+            }
+            catch
+            {
+                SceneManager.LoadScene("MainMenu");
+            }
 
+            // Search for the current stage and open the next one if there is one
             for (int i = 0; i < m_fileList.Length - 1; i++)
             {
                 if (m_fileList[i].Name == curStageName)
@@ -39,6 +48,7 @@ public class Complete_Next : MonoBehaviour, IPointerClickHandler
                     gameController.GetComponent<GameStage>().loadStage(curStagePath + m_fileList[i + 1].Name.Remove(m_fileList[i + 1].Name.Length - ".stage".Length));
                     gameController.runGame(gameController.mode);
                     GetComponentInParent<Canvas>().enabled = false;
+
                     return;
                 }
             }

@@ -6,22 +6,22 @@ using UnityEngine.UI;
 
 public class Editor_LoadButton : MonoBehaviour, IPointerClickHandler
 {
+    public InputField pathInput;
+    public InputField stageNameInput;
+
     void Start()
     {
-        m_editor = GameObject.FindWithTag("GameController").GetComponent<Editor>();
         m_gameStage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
+        m_editor = GameObject.FindWithTag("GameController").GetComponent<Editor>();
     }
 
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            string loadPath = transform.parent.GetComponent<InputField>().text;
+            m_editor.loadSave(pathInput.text);
 
-            m_editor.loadSave(loadPath);
-
-            InputField field = transform.parent.Find("Stage").GetComponent<InputField>();
-            field.text = m_gameStage.stageName;
+            stageNameInput.text = m_gameStage.stageName;
         }
     }
 
