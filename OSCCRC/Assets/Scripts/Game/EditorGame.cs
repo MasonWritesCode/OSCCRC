@@ -161,6 +161,7 @@ public class EditorGame : IGameMode
             m_paused = false;
             m_playing = true;
             saveAutosave(ref m_pauseSaveData);
+            countMice();
         }
         else if (newState == GameState.State.Ended_Failure)
         {
