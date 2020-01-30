@@ -3,10 +3,11 @@
 
 public static class GlobalData {
 
-    // MainManu exports:
+    // MainMenu exports:
 
     public static GameController.GameMode mode;
     public static string currentStagePath;
+    public static bool[] isHumanPlayer = { true, false, false, false };
 
 
     // Development Related Values:

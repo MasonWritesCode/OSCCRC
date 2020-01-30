@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 1278166}
   - component: {fileID: 1278168}
   - component: {fileID: 1278167}
+  - component: {fileID: 1278169}
   m_Layer: 0
   m_Name: Player3
   m_TagString: Untagged
@@ -187,6 +188,37 @@ MonoBehaviour:
   pauseDisplay: {fileID: 1519803097}
   fpsDisplay: {fileID: 996980960}
   stickSensitivity: 0.1
+--- !u!114 &1278169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1278165}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: a0981a8aa7e5c8d46af2908256615243,
+    type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Controller
+  m_DefaultActionMap: Game
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &58530776
 GameObject:
   m_ObjectHideFlags: 0
@@ -6031,6 +6063,7 @@ GameObject:
   - component: {fileID: 1470011350}
   - component: {fileID: 1470011352}
   - component: {fileID: 1470011351}
+  - component: {fileID: 1470011353}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Untagged
@@ -6086,6 +6119,37 @@ MonoBehaviour:
   pauseDisplay: {fileID: 1519803097}
   fpsDisplay: {fileID: 996980960}
   stickSensitivity: 0.1
+--- !u!114 &1470011353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470011349}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: a0981a8aa7e5c8d46af2908256615243,
+    type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Controller
+  m_DefaultActionMap: Game
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &1499287366
 GameObject:
   m_ObjectHideFlags: 0
@@ -6209,6 +6273,7 @@ GameObject:
   - component: {fileID: 1509620758}
   - component: {fileID: 1509620760}
   - component: {fileID: 1509620759}
+  - component: {fileID: 1509620761}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Untagged
@@ -6264,6 +6329,37 @@ MonoBehaviour:
   pauseDisplay: {fileID: 1519803097}
   fpsDisplay: {fileID: 996980960}
   stickSensitivity: 0.1
+--- !u!114 &1509620761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1509620757}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: a0981a8aa7e5c8d46af2908256615243,
+    type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Controller
+  m_DefaultActionMap: Game
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &1519803094
 GameObject:
   m_ObjectHideFlags: 0

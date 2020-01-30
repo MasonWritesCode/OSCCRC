@@ -12,7 +12,7 @@ public class Menu_Panel : MonoBehaviour {
     public RectTransform mapsList;
     public SceneLoader sceneLoader;
 
-    public Folder folder { get { return m_folder; } set { m_folder = value; getFiles(value); page = 0; } }
+    public Folder folder { get { return m_folder; } set { setFolder(value); } }
     public int page { get { return m_pageNum; } set { setPage(value); } }
 
     void Awake()
@@ -23,6 +23,10 @@ public class Menu_Panel : MonoBehaviour {
         m_folderNames.Add(Folder.Custom, "Custom/");
 
         m_tempStageInfo = gameObject.AddComponent<GameStage>();
+
+        // We might have wanted to set folder before the gameobject became active
+        // So now that we are active we can open the folder that was set
+        setFolder(m_folder);
     }
 
 
@@ -79,6 +83,19 @@ public class Menu_Panel : MonoBehaviour {
     }
 
 
+    // Loads files from a folder
+    private void setFolder(Folder folder)
+    {
+        m_folder = folder;
+        // We use m_temStageInfo to verify the gameobject became active since folder might be set before then
+        if (m_tempStageInfo != null)
+        {
+            getFiles(folder);
+            page = 0;
+        }
+    }
+
+
     // Displays a page of the file list
     private void setPage(int pageNum)
     {
@@ -120,5 +137,5 @@ public class Menu_Panel : MonoBehaviour {
     private Folder m_folder = Folder.Unset;
     private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(4);
     private FileInfo[] m_fileList;
-    private GameStage m_tempStageInfo;
+    private GameStage m_tempStageInfo = null;
 }

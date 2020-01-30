@@ -113,6 +113,17 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""e3ec4e1e-0257-4736-a101-be92ed2c98ef"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""CursorMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""ff1a32e9-30bb-4578-85c7-558a49176f4b"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",

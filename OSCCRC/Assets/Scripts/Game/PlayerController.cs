@@ -57,12 +57,11 @@ public class PlayerController : MonoBehaviour {
         InputActionAsset inputActions = m_playerInput.actions;
         if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
         {
-            if (inputActions["CursorMovement"].triggered || m_gamepad.leftStick.IsActuated())
+            if (inputActions["CursorMovement"].triggered || m_gamepad.leftStick.IsActuated() || m_gamepad.rightStick.IsActuated())
             {
                 if (m_isGamepad)
                 {
                     Vector2 inputVec = m_gamepad.leftStick.ReadValue() * stickSensitivity;
-                    Debug.Log(inputVec);
                     m_cursorPos += new Vector3(inputVec[0], 0.0f, inputVec[1]);
                     cursor.position = m_mainCamera.WorldToScreenPoint(m_cursorPos);
                 }
@@ -387,6 +386,7 @@ public class PlayerController : MonoBehaviour {
 
     private void OnControlsChanged()
     {
+        // TODO: Do we move the mouse to the cursor position if we switch away from controller?
         m_isGamepad = m_playerInput.currentControlScheme != "Mouse+Keyboard";
         m_mouse = UnityEngine.InputSystem.Mouse.current;
         m_gamepad = Gamepad.current;

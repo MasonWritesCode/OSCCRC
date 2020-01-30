@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 // This class controls various parts of gameplay and manages the state of the game.
 
@@ -74,13 +75,25 @@ public class GameController : MonoBehaviour {
             }
         }
 
+        // Set up our players
         GameObject players = GameObject.FindWithTag("Player");
         if (players)
         {
             // We enable the other players for 4 player modes
-            for (int i = 1; i < players.transform.childCount - 1; ++i)
+            for (int i = 0; i < players.transform.childCount - 1; ++i)
             {
-                players.transform.GetChild(i).gameObject.SetActive(newMode == GameMode.Competitive);
+                GameObject playerObject = players.transform.GetChild(i).gameObject;
+
+                // For now, set as many human players as we have input devices
+                bool isHuman = GlobalData.isHumanPlayer[i];
+                playerObject.GetComponent<PlayerController>().enabled =  isHuman;
+                playerObject.GetComponent<PlayerInput>().enabled      =  isHuman;
+                playerObject.GetComponent<AIController>().enabled     = !isHuman;
+
+                if (i > 0)
+                {
+                    playerObject.SetActive(newMode == GameMode.Competitive);
+                }
             }
         }
 
