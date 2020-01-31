@@ -120,13 +120,16 @@ public class PlayerController : MonoBehaviour {
             // "Pause" input does not suspend the game in the traditional sense of pause, but toggles the puzzle-placement state
             if (inputActions["Pause"].triggered)
             {
-                if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused || m_gameController.gameState.mainState == GameState.State.Ended_Failure)
+                if (m_gameController.mode != GameController.GameMode.Competitive)
                 {
-                    m_gameController.gameState.mainState = GameState.State.Started_Paused;
-                }
-                else if (m_gameController.gameState.mainState == GameState.State.Started_Paused)
-                {
-                    m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
+                    if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused || m_gameController.gameState.mainState == GameState.State.Ended_Failure)
+                    {
+                        m_gameController.gameState.mainState = GameState.State.Started_Paused;
+                    }
+                    else if (m_gameController.gameState.mainState == GameState.State.Started_Paused)
+                    {
+                        m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
+                    }
                 }
             }
 
@@ -176,13 +179,16 @@ public class PlayerController : MonoBehaviour {
         // For now, we use a button press to toggle double movement speed
         if (inputActions["SpeedToggle"].triggered)
         {
-            if (GridMovement.speedMultiplier > 1.0f)
+            if (m_gameController.mode != GameController.GameMode.Competitive)
             {
-                GridMovement.speedMultiplier = 1.0f;
-            }
-            else
-            {
-                GridMovement.speedMultiplier = 2.0f;
+                if (GridMovement.speedMultiplier > 1.0f)
+                {
+                    GridMovement.speedMultiplier = 1.0f;
+                }
+                else
+                {
+                    GridMovement.speedMultiplier = 2.0f;
+                }
             }
         }
 
