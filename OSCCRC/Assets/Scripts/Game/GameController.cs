@@ -185,7 +185,7 @@ public class GameController : MonoBehaviour {
             return;
         }
         // One scenario we could consider adding is to disable physics when there are no cats to collide with.
-        if (m_gameState.mainState != GameState.State.Started_Unpaused || m_gameState.hasState(GameState.TagState.Suspended))
+        if (m_gameState.mainState == GameState.State.Started_Paused || m_gameState.hasState(GameState.TagState.Suspended))
         {
             return;
         }

@@ -34,7 +34,7 @@ public class CompetitiveGame : IGameMode
         }
         if (m_spawnTiles.Count == 0)
         {
-            Debug.LogError("No spawn tiles found. Competitive mode opened on non-competitive map");
+            Debug.LogWarning("No spawn tiles found. Competitive mode opened on non-competitive map");
         }
 
         m_compDisplay = GameObject.Find("CompetitiveDisplay (UI)");
@@ -140,8 +140,11 @@ public class CompetitiveGame : IGameMode
             }
 
             m_gameMap.destroyCat(deadMeat.transform);
-            // We create a new cat whenever one dies
-            spawnCat();
+            // We create a new cat whenever one dies while game is running
+            if (m_gameState.mainState == GameState.State.Started_Unpaused)
+            {
+                spawnCat();
+            }
         }
         else if (deadMeat is Mouse)
         {
@@ -166,11 +169,6 @@ public class CompetitiveGame : IGameMode
             }
 
             m_gameMap.destroyMouse(deadMeat.transform);
-        }
-        else
-        {
-            AudioSource audioData = m_audioParent.Find("MouseDiedSound").GetComponent<AudioSource>();
-            audioData.Play(0);
         }
     }
 
