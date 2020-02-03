@@ -50,6 +50,7 @@ public class Timer {
 
 
     // Starts the timer with the specified duration, with an update callback called after each update delay
+    // An update event will not happen if the timer ends at the same time as an update
     public void startTimerWithUpdate(float durationInSeconds, float updateInSeconds)
     {
         if (m_timerRunning)

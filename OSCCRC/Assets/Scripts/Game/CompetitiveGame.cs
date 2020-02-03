@@ -110,7 +110,15 @@ public class CompetitiveGame : IGameMode
         Timer ptimer = new Timer();
         ptimer.timerUpdate += () =>
         {
-            m_gameMap.blinkTile(tile, 1.0f);
+            if (tile.improvement != MapTile.TileImprovement.Direction)
+            {
+                // A cat destroyed the direction tile, so we just stop the blinking timer
+                ptimer.stopTimer();
+            }
+            else
+            {
+                m_gameMap.blinkTile(tile, 1.0f);
+            }
         };
         ptimer.timerCompleted += () =>
         {
