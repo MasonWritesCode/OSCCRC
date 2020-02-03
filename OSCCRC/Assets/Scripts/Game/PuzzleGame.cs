@@ -6,12 +6,14 @@ using UnityEngine.UI;
 
 // This is an interface between the game controller and the Puzzle game mode.
 // This mode requires being passed information about the game state.
+// This mode requires being passed its related UI transform.
 
 public class PuzzleGame : IGameMode {
 
-    public PuzzleGame(GameState gameStateRef)
+    public PuzzleGame(GameState gameStateRef, Transform modeUI)
     {
         m_gameState = gameStateRef;
+        m_display = modeUI;
     }
 
     // Begins a puzzle game
@@ -52,8 +54,7 @@ public class PuzzleGame : IGameMode {
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
-        m_placementsDisplay = GameObject.Find("PlacementsDisplay (UI)");
-        m_placementsDisplay.GetComponent<Canvas>().enabled = true;
+        m_display.GetComponent<Canvas>().enabled = true;
         showAvailablePlacements();
     }
 
@@ -92,6 +93,7 @@ public class PuzzleGame : IGameMode {
         {
             m_gameState.mainState = GameState.State.Ended_Victory;
             CompletionTracker.markCompleted(GlobalData.currentStagePath);
+            m_display.Find("CompleteMenu").gameObject.SetActive(true);
         }
         else
         {
@@ -240,10 +242,10 @@ public class PuzzleGame : IGameMode {
     // Updates the display of available placements
     private void showAvailablePlacements()
     {
-        m_placementsDisplay.transform.Find("UpText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.North).ToString();
-        m_placementsDisplay.transform.Find("DownText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.South).ToString();
-        m_placementsDisplay.transform.Find("LeftText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.West).ToString();
-        m_placementsDisplay.transform.Find("RightText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.East).ToString();
+        m_display.Find("UpText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.North).ToString();
+        m_display.Find("DownText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.South).ToString();
+        m_display.Find("LeftText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.West).ToString();
+        m_display.Find("RightText").GetComponentInChildren<Text>().text = "x" + m_placements.get(Directions.Direction.East).ToString();
     }
 
 
@@ -298,18 +300,19 @@ public class PuzzleGame : IGameMode {
     }
 
 
-    private int m_numMice = 0;
-    private int m_currentMice = 0;
-    private AvailablePlacements m_placements;
-    private AvailablePlacements m_originalPlacements;
-    private GameObject m_placementsDisplay;
-    private bool m_paused;
-    private bool m_playing;
-    private float m_autoResetDelay = 1.5f;
-    private Timer m_timer = null;
-    private byte[] m_pauseSaveData;
-    private byte[] m_resetSaveData;
+    private Transform m_display;
+    private Transform m_audioParent;
     private GameMap m_gameMap;
     private GameState m_gameState;
-    private Transform m_audioParent;
+    private Timer m_timer = null;
+
+    private AvailablePlacements m_placements;
+    private AvailablePlacements m_originalPlacements;
+    private byte[] m_pauseSaveData;
+    private byte[] m_resetSaveData;
+    private int m_numMice = 0;
+    private int m_currentMice = 0;
+    private float m_autoResetDelay = 1.5f;
+    private bool m_paused;
+    private bool m_playing;
 }

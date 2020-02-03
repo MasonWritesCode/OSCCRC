@@ -5,12 +5,14 @@ using UnityEngine.UI;
 
 // This is an interface between the game controller and the 4 player Competitive game mode.
 // This mode requires being passed information about the game state.
+// This mode requires being passed its related UI transform.
 
 public class CompetitiveGame : IGameMode
 {
-    public CompetitiveGame(GameState gameStateRef)
+    public CompetitiveGame(GameState gameStateRef, Transform modeUI)
     {
         m_gameState = gameStateRef;
+        m_display = modeUI;
     }
 
     // Begins a puzzle game
@@ -37,13 +39,12 @@ public class CompetitiveGame : IGameMode
             Debug.LogWarning("No spawn tiles found. Competitive mode opened on non-competitive map");
         }
 
-        m_compDisplay = GameObject.Find("CompetitiveDisplay (UI)");
-        m_compDisplay.GetComponent<Canvas>().enabled = true;
-        m_timerText = m_compDisplay.transform.Find("Timer").GetComponentInChildren<Text>();
+        m_display.GetComponent<Canvas>().enabled = true;
+        m_timerText = m_display.Find("Timer").GetComponentInChildren<Text>();
 
         for (int i = 0; i < m_players.Length; ++i)
         {
-            m_players[i] = new Player(m_compDisplay.transform.Find("Score" + i).GetComponentInChildren<Text>());
+            m_players[i] = new Player(m_display.Find("Score" + i).GetComponentInChildren<Text>());
             m_players[i].playerName = "Player " + i;
         }
 
@@ -299,18 +300,20 @@ public class CompetitiveGame : IGameMode
     }
 
 
+    private Transform m_display;
+    private Transform m_audioParent;
     private GameState m_gameState;
     private GameMap m_gameMap;
-    private GameObject m_compDisplay;
     private Text m_timerText;
-    private List<MapTile> m_spawnTiles = new List<MapTile>();
-    private Player[] m_players = new Player[4];
+
     private System.Random m_rng = new System.Random();
     private Timer m_catSpawnTimer = null;
     private Timer m_mouseSpawnTimer = null;
     private Timer m_spawnFrequencyTimer = null;
     private Timer m_gameTimer = new Timer();
     private Timer m_startCountdown = new Timer();
+
+    private List<MapTile> m_spawnTiles = new List<MapTile>();
+    private Player[] m_players = new Player[4];
     private int m_remainingTime;
-    private Transform m_audioParent;
 }

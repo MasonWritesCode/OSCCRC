@@ -5,12 +5,14 @@ using UnityEngine;
 
 // This is an interface between the game controller and the Puzzle game mode.
 // This mode requires being passed information about the game state.
+// This mode requires being passed its related UI transform.
 
 public class EditorGame : IGameMode
 {
-    public EditorGame(GameState gameStateRef)
+    public EditorGame(GameState gameStateRef, Transform modeUI)
     {
         m_gameState = gameStateRef;
+        m_display = modeUI;
     }
 
     // Begins a puzzle game
@@ -29,8 +31,7 @@ public class EditorGame : IGameMode
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
-        m_saveMenu = GameObject.Find("EditorMenu (UI)");
-        m_saveMenu.GetComponent<Canvas>().enabled = true;
+        m_display.GetComponent<Canvas>().enabled = true;
 
         return;
     }
@@ -249,15 +250,16 @@ public class EditorGame : IGameMode
     }
 
 
-    private int m_numMice = 0;
-    private int m_currentMice = 0;
-    private GameObject m_saveMenu;
-    private bool m_paused;
-    private bool m_playing;
-    private float m_autoResetDelay = 1.5f;
-    private Timer m_timer = null;
-    private byte[] m_pauseSaveData;
+    private Transform m_display;
+    private Transform m_audioParent;
     private GameMap m_gameMap;
     private GameState m_gameState;
-    private Transform m_audioParent;
+    private Timer m_timer = null;
+
+    private byte[] m_pauseSaveData;
+    private int m_numMice = 0;
+    private int m_currentMice = 0;
+    private float m_autoResetDelay = 1.5f;
+    private bool m_paused;
+    private bool m_playing;
 }

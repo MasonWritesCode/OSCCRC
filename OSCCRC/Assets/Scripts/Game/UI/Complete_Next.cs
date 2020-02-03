@@ -47,7 +47,7 @@ public class Complete_Next : MonoBehaviour, IPointerClickHandler
                     GameController gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
                     gameController.GetComponent<GameStage>().loadStage(curStagePath + m_fileList[i + 1].Name.Remove(m_fileList[i + 1].Name.Length - ".stage".Length));
                     gameController.runGame(gameController.mode);
-                    GetComponentInParent<Canvas>().enabled = false;
+                    transform.parent.gameObject.SetActive(false);
 
                     return;
                 }

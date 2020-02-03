@@ -12,7 +12,9 @@ public class GameController : MonoBehaviour {
     public enum GameMode { None, Editor, Puzzle, Competitive };
     public GameMode mode { get { return m_mode; } }
     public GameState gameState { get { return m_gameState; } }
-    public Canvas completeDisplay;
+    public Transform puzzleUI;      // Editor Set
+    public Transform editorUI;      // Editor Set
+    public Transform competitiveUI; // Editor Set
 
 
     // Checks if a player is allowed to place the desired improvement, and does so if they can
@@ -52,13 +54,13 @@ public class GameController : MonoBehaviour {
         switch (newMode)
         {
             case GameMode.Puzzle:
-                m_game = new PuzzleGame(m_gameState);
+                m_game = new PuzzleGame(m_gameState, puzzleUI);
                 break;
             case GameMode.Editor:
-                m_game = new EditorGame(m_gameState);
+                m_game = new EditorGame(m_gameState, editorUI);
                 break;
             case GameMode.Competitive:
-                m_game = new CompetitiveGame(m_gameState);
+                m_game = new CompetitiveGame(m_gameState, competitiveUI);
                 break;
         }
 
@@ -133,8 +135,6 @@ public class GameController : MonoBehaviour {
         m_gameState = new GameState();
         m_gameState.stateAdded += onTagStateAdd;
         m_gameState.stateRemoved += onTagStateRemove;
-
-        m_gameState.mainStateChange += onLevelComplete;
 
         GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStagePath;
@@ -223,20 +223,6 @@ public class GameController : MonoBehaviour {
             Cursor.visible = false;
 
             Time.timeScale = m_timeScaleHolder;
-        }
-    }
-
-    // Does actions when a user completes a stage
-    private void onLevelComplete(GameState.State stateOld, GameState.State stateNew)
-    {
-        if (stateNew == GameState.State.Ended_Victory)
-        {
-            // This should be moved into PuzzleGame in some way or another at some point
-            //   when we figure out how we want to store the display reference to the mode without it being a monobehavior
-            if (m_mode == GameMode.Puzzle)
-            {
-                completeDisplay.enabled = true;
-            }
         }
     }
 
