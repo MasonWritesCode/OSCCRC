@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-public class Pause_Yes : MonoBehaviour, IPointerClickHandler
+public class OpenMainMenu : MonoBehaviour, IPointerClickHandler
 {
     public AudioSource audioData;
 

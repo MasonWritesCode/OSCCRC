@@ -45,7 +45,7 @@ public class CompetitiveGame : IGameMode
         for (int i = 0; i < m_players.Length; ++i)
         {
             m_players[i] = new Player(m_display.Find("Score" + i).GetComponentInChildren<Text>());
-            m_players[i].playerName = "Player " + i;
+            m_players[i].playerName = "Player " + (i + 1);
         }
 
         m_gameState.mainState = GameState.State.Started_Paused;
@@ -276,6 +276,9 @@ public class CompetitiveGame : IGameMode
     // Game finishes with a victor
     private void finishGame()
     {
+        // We want to update the timer when it finishes as well
+        tickGameTimer();
+
         int victor = 0;
         for (int i = 1; i < m_players.Length; ++i)
         {
@@ -286,17 +289,18 @@ public class CompetitiveGame : IGameMode
         }
 
         // Detect for game draw. If there is draw, use Ended_Failure state
-        // TODO: UI instead of debug log
+        Transform completeMenu = m_display.Find("CompleteMenu");
         if (victor != 0 && m_players[0].score == m_players[victor].score)
         {
             m_gameState.mainState = GameState.State.Ended_Failure;
-            Debug.Log("The game ended in a draw.");
+            completeMenu.Find("Text").GetComponent<Text>().text = "The game ended in a draw.";
         }
         else
         {
             m_gameState.mainState = GameState.State.Ended_Victory;
-            Debug.Log(m_players[victor].playerName + " wins!");
+            completeMenu.Find("Text").GetComponent<Text>().text = m_players[victor].playerName + " wins!";
         }
+        completeMenu.gameObject.SetActive(true);
     }
 
 
