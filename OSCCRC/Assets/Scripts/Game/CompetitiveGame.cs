@@ -13,6 +13,11 @@ public class CompetitiveGame : IGameMode
     {
         m_gameState = gameStateRef;
         m_display = modeUI;
+
+        m_modifierFunctions = new ModifierFunction[] {
+            null, null, null, null, new ModifierFunction(removePlacements), null, null, null
+        };
+        Debug.Assert(m_modifierFunctions.Length == m_modifierText.Length);
     }
 
     // Begins a puzzle game
@@ -44,7 +49,7 @@ public class CompetitiveGame : IGameMode
 
         for (int i = 0; i < m_players.Length; ++i)
         {
-            m_players[i] = new Player(m_display.Find("Score" + i).GetComponentInChildren<Text>());
+            m_players[i] = new Player(i, m_display.Find("Score" + i).GetComponentInChildren<Text>());
             m_players[i].playerName = "Player " + (i + 1);
         }
 
@@ -92,15 +97,12 @@ public class CompetitiveGame : IGameMode
         }
 
         const int maxPlacements = 3;
-
         Player player = m_players[playerID];
 
         // Players are limited to the 3 most recently placed
-        if (player.placements.Count >= maxPlacements)
+        if (player.placementCount >= maxPlacements)
         {
-            Placement tileToClear = player.placements.Dequeue();
-            tileToClear.timer.stopTimer();
-            tileToClear.tile.improvement = MapTile.TileImprovement.None;
+            player.dequeuePlacement();
         }
 
         tile.owner = playerID;
@@ -130,7 +132,7 @@ public class CompetitiveGame : IGameMode
         newPlacement.tile = tile;
         newPlacement.timer = ptimer;
 
-        player.placements.Enqueue(newPlacement);
+        player.enqueuePlacement(newPlacement);
     }
 
 
@@ -171,7 +173,13 @@ public class CompetitiveGame : IGameMode
                 }
                 else
                 {
+                    // Not sure if special mice are supposed to increase score or not
                     newScore += 1;
+
+                    if (deadMeat is SpecialMouse)
+                    {
+                        addRandomGameModifier();
+                    }
                 }
 
                 m_players[owner].score = Mathf.Min(newScore, 999);
@@ -191,17 +199,48 @@ public class CompetitiveGame : IGameMode
 
     private class Player
     {
-        public Player(Text textObj)
+        // ID_num is the Maptile.owner ID
+        public Player(int ID_num, Text textObj)
         {
-            scoreText = textObj;
+            ID = ID_num;
+            m_scoreText = textObj;
         }
 
-        public Queue<Placement> placements = new Queue<Placement>();
-        public int score { get { return m_score; } set { m_score = value; scoreText.text = string.Format("{0:000}", value); } }
-        public Text scoreText = null;
+        public int score { get { return m_score; } set { m_score = value; m_scoreText.text = string.Format("{0:000}", value); } }
+        public int placementCount { get { return placements.Count; } }
+
+        public void enqueuePlacement(Placement p)
+        {
+            placements.Enqueue(p);
+        }
+
+        public Placement dequeuePlacement()
+        {
+            Placement p = placements.Dequeue();
+
+            p.timer.stopTimer();
+            if (p.tile.improvement == MapTile.TileImprovement.Direction && p.tile.owner == ID)
+            {
+                p.tile.improvement = MapTile.TileImprovement.None;
+            }
+
+            return p;
+        }
+
+        public void clearPlacements()
+        {
+            for (int i = placements.Count; i > 0; --i)
+            {
+                dequeuePlacement();
+            }
+        }
+
+        public int ID;
         public string playerName = "Player";
 
         private int m_score = 0;
+        private Queue<Placement> placements = new Queue<Placement>();
+        private Text m_scoreText = null;
     }
 
 
@@ -243,6 +282,14 @@ public class CompetitiveGame : IGameMode
     }
 
 
+    // Spawns a special game modifier mouse at a random spawner
+    private void spawnSpecialMouse()
+    {
+        MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
+        m_gameMap.placeSpecialMouse(spawn.transform.localPosition, spawn.improvementDirection);
+    }
+
+
     // Set each spawner to begin spawning mice and spawn in a cat, the normal case without special mice effects
     // I don't know how frequently mice are supposed to spawn, so it will be random averaging 3 seconds per spawner for now
     private void beginNormalSpawn()
@@ -258,7 +305,14 @@ public class CompetitiveGame : IGameMode
                 // 1 in 100 chance to spawn a 50 point mouse for now
                 if (m_rng.Next(100) == 0)
                 {
-                    spawnBigMouse();
+                    if (m_rng.Next(2) == 0)
+                    {
+                        spawnBigMouse();
+                    }
+                    else
+                    {
+                        spawnSpecialMouse();
+                    }
                 }
                 else
                 {
@@ -267,6 +321,55 @@ public class CompetitiveGame : IGameMode
             }
         };
         m_spawnFrequencyTimer.startTimerWithUpdate((float)m_remainingTime, 0.1667f);
+    }
+
+
+    // Randomly select a game modifier to apply
+    private void addRandomGameModifier()
+    {
+        // For now, we only have one implemented, so just do that
+        int modifierSelection = 4;
+        GameObject modifierDisplay = m_display.Find("Event Popup").gameObject;
+
+        modifierDisplay.GetComponentInChildren<Text>().text = m_modifierText[modifierSelection];
+        modifierDisplay.SetActive(true);
+
+        PauseInstance pause = TimeManager.addTimePause();
+
+        // TODO: We need to Pause unscaled timers on suspend state
+        m_modifierTimer = new Timer();
+        m_modifierTimer.timerCompleted += () => {
+            modifierDisplay.SetActive(false);
+            TimeManager.removeTimePause(pause);
+
+            if (m_modifierFunctions[modifierSelection] != null)
+            {
+                m_modifierFunctions[modifierSelection]();
+            }
+        };
+        m_modifierTimer.isScaledTime = false;
+        m_modifierTimer.startTimer(2.0f);
+    }
+
+
+    // Place Arrows Again - players arrows are removed
+    private void removePlacements()
+    {
+        for (int i = 0; i < m_players.Length; ++i)
+        {
+            m_players[i].clearPlacements();
+        }
+
+        PauseInstance pause = TimeManager.addTimePause();
+
+        // We give the player some time to re-make placements
+        // TODO: We need to Pause unscaled timers on suspend state
+        m_modifierTimer = new Timer();
+        m_modifierTimer.timerCompleted += () => {
+            TimeManager.removeTimePause(pause);
+        };
+        m_modifierTimer.isScaledTime = false;
+        m_modifierTimer.startTimer(4.0f);
     }
 
 
@@ -312,16 +415,23 @@ public class CompetitiveGame : IGameMode
     }
 
 
+    public delegate void ModifierFunction();
+    private static readonly string[] m_modifierText = {
+        "Mouse Mania!", "Everybody Move!", "Cat Mania!", "Cat Attack!", "Place Arrows Again!", "Mouse Monopoly!", "Speed Up!", "Slow Down!"
+    };
+
     private Transform m_display;
     private Transform m_audioParent;
     private GameState m_gameState;
     private GameMap m_gameMap;
     private Text m_timerText;
 
+    private ModifierFunction[] m_modifierFunctions;
     private System.Random m_rng = new System.Random();
     private Timer m_catSpawnTimer = null;
     private Timer m_mouseSpawnTimer = null;
     private Timer m_spawnFrequencyTimer = null;
+    private Timer m_modifierTimer = null;
     private Timer m_gameTimer = new Timer();
     private Timer m_startCountdown = new Timer();
 

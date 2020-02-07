@@ -198,7 +198,10 @@ public class GameController : MonoBehaviour {
     {
         Cursor.visible = true;
 
-        Time.timeScale = m_timeScaleHolder;
+        if (m_pauseInstance != null)
+        {
+            TimeManager.removeTimePause(m_pauseInstance);
+        }
     }
 
     // Set timescale to 0 for suspending the game
@@ -209,8 +212,7 @@ public class GameController : MonoBehaviour {
         {
             Cursor.visible = true;
 
-            m_timeScaleHolder = Time.timeScale;
-            Time.timeScale = 0.0f;
+            m_pauseInstance = TimeManager.addTimePause();
         }
     }
 
@@ -222,15 +224,19 @@ public class GameController : MonoBehaviour {
         {
             Cursor.visible = false;
 
-            Time.timeScale = m_timeScaleHolder;
+            if (m_pauseInstance != null)
+            {
+                TimeManager.removeTimePause(m_pauseInstance);
+            }
         }
     }
 
 
-    private GameMode m_mode = GameMode.None;
-    private GameState m_gameState;
-    private IGameMode m_game;
-    private float m_timeScaleHolder = 1.0f;
     private EventSystem m_eventSystem;
+    private GameState m_gameState;
+    private PauseInstance m_pauseInstance = null;
+
+    private GameMode m_mode = GameMode.None;
+    private IGameMode m_game;
     private bool m_wasInputFocused;
 }
