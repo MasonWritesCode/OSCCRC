@@ -7,6 +7,8 @@ using UnityEngine.UI;
 // This mode requires being passed information about the game state.
 // This mode requires being passed its related UI transform.
 
+// TODO: Limit on number of spawned mice
+
 public class CompetitiveGame : IGameMode
 {
     public CompetitiveGame(GameState gameStateRef, Transform modeUI)
@@ -15,7 +17,7 @@ public class CompetitiveGame : IGameMode
         m_display = modeUI;
 
         m_modifierFunctions = new ModifierFunction[] {
-            null, null, null, null, new ModifierFunction(removePlacements), null, null, null
+            new ModifierFunction(beginMouseMania), null, null, null, new ModifierFunction(removePlacements), null, null, null
         };
         Debug.Assert(m_modifierFunctions.Length == m_modifierText.Length);
     }
@@ -300,7 +302,7 @@ public class CompetitiveGame : IGameMode
             // 1/18 chance 6 times per second for EV of 3 seconds, per spawner
             if (m_rng.Next(18) < m_spawnTiles.Count)
             {
-                // 1 in 100 chance to spawn a 50 point mouse for now
+                // 1 in 100 chance to spawn a 50 point or special mouse for now
                 if (m_rng.Next(100) == 0)
                 {
                     if (m_rng.Next(2) == 0)
@@ -331,8 +333,9 @@ public class CompetitiveGame : IGameMode
     // Randomly select a game modifier to apply
     private void addRandomGameModifier()
     {
-        // For now, we only have one implemented, so just do that
-        int modifierSelection = 4;
+        // For now, we have only a subset of options
+        int[] availableEvents = { 0, 4 };
+        int modifierSelection = availableEvents[m_rng.Next(availableEvents.Length)];
         GameObject modifierDisplay = m_display.Find("Event Popup").gameObject;
 
         modifierDisplay.GetComponentInChildren<Text>().text = m_modifierText[modifierSelection];
@@ -346,13 +349,42 @@ public class CompetitiveGame : IGameMode
             modifierDisplay.SetActive(false);
             TimeManager.removeTimePause(pause);
 
-            if (m_modifierFunctions[modifierSelection] != null)
-            {
-                m_modifierFunctions[modifierSelection]();
-            }
+            m_modifierFunctions[modifierSelection]();
         };
         m_modifierTimer.isScaledTime = false;
         m_modifierTimer.startTimer(2.0f);
+    }
+
+
+    // Mouse Mania - Rapid mouse spawning for some time
+    private void beginMouseMania()
+    {
+        m_spawnFrequencyTimer.stopTimer();
+
+        // Remove the normal-spawn cat
+        // There is no gamemap function for removing all cats, so just search the map
+        Cat cat = m_gameMap.GetComponentInChildren<Cat>();
+        m_gameMap.destroyMover(cat);
+        m_catCounter = 0;
+
+        m_spawnFrequencyTimer = new Timer();
+        m_spawnFrequencyTimer.timerUpdate += () => {
+            // How often do we spawn a mouse? For now, one per update.
+            // 1 in 100 chance to spawn a 50 point mouse for now
+            if (m_rng.Next(100) == 0)
+            {
+                spawnBigMouse();
+            }
+            else
+            {
+                spawnMouse();
+            }
+        };
+        m_spawnFrequencyTimer.timerCompleted += () => {
+            m_spawnFrequencyTimer.stopTimer();
+            beginNormalSpawn();
+        };
+        m_spawnFrequencyTimer.startTimerWithUpdate(Mathf.Min(10.0f, (float)m_remainingTime), 0.1667f);
     }
 
 
