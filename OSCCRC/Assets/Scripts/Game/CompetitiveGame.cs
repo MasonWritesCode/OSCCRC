@@ -176,6 +176,7 @@ public class CompetitiveGame : IGameMode
 
                     if (deadMeat is SpecialMouse)
                     {
+                        --m_specialMouseCounter;
                         addRandomGameModifier();
                     }
                 }
@@ -243,13 +244,12 @@ public class CompetitiveGame : IGameMode
 
 
     // Spawns a cat at a random spawner
-    private void spawnCat()
+    private void spawnCat(MapTile spawn)
     {
         // We create a new timer to clear the lambda subscriber for now
         m_catSpawnTimer = new Timer();
 
         m_catSpawnTimer.timerCompleted += () => {
-            MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
             m_gameMap.placeCat(spawn.transform.localPosition, spawn.improvementDirection);
             m_catSpawnTimer = null;
         };
@@ -260,13 +260,12 @@ public class CompetitiveGame : IGameMode
 
 
     // Spawns a mouse at a random spawner
-    private void spawnMouse()
+    private void spawnMouse(MapTile spawn)
     {
         // We create a new timer to clear the lambda subscriber for now
         m_mouseSpawnTimer = new Timer();
 
         m_mouseSpawnTimer.timerCompleted += () => {
-            MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
             m_gameMap.placeMouse(spawn.transform.localPosition, spawn.improvementDirection);
             m_mouseSpawnTimer = null;
         };
@@ -275,17 +274,15 @@ public class CompetitiveGame : IGameMode
 
 
     // Spawns a 50 point mouse at a random spawner
-    private void spawnBigMouse()
+    private void spawnBigMouse(MapTile spawn)
     {
-        MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
         m_gameMap.placeBigMouse(spawn.transform.localPosition, spawn.improvementDirection);
     }
 
 
     // Spawns a special game modifier mouse at a random spawner
-    private void spawnSpecialMouse()
+    private void spawnSpecialMouse(MapTile spawn)
     {
-        MapTile spawn = m_spawnTiles[m_rng.Next(m_spawnTiles.Count)];
         m_gameMap.placeSpecialMouse(spawn.transform.localPosition, spawn.improvementDirection);
     }
 
@@ -295,35 +292,40 @@ public class CompetitiveGame : IGameMode
     private void beginNormalSpawn()
     {
         // We always start with one cat? Might need a delayed entrance?
-        spawnCat();
+        spawnCat(m_spawnTiles[m_rng.Next(m_spawnTiles.Count)]);
 
         m_spawnFrequencyTimer = new Timer();
         m_spawnFrequencyTimer.timerUpdate += () => {
             // 1/18 chance 6 times per second for EV of 3 seconds, per spawner
-            if (m_rng.Next(18) < m_spawnTiles.Count)
+            for (int i = m_spawnTiles.Count - 1; i >= 0; --i)
             {
-                // 1 in 100 chance to spawn a 50 point or special mouse for now
-                if (m_rng.Next(100) == 0)
+                if (m_rng.Next(18) == 0)
                 {
-                    if (m_rng.Next(2) == 0)
+                    // 1 in 80 chance to spawn a 50 point or special mouse for now
+                    if (m_rng.Next(80) == 0)
                     {
-                        spawnBigMouse();
+                        Debug.Log(m_specialMouseCounter);
+                        if (m_specialMouseCounter == 0 && m_rng.Next(2) == 0)
+                        {
+                            spawnSpecialMouse(m_spawnTiles[i]);
+                            ++m_specialMouseCounter;
+                        }
+                        else
+                        {
+                            spawnBigMouse(m_spawnTiles[i]);
+                        }
                     }
                     else
                     {
-                        spawnSpecialMouse();
+                        spawnMouse(m_spawnTiles[i]);
                     }
-                }
-                else
-                {
-                    spawnMouse();
                 }
             }
 
             // We create a new cat whenever one dies while game is running
             if (m_catCounter == 0 && m_gameState.mainState == GameState.State.Started_Unpaused)
             {
-                spawnCat();
+                spawnCat(m_spawnTiles[m_rng.Next(m_spawnTiles.Count)]);
             }
         };
         m_spawnFrequencyTimer.startTimerWithUpdate((float)m_remainingTime, 0.1667f);
@@ -369,15 +371,21 @@ public class CompetitiveGame : IGameMode
 
         m_spawnFrequencyTimer = new Timer();
         m_spawnFrequencyTimer.timerUpdate += () => {
-            // How often do we spawn a mouse? For now, one per update.
-            // 1 in 100 chance to spawn a 50 point mouse for now
-            if (m_rng.Next(100) == 0)
+            for (int i = m_spawnTiles.Count - 1; i >= 0; --i)
             {
-                spawnBigMouse();
-            }
-            else
-            {
-                spawnMouse();
+                // How often do we spawn a mouse? For now, 1/2 chance per spawner
+                // 1 in 80 chance to spawn a 50 point mouse for now
+                if (m_rng.Next(2) == 0)
+                {
+                    if (m_rng.Next(80) == 0)
+                    {
+                        spawnBigMouse(m_spawnTiles[i]);
+                    }
+                    else
+                    {
+                        spawnMouse(m_spawnTiles[i]);
+                    }
+                }
             }
         };
         m_spawnFrequencyTimer.timerCompleted += () => {
@@ -475,4 +483,5 @@ public class CompetitiveGame : IGameMode
     private Player[] m_players = new Player[4];
     private int m_remainingTime;
     private int m_catCounter = 0;
+    private int m_specialMouseCounter = 0;
 }
