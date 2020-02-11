@@ -177,31 +177,36 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Removes a Mouse game object with transform "mouse"
-    // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
-    public void destroyMouse(Transform mouse)
+    // Removes a Gridmovement GameObject with transform "mover"
+    // GameController's destroyMover should be used instead for game logic processing, this just deletes the object
+    public void destroyMover(GridMovement mover)
     {
-        //mouse.gameObject.SetActive(false);
-        if (m_mainCamera.isAttached && mouse.GetComponentInChildren<Camera>())
+        //mover.gameObject.SetActive(false);
+        if (m_mainCamera.isAttached && mover.GetComponentInChildren<Camera>())
         {
             m_mainCamera.setCameraOrthographic();
             m_mainCamera.setCameraView(this);
         }
-        Destroy(mouse.gameObject);
+
+        Destroy(mover.gameObject);
     }
 
 
-    // Removes a Cat game object with transform "cat"
-    // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
-    public void destroyCat(Transform cat)
+    // Removes all cats and mice on the GameMap, without game logic processing
+    public void destroyAllMovers()
     {
-        //cat.gameObject.SetActive(false);
-        if (m_mainCamera.isAttached && cat.GetComponentInChildren<Camera>())
+        GridMovement[] movers = GetComponentsInChildren<GridMovement>();
+
+        if (m_mainCamera.isAttached)
         {
             m_mainCamera.setCameraOrthographic();
             m_mainCamera.setCameraView(this);
         }
-        Destroy(cat.gameObject);
+
+        for (int i = movers.Length; i > 0; --i)
+        {
+            Destroy(movers[i].gameObject);
+        }
     }
 
 
@@ -240,18 +245,7 @@ public class GameMap : MonoBehaviour
         // Removing walls will be handled at the same point in code where they are placed
 
         // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
-        GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>();
-        for (int i = 0; i < deadMeat.Length; ++i)
-        {
-            if (deadMeat[i] is Mouse)
-            {
-                destroyMouse(deadMeat[i].transform);
-            }
-            else if (deadMeat[i] is Cat)
-            {
-                destroyCat(deadMeat[i].transform);
-            }
-        }
+        destroyAllMovers();
 
         // Remove ping ring
         // If there is a nice way to find them all we might consider supporting multiple rings, but to be simple require one and use find for now

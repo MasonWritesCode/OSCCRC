@@ -330,14 +330,7 @@ public class Editor : MonoBehaviour {
                         GridMovement gm = m_movingObjects[selectedTile].GetComponent<GridMovement>();
                         if (gm)
                         {
-                            if (gm is Mouse)
-                            {
-                                m_gameMap.destroyMouse(m_movingObjects[selectedTile].transform);
-                            }
-                            else if (gm is Cat)
-                            {
-                                m_gameMap.destroyCat(m_movingObjects[selectedTile].transform);
-                            }
+                            m_gameMap.destroyMover(gm);
                         }
                     }
                     m_movingObjects.Remove(selectedTile);

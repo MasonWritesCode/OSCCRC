@@ -90,14 +90,7 @@ public class EditorGame : IGameMode
 
         if (m_paused || !m_playing)
         {
-            if (deadMeat is Cat)
-            {
-                m_gameMap.destroyCat(deadMeat.transform);
-            }
-            else if (deadMeat is Mouse)
-            {
-                m_gameMap.destroyMouse(deadMeat.transform);
-            }
+            m_gameMap.destroyMover(deadMeat);
             return;
         }
 
@@ -125,7 +118,7 @@ public class EditorGame : IGameMode
             else
             {
                 --m_currentMice;
-                m_gameMap.destroyMouse(deadMeat.transform);
+                m_gameMap.destroyMover(deadMeat);
                 if (m_currentMice <= 0)
                 {
                     AudioSource audioData = m_audioParent.Find("SuccessSound").GetComponent<AudioSource>();

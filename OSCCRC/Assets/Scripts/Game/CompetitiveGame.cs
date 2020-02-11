@@ -150,12 +150,8 @@ public class CompetitiveGame : IGameMode
                 m_players[owner].score = m_players[owner].score * 2 / 3;
             }
 
-            m_gameMap.destroyCat(deadMeat.transform);
-            // We create a new cat whenever one dies while game is running
-            if (m_gameState.mainState == GameState.State.Started_Unpaused)
-            {
-                spawnCat();
-            }
+            m_gameMap.destroyMover(deadMeat);
+            --m_catCounter;
         }
         else if (deadMeat is Mouse)
         {
@@ -185,7 +181,7 @@ public class CompetitiveGame : IGameMode
                 m_players[owner].score = Mathf.Min(newScore, 999);
             }
 
-            m_gameMap.destroyMouse(deadMeat.transform);
+            m_gameMap.destroyMover(deadMeat);
         }
     }
 
@@ -256,6 +252,8 @@ public class CompetitiveGame : IGameMode
             m_catSpawnTimer = null;
         };
         m_catSpawnTimer.startTimer(2.0f);
+
+        ++m_catCounter;
     }
 
 
@@ -318,6 +316,12 @@ public class CompetitiveGame : IGameMode
                 {
                     spawnMouse();
                 }
+            }
+
+            // We create a new cat whenever one dies while game is running
+            if (m_catCounter == 0 && m_gameState.mainState == GameState.State.Started_Unpaused)
+            {
+                spawnCat();
             }
         };
         m_spawnFrequencyTimer.startTimerWithUpdate((float)m_remainingTime, 0.1667f);
@@ -438,4 +442,5 @@ public class CompetitiveGame : IGameMode
     private List<MapTile> m_spawnTiles = new List<MapTile>();
     private Player[] m_players = new Player[4];
     private int m_remainingTime;
+    private int m_catCounter = 0;
 }
