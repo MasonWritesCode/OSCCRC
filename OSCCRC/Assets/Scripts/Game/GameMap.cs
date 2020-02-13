@@ -203,7 +203,7 @@ public class GameMap : MonoBehaviour
             m_mainCamera.setCameraView(this);
         }
 
-        for (int i = movers.Length; i > 0; --i)
+        for (int i = movers.Length - 1; i >= 0; --i)
         {
             Destroy(movers[i].gameObject);
         }
