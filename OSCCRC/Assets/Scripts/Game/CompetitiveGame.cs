@@ -17,7 +17,8 @@ public class CompetitiveGame : IGameMode
         m_display = modeUI;
 
         m_modifierFunctions = new ModifierFunction[] {
-            new ModifierFunction(beginMouseMania), null, null, null, new ModifierFunction(removePlacements), null, null, null
+            new ModifierFunction(beginMouseMania), null, new ModifierFunction(beginCatMania), null,
+            new ModifierFunction(removePlacements), null, null, null
         };
         Debug.Assert(m_modifierFunctions.Length == m_modifierText.Length);
     }
@@ -176,12 +177,16 @@ public class CompetitiveGame : IGameMode
 
                     if (deadMeat is SpecialMouse)
                     {
-                        --m_specialMouseCounter;
                         addRandomGameModifier();
                     }
                 }
 
                 m_players[owner].score = Mathf.Min(newScore, 999);
+            }
+
+            if (deadMeat is SpecialMouse)
+            {
+                --m_specialMouseCounter;
             }
 
             m_gameMap.destroyMover(deadMeat);
@@ -302,9 +307,9 @@ public class CompetitiveGame : IGameMode
                 if (m_rng.Next(18) == 0)
                 {
                     // 1 in 80 chance to spawn a 50 point or special mouse for now
-                    if (m_rng.Next(80) == 0)
+                    //if (m_rng.Next(80) == 0)
+                    if (m_rng.Next(2) == 0)
                     {
-                        Debug.Log(m_specialMouseCounter);
                         if (m_specialMouseCounter == 0 && m_rng.Next(2) == 0)
                         {
                             spawnSpecialMouse(m_spawnTiles[i]);
@@ -336,7 +341,7 @@ public class CompetitiveGame : IGameMode
     private void addRandomGameModifier()
     {
         // For now, we have only a subset of options
-        int[] availableEvents = { 0, 4 };
+        int[] availableEvents = { 0, 2, 4 };
         int modifierSelection = availableEvents[m_rng.Next(availableEvents.Length)];
         GameObject modifierDisplay = m_display.Find("Event Popup").gameObject;
 
@@ -390,6 +395,38 @@ public class CompetitiveGame : IGameMode
         };
         m_spawnFrequencyTimer.timerCompleted += () => {
             m_spawnFrequencyTimer.stopTimer();
+            beginNormalSpawn();
+        };
+        m_spawnFrequencyTimer.startTimerWithUpdate(Mathf.Min(10.0f, (float)m_remainingTime), 0.1667f);
+    }
+
+
+    // Cat Mania - multiple cats and no mice for some time
+    private void beginCatMania()
+    {
+        m_spawnFrequencyTimer.stopTimer();
+        m_gameMap.destroyAllMovers();
+
+        // We have a cat for each spawn tile
+        m_catCounter = 0;
+        for (int i = m_catCounter; i < m_spawnTiles.Count; ++i)
+        {
+            spawnCat(m_spawnTiles[i]);
+        }
+
+        // We spawn a cat each time one has been removed, on a random spawner
+        m_spawnFrequencyTimer = new Timer();
+        m_spawnFrequencyTimer.timerUpdate += () => {
+            while (m_catCounter < m_spawnTiles.Count)
+            {
+                spawnCat(m_spawnTiles[m_rng.Next(m_spawnTiles.Count)]);
+            }
+        };
+        m_spawnFrequencyTimer.timerCompleted += () => {
+            m_spawnFrequencyTimer.stopTimer();
+            m_gameMap.destroyAllMovers();
+            m_catCounter = 0;
+            m_specialMouseCounter = 0;
             beginNormalSpawn();
         };
         m_spawnFrequencyTimer.startTimerWithUpdate(Mathf.Min(10.0f, (float)m_remainingTime), 0.1667f);
