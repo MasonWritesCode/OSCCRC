@@ -7,18 +7,18 @@ using UnityEngine;
 //
 // Currently, each instance can only run a single timer at once. The timer does not repeat, it has to be invoked again to run again.
 // Basic functionality is to use startTimer(float timeInSeconds) on an instance to have that instance start its timer.
+// A repeating loop can be done by starting a timer with infinity as the duration with an update, and manually ending it with stopTimer when done.
 //
-// We could enhance this class with a shouldRepeat property for a true looping timer.
 
-public class Timer {
+public class Timer : System.IDisposable {
 
     public delegate void voidEvent();
     public event voidEvent timerCompleted;
     public event voidEvent timerUpdate;
 
 
-    // Whether the timer should use scaled time or not. Must be set before starting the timer. Defaults to true.
-    public bool isScaledTime { get { return m_isScaledTime; } set { m_isScaledTime = value; } }
+    // Whether the timer was set to use scaled time or not.
+    public bool isScaledTime { get { return m_isScaledTime; } }
 
     // Whether the timer is currently running. Is false if the timer is unstarted, paused,or stopped.
     public bool isRunning { get { return m_timerRunning; } }
@@ -27,17 +27,57 @@ public class Timer {
     public float remainingTime { get { return getRemainingTime(); } }
 
 
+    // useScaledTime specifies whether scaled time or real time is used
+    public Timer(bool useScaledTime = true)
+    {
+        m_isScaledTime = useScaledTime;
+    }
+
+
+    ~Timer()
+    {
+        Dispose(false);
+    }
+
+
     // Starts the timer with the specified duration
     public void startTimer(float durationInSeconds)
     {
-        initializeAndStartTimer(durationInSeconds, -1.0f);
+        startTimerWithUpdate(durationInSeconds, -1.0f);
     }
 
 
     // Starts the timer with the specified duration, with an update callback called after each update delay
     public void startTimerWithUpdate(float durationInSeconds, float updateInSeconds)
     {
-        initializeAndStartTimer(durationInSeconds, updateInSeconds);
+        if (m_timerRunning)
+        {
+            Debug.LogWarning("Attempted to start a timer that was already running");
+            return;
+        }
+
+        // The timer object can be destroyed on scene change (which we want so it stops the timer)
+        // So we have to make sure a new one is created in case it does, so check each timer start
+        if (m_timerObj == null)
+        {
+            m_timerObj = new GameObject("Timer").AddComponent<TimerComponent>();
+        }
+
+        m_coroutineStartTime = getCurrentTimeStamp();
+        m_prevUsedTime = 0.0f;
+        m_targetDuration = durationInSeconds;
+        m_updateDuration = updateInSeconds;
+
+        m_timerRunning = true;
+
+        if (updateInSeconds > 0.0f)
+        {
+            m_coroutineInstance = m_timerObj.StartCoroutine(runUpdateTimer(durationInSeconds, updateInSeconds));
+        }
+        else
+        {
+            m_coroutineInstance = m_timerObj.StartCoroutine(runTimer(durationInSeconds));
+        }
     }
 
 
@@ -81,6 +121,13 @@ public class Timer {
             m_timerObj.StopCoroutine(m_coroutineInstance);
             m_timerRunning = false;
         }
+    }
+
+
+    public void Dispose()
+    {
+        Dispose(true);
+        System.GC.SuppressFinalize(this);
     }
 
 
@@ -162,39 +209,6 @@ public class Timer {
     }
 
 
-    private void initializeAndStartTimer(float timerDuration, float updateDuration)
-    {
-        if (m_timerRunning)
-        {
-            Debug.LogWarning("Attempted to start a timer that was already running");
-            return;
-        }
-
-        // The timer object can be destroyed on scene change (which we want so it stops the timer)
-        // So we have to make sure a new one is created in case it does, so check each timer start
-        if (m_timerObj == null)
-        {
-            m_timerObj = new GameObject("Timer").AddComponent<TimerComponent>();
-        }
-
-        m_coroutineStartTime = getCurrentTimeStamp();
-        m_prevUsedTime = 0.0f;
-        m_targetDuration = timerDuration;
-        m_updateDuration = updateDuration;
-
-        m_timerRunning = true;
-
-        if (updateDuration > 0.0f)
-        {
-            m_coroutineInstance = m_timerObj.StartCoroutine(runUpdateTimer(timerDuration, updateDuration));
-        }
-        else
-        {
-            m_coroutineInstance = m_timerObj.StartCoroutine(runTimer(timerDuration));
-        }
-    }
-
-
     private float getRemainingTime()
     {
         if (!m_timerRunning)
@@ -212,16 +226,31 @@ public class Timer {
     }
 
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (m_disposed)
+        {
+            return;
+        }
+
+        stopTimer();
+
+        m_disposed = true;
+    }
+
+
     // We can't add a Monobehavior directly, so we create an empty wrapper
     private class TimerComponent : MonoBehaviour { }
 
     private static TimerComponent m_timerObj = null;
 
     private bool m_timerRunning = false;
-    private bool m_isScaledTime = true;
+    private bool m_isScaledTime;
     private float m_updateDuration;
     private float m_targetDuration = 0.0f;
     private float m_coroutineStartTime;
     private float m_prevUsedTime = 0.0f;
     private Coroutine m_coroutineInstance;
+
+    private bool m_disposed = false;
 }

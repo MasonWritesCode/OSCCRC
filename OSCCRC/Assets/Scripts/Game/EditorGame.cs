@@ -53,6 +53,11 @@ public class EditorGame : IGameMode
     public void endGame()
     {
         m_gameState.mainStateChange -= onStateChange;
+
+        if (m_timer != null)
+        {
+            m_timer.Dispose();
+        }
     }
 
 
@@ -134,6 +139,7 @@ public class EditorGame : IGameMode
             }
         }
     }
+
 
 
     private void onStateChange(GameState.State oldState, GameState.State newState)

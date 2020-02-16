@@ -87,7 +87,25 @@ public class CompetitiveGame : IGameMode
     // Ends a competitive game
     public void endGame()
     {
-        return;
+        if (m_catSpawnTimer != null)
+        {
+            m_catSpawnTimer.Dispose();
+        }
+        if (m_mouseSpawnTimer != null)
+        {
+            m_mouseSpawnTimer.Dispose();
+        }
+        if (m_spawnFrequencyTimer != null)
+        {
+            m_spawnFrequencyTimer.Dispose();
+        }
+        if (m_modifierTimer != null)
+        {
+            m_modifierTimer.Dispose();
+        }
+
+        m_gameTimer.Dispose();
+        m_startCountdown.Dispose();
     }
 
 
@@ -267,14 +285,7 @@ public class CompetitiveGame : IGameMode
     // Spawns a mouse at a random spawner
     private void spawnMouse(MapTile spawn)
     {
-        // We create a new timer to clear the lambda subscriber for now
-        m_mouseSpawnTimer = new Timer();
-
-        m_mouseSpawnTimer.timerCompleted += () => {
-            m_gameMap.placeMouse(spawn.transform.localPosition, spawn.improvementDirection);
-            m_mouseSpawnTimer = null;
-        };
-        m_mouseSpawnTimer.startTimer(2.0f);
+        m_gameMap.placeMouse(spawn.transform.localPosition, spawn.improvementDirection);
     }
 
 
@@ -351,14 +362,13 @@ public class CompetitiveGame : IGameMode
         PauseInstance pause = TimeManager.addTimePause();
 
         // TODO: We need to Pause unscaled timers on suspend state
-        m_modifierTimer = new Timer();
+        m_modifierTimer = new Timer(false);
         m_modifierTimer.timerCompleted += () => {
             modifierDisplay.SetActive(false);
             TimeManager.removeTimePause(pause);
 
             m_modifierFunctions[modifierSelection]();
         };
-        m_modifierTimer.isScaledTime = false;
         m_modifierTimer.startTimer(2.0f);
     }
 
@@ -445,11 +455,10 @@ public class CompetitiveGame : IGameMode
 
         // We give the player some time to re-make placements
         // TODO: We need to Pause unscaled timers on suspend state
-        m_modifierTimer = new Timer();
+        m_modifierTimer = new Timer(false);
         m_modifierTimer.timerCompleted += () => {
             TimeManager.removeTimePause(pause);
         };
-        m_modifierTimer.isScaledTime = false;
         m_modifierTimer.startTimer(4.0f);
     }
 
