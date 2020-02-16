@@ -57,6 +57,8 @@ public class CompetitiveGame : IGameMode
         }
 
         m_gameState.mainState = GameState.State.Started_Paused;
+        m_gameState.stateAdded += onTagStateAdd;
+        m_gameState.stateRemoved += onTagStateRemove;
 
         // Go ahead and set the time
         m_remainingTime = 181;
@@ -106,6 +108,9 @@ public class CompetitiveGame : IGameMode
 
         m_gameTimer.Dispose();
         m_startCountdown.Dispose();
+
+        m_gameState.stateAdded -= onTagStateAdd;
+        m_gameState.stateRemoved -= onTagStateRemove;
     }
 
 
@@ -319,7 +324,7 @@ public class CompetitiveGame : IGameMode
                 {
                     // 1 in 80 chance to spawn a 50 point or special mouse for now
                     //if (m_rng.Next(80) == 0)
-                    if (m_rng.Next(2) == 0)
+                    if (m_rng.Next(8) == 0)
                     {
                         if (m_specialMouseCounter == 0 && m_rng.Next(2) == 0)
                         {
@@ -361,7 +366,6 @@ public class CompetitiveGame : IGameMode
 
         PauseInstance pause = TimeManager.addTimePause();
 
-        // TODO: We need to Pause unscaled timers on suspend state
         m_modifierTimer = new Timer(false);
         m_modifierTimer.timerCompleted += () => {
             modifierDisplay.SetActive(false);
@@ -454,7 +458,6 @@ public class CompetitiveGame : IGameMode
         PauseInstance pause = TimeManager.addTimePause();
 
         // We give the player some time to re-make placements
-        // TODO: We need to Pause unscaled timers on suspend state
         m_modifierTimer = new Timer(false);
         m_modifierTimer.timerCompleted += () => {
             TimeManager.removeTimePause(pause);
@@ -502,6 +505,30 @@ public class CompetitiveGame : IGameMode
             completeMenu.Find("Text").GetComponent<Text>().text = m_players[victor].playerName + " wins!";
         }
         completeMenu.gameObject.SetActive(true);
+    }
+
+
+    private void onTagStateAdd(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            if (m_modifierTimer != null && m_modifierTimer.isRunning)
+            {
+                m_modifierTimer.pauseTimer();
+            }
+        }
+    }
+
+
+    private void onTagStateRemove(GameState.TagState state)
+    {
+        if (state == GameState.TagState.Suspended)
+        {
+            if (m_modifierTimer != null && !m_modifierTimer.isRunning)
+            {
+                m_modifierTimer.resumeTimer();
+            }
+        }
     }
 
 
