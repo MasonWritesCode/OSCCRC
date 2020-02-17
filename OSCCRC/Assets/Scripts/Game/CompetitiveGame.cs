@@ -8,6 +8,7 @@ using UnityEngine.UI;
 // This mode requires being passed its related UI transform.
 
 // TODO: Limit on number of spawned mice
+// TODO: Modifier removes previous, i.e. Place Arrows Again will end a Slow Down
 
 public class CompetitiveGame : IGameMode
 {
@@ -18,7 +19,7 @@ public class CompetitiveGame : IGameMode
 
         m_modifierFunctions = new ModifierFunction[] {
             new ModifierFunction(beginMouseMania), null, new ModifierFunction(beginCatMania), null,
-            new ModifierFunction(removePlacements), null, null, null
+            new ModifierFunction(removePlacements), null, null, new ModifierFunction(beginSlowMode)
         };
         Debug.Assert(m_modifierFunctions.Length == m_modifierText.Length);
     }
@@ -357,7 +358,7 @@ public class CompetitiveGame : IGameMode
     private void addRandomGameModifier()
     {
         // For now, we have only a subset of options
-        int[] availableEvents = { 0, 2, 4 };
+        int[] availableEvents = { 0, 2, 4, 7 };
         int modifierSelection = availableEvents[m_rng.Next(availableEvents.Length)];
         GameObject modifierDisplay = m_display.Find("Event Popup").gameObject;
 
@@ -463,6 +464,19 @@ public class CompetitiveGame : IGameMode
             TimeManager.removeTimePause(pause);
         };
         m_modifierTimer.startTimer(4.0f);
+    }
+
+
+    // Slow Down - Grid movers move more slowly
+    private void beginSlowMode()
+    {
+        GridMovement.speedMultiplier = 0.5f;
+
+        m_modifierTimer = new Timer(false);
+        m_modifierTimer.timerCompleted += () => {
+            GridMovement.speedMultiplier = 1.0f;
+        };
+        m_modifierTimer.startTimer(10.0f);
     }
 
 
