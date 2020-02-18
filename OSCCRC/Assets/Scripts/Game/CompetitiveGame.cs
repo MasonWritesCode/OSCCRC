@@ -386,8 +386,11 @@ public class CompetitiveGame : IGameMode
         // Remove the normal-spawn cat
         // There is no gamemap function for removing all cats, so just search the map
         Cat cat = m_gameMap.GetComponentInChildren<Cat>();
-        m_gameMap.destroyMover(cat);
-        m_catCounter = 0;
+        if (cat != null)
+        {
+            m_gameMap.destroyMover(cat);
+            m_catCounter = 0;
+        }
 
         m_spawnFrequencyTimer = new Timer();
         m_spawnFrequencyTimer.timerUpdate += () => {
@@ -526,7 +529,7 @@ public class CompetitiveGame : IGameMode
     {
         if (state == GameState.TagState.Suspended)
         {
-            if (m_modifierTimer != null && m_modifierTimer.isRunning)
+            if (m_modifierTimer != null && m_modifierTimer.isStarted && m_modifierTimer.isPaused)
             {
                 m_modifierTimer.pauseTimer();
             }
@@ -538,7 +541,7 @@ public class CompetitiveGame : IGameMode
     {
         if (state == GameState.TagState.Suspended)
         {
-            if (m_modifierTimer != null && !m_modifierTimer.isRunning)
+            if (m_modifierTimer != null && m_modifierTimer.isStarted && !m_modifierTimer.isPaused)
             {
                 m_modifierTimer.resumeTimer();
             }

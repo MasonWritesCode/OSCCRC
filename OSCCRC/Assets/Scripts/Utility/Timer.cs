@@ -20,8 +20,11 @@ public class Timer : System.IDisposable {
     // Whether the timer was set to use scaled time or not.
     public bool isScaledTime { get { return m_isScaledTime; } }
 
-    // Whether the timer is currently running. Is false if the timer is unstarted, paused,or stopped.
-    public bool isRunning { get { return m_timerRunning; } }
+    // Whether the timer has been started. False if the timer is unstarted or stopped.
+    public bool isStarted { get { return m_timerStarted; } }
+
+    // Whether the timer is currently started, but paused.
+    public bool isPaused { get { return m_timerPaused; } }
 
     // The remaining time on the timer. Returns 0.0 if the timer is not running.
     public float remainingTime { get { return getRemainingTime(); } }
@@ -50,9 +53,9 @@ public class Timer : System.IDisposable {
     // Starts the timer with the specified duration, with an update callback called after each update delay
     public void startTimerWithUpdate(float durationInSeconds, float updateInSeconds)
     {
-        if (m_timerRunning)
+        if (m_timerStarted)
         {
-            Debug.LogWarning("Attempted to start a timer that was already running");
+            Debug.LogWarning("Attempted to start a Timer that was already started.");
             return;
         }
 
@@ -68,7 +71,8 @@ public class Timer : System.IDisposable {
         m_targetDuration = durationInSeconds;
         m_updateDuration = updateInSeconds;
 
-        m_timerRunning = true;
+        m_timerStarted = true;
+        m_timerPaused = false;
 
         if (updateInSeconds > 0.0f)
         {
@@ -84,14 +88,14 @@ public class Timer : System.IDisposable {
     // Pauses a started timer
     public void pauseTimer()
     {
-        if (!m_timerRunning)
+        if (m_timerPaused || !m_timerStarted)
         {
-            Debug.LogWarning("Attempted to pause a stopped timer");
+            Debug.LogWarning("Attempted to pause a paused or stopped Timer.");
             return;
         }
 
         m_timerObj.StopCoroutine(m_coroutineInstance);
-        m_timerRunning = false;
+        m_timerPaused = true;
         m_prevUsedTime = getCurrentTimeStamp() - m_coroutineStartTime;
     }
 
@@ -99,7 +103,13 @@ public class Timer : System.IDisposable {
     // Resumes a paused timer
     public void resumeTimer()
     {
-        m_timerRunning = true;
+        if (!m_timerStarted)
+        {
+            Debug.LogWarning("Attempted to resume an unstarted/stopped Timer.");
+            return;
+        }
+
+        m_timerPaused = false;
 
         m_coroutineStartTime = getCurrentTimeStamp();
         if (m_updateDuration > 0.0f)
@@ -116,10 +126,11 @@ public class Timer : System.IDisposable {
     // Stops the timer if it is started
     public void stopTimer()
     {
-        if (m_timerRunning)
+        if (m_timerStarted)
         {
             m_timerObj.StopCoroutine(m_coroutineInstance);
-            m_timerRunning = false;
+            m_timerPaused = false;
+            m_timerStarted = false;
         }
     }
 
@@ -151,7 +162,7 @@ public class Timer : System.IDisposable {
             }
         }
 
-        m_timerRunning = false;
+        m_timerStarted = false;
         if (timerCompleted != null)
         {
             timerCompleted();
@@ -201,7 +212,7 @@ public class Timer : System.IDisposable {
             }
         }
 
-        m_timerRunning = false;
+        m_timerStarted = false;
         if (timerCompleted != null)
         {
             timerCompleted();
@@ -211,7 +222,7 @@ public class Timer : System.IDisposable {
 
     private float getRemainingTime()
     {
-        if (!m_timerRunning)
+        if (!m_timerStarted)
         {
             return 0.0f;
         }
@@ -244,7 +255,8 @@ public class Timer : System.IDisposable {
 
     private static TimerComponent m_timerObj = null;
 
-    private bool m_timerRunning = false;
+    private bool m_timerPaused = false;
+    private bool m_timerStarted = false;
     private bool m_isScaledTime;
     private float m_updateDuration;
     private float m_targetDuration = 0.0f;
