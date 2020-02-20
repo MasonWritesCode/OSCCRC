@@ -19,7 +19,7 @@ public class CompetitiveGame : IGameMode
 
         m_modifierFunctions = new ModifierFunction[] {
             new ModifierFunction(beginMouseMania), null, new ModifierFunction(beginCatMania), null,
-            new ModifierFunction(removePlacements), null, null, new ModifierFunction(beginSlowMode)
+            new ModifierFunction(removePlacements), null, new ModifierFunction(beginFastMode), new ModifierFunction(beginSlowMode)
         };
         Debug.Assert(m_modifierFunctions.Length == m_modifierText.Length);
     }
@@ -324,8 +324,7 @@ public class CompetitiveGame : IGameMode
                 if (m_rng.Next(18) == 0)
                 {
                     // 1 in 80 chance to spawn a 50 point or special mouse for now
-                    //if (m_rng.Next(80) == 0)
-                    if (m_rng.Next(8) == 0)
+                    if (m_rng.Next(80) == 0)
                     {
                         if (m_specialMouseCounter == 0 && m_rng.Next(2) == 0)
                         {
@@ -358,7 +357,7 @@ public class CompetitiveGame : IGameMode
     private void addRandomGameModifier()
     {
         // For now, we have only a subset of options
-        int[] availableEvents = { 0, 2, 4, 7 };
+        int[] availableEvents = { 0, 2, 4, 6, 7 };
         int modifierSelection = availableEvents[m_rng.Next(availableEvents.Length)];
         GameObject modifierDisplay = m_display.Find("Event Popup").gameObject;
 
@@ -474,6 +473,19 @@ public class CompetitiveGame : IGameMode
     private void beginSlowMode()
     {
         GridMovement.speedMultiplier = 0.5f;
+
+        m_modifierTimer = new Timer(false);
+        m_modifierTimer.timerCompleted += () => {
+            GridMovement.speedMultiplier = 1.0f;
+        };
+        m_modifierTimer.startTimer(10.0f);
+    }
+
+
+    // Speed Up - Grid movers move more quickly
+    private void beginFastMode()
+    {
+        GridMovement.speedMultiplier = 2.0f;
 
         m_modifierTimer = new Timer(false);
         m_modifierTimer.timerCompleted += () => {
