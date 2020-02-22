@@ -68,7 +68,7 @@ public class Menu_Panel : MonoBehaviour {
         int myHeight = 26;
         int myWidth = 560;
         int m_XAxis = 0;
-        int m_YAxis = 160 - ((myHeight + 5) * place);
+        int m_YAxis = 145 - ((myHeight + 10) * place);
 
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, myHeight);
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, myWidth);
@@ -131,7 +131,7 @@ public class Menu_Panel : MonoBehaviour {
     }
 
 
-    private const int m_numEntries = 10; // Number of entries displayed at any given time
+    private const int m_numEntries = 8; // Number of entries displayed at any given time
     private int m_pageNum = 0;
     private int m_startIndex = 0;
     private Folder m_folder = Folder.Unset;
