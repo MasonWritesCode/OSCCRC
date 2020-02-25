@@ -17,7 +17,7 @@ public class Menu_AudioSettings : MonoBehaviour
     public Toggle backgroundMuted;  // Editor Set
 
 
-    // Updates UI to currently applies settings
+    // Updates UI to currently applied settings
     public void read()
     {
         float curVolume;

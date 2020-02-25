@@ -11,6 +11,7 @@ public class Menu_DisplaySettings : MonoBehaviour
     public Toggle vsyncSelect;         // Editor Set
 
 
+    // Updates UI to currently applied settings
     public void read()
     {
         Resolution currentRes = Screen.currentResolution;
@@ -49,6 +50,7 @@ public class Menu_DisplaySettings : MonoBehaviour
     }
 
 
+    // Applies user input settings
     public void apply()
     {
         // It is probably safe to assume our dropdown and Screen.resolutions will not change and will match indecies
