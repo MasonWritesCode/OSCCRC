@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class Menu_ApplySettings : MonoBehaviour, IPointerClickHandler
 {
     public Menu_AudioSettings audioSettings; // Editor Set
+    public Menu_DisplaySettings displaySettings; // Editor Set
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +22,10 @@ public class Menu_ApplySettings : MonoBehaviour, IPointerClickHandler
             if (audioSettings.isActiveAndEnabled)
             {
                 audioSettings.apply();
+            }
+            if (displaySettings.isActiveAndEnabled)
+            {
+                displaySettings.apply();
             }
         }
     }
