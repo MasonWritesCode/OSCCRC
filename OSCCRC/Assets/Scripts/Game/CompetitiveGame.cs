@@ -323,8 +323,8 @@ public class CompetitiveGame : IGameMode
             {
                 if (m_rng.Next(18) == 0)
                 {
-                    // 1 in 80 chance to spawn a 50 point or special mouse for now
-                    if (m_rng.Next(80) == 0)
+                    // 1 in 50 chance to spawn a 50 point or special mouse for now
+                    if (m_rng.Next(50) == 0)
                     {
                         if (m_specialMouseCounter == 0 && m_rng.Next(2) == 0)
                         {
@@ -396,10 +396,10 @@ public class CompetitiveGame : IGameMode
             for (int i = m_spawnTiles.Count - 1; i >= 0; --i)
             {
                 // How often do we spawn a mouse? For now, 1/2 chance per spawner
-                // 1 in 80 chance to spawn a 50 point mouse for now
+                // 1 in 50 chance to spawn a 50 point mouse for now
                 if (m_rng.Next(2) == 0)
                 {
-                    if (m_rng.Next(80) == 0)
+                    if (m_rng.Next(50) == 0)
                     {
                         spawnBigMouse(m_spawnTiles[i]);
                     }
