@@ -185,7 +185,7 @@ MonoBehaviour:
   playerID: 3
   cursor: {fileID: 1689759560}
   highlighter: {fileID: 1638084543}
-  pauseDisplay: {fileID: 1519803097}
+  pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
   stickSensitivity: 0.1
 --- !u!114 &1278169
@@ -1377,7 +1377,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &292187556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1407,7 +1407,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 292187555}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -1950,7 +1950,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &473156097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1997,7 +1997,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 473156096}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -3541,7 +3541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioData: {fileID: 1351209075}
-  pauseDisplay: {fileID: 1519803097}
+  pauseDisplay: {fileID: 1519803094}
 --- !u!1 &903401643
 GameObject:
   m_ObjectHideFlags: 0
@@ -6412,7 +6412,7 @@ MonoBehaviour:
   playerID: 1
   cursor: {fileID: 82157076}
   highlighter: {fileID: 483816935}
-  pauseDisplay: {fileID: 1519803097}
+  pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
   stickSensitivity: 0.1
 --- !u!114 &1470011353
@@ -6622,7 +6622,7 @@ MonoBehaviour:
   playerID: 2
   cursor: {fileID: 1572422977}
   highlighter: {fileID: 298173076}
-  pauseDisplay: {fileID: 1519803097}
+  pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
   stickSensitivity: 0.1
 --- !u!114 &1509620761
@@ -6674,7 +6674,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1519803095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6721,7 +6721,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1519803094}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -6878,7 +6878,7 @@ MonoBehaviour:
   playerID: 0
   cursor: {fileID: 117555090}
   highlighter: {fileID: 1406404670}
-  pauseDisplay: {fileID: 1519803097}
+  pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
   stickSensitivity: 0.1
 --- !u!114 &1579695486
@@ -6945,7 +6945,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1583046053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6992,7 +6992,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1583046052}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}

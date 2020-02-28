@@ -48,7 +48,7 @@ public class CompetitiveGame : IGameMode
             Debug.LogWarning("No spawn tiles found. Competitive mode opened on non-competitive map");
         }
 
-        m_display.GetComponent<Canvas>().enabled = true;
+        m_display.gameObject.SetActive(true);
         m_timerText = m_display.Find("Timer").GetComponentInChildren<Text>();
 
         for (int i = 0; i < m_players.Length; ++i)

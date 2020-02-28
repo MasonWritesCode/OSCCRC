@@ -6,11 +6,11 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour {
 
     [Range(0, 3)] public int playerID;
-    public RectTransform cursor;   // Editor set
-    public Transform highlighter;  // Editor set
-    public Canvas pauseDisplay;    // Editor set
-    public Canvas fpsDisplay;      // Editor set
-    public float stickSensitivity; // Editor set
+    public RectTransform cursor;    // Editor set
+    public Transform highlighter;   // Editor set
+    public GameObject pauseDisplay; // Editor set
+    public Canvas fpsDisplay;       // Editor set
+    public float stickSensitivity;  // Editor set
     public MapTile currentTile { get { return m_currentTile; } }
 
 
@@ -142,14 +142,14 @@ public class PlayerController : MonoBehaviour {
 
         if (inputActions["Menu"].triggered)
         {
-            if (!pauseDisplay.enabled)
+            if (!pauseDisplay.activeSelf)
             {
-                pauseDisplay.enabled = true;
+                pauseDisplay.SetActive(true);
                 m_gameController.gameState.addState(GameState.TagState.Suspended);
             }
             else
             {
-                pauseDisplay.enabled = false;
+                pauseDisplay.SetActive(false);
                 // Currently the Menu input is the only one that can suspend the game.
                 // If this changes, we will need to make sure that we account for all toggles to suspend.
                 m_gameController.gameState.removeState(GameState.TagState.Suspended);

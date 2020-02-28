@@ -31,7 +31,7 @@ public class EditorGame : IGameMode
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
-        m_display.GetComponent<Canvas>().enabled = true;
+        m_display.gameObject.SetActive(true);
 
         return;
     }
