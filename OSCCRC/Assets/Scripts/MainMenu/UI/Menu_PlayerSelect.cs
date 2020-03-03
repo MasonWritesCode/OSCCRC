@@ -10,7 +10,7 @@ public class Menu_PlayerSelect : MonoBehaviour
     void Start()
     {
         m_selector = GetComponent<Dropdown>();
-        GlobalData.isHumanPlayer[Player_Index] = m_selector.value == 0;
+        m_selector.value = GlobalData.isHumanPlayer[Player_Index] ? 0 : 1;
 
         m_selector.onValueChanged.AddListener(delegate {
             OnDropdownValueChange();
