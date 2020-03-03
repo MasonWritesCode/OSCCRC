@@ -14,7 +14,8 @@ public class PlayerController : MonoBehaviour {
     public MapTile currentTile { get { return m_currentTile; } }
 
 
-	void Start () {
+    void Start()
+    {
         m_playerInput = GetComponent<PlayerInput>();
         m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
@@ -45,18 +46,15 @@ public class PlayerController : MonoBehaviour {
 
         if (m_isGamepad)
         {
-            m_cursorPos = Vector3.zero;
-            cursor.position = m_mainCamera.WorldToScreenPoint(m_cursorPos);
+            cursor.position = m_mainCamera.WorldToScreenPoint(Vector3.zero);
         }
         else
         {
-            Vector2 mousePosition = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
-            m_cursorPos = m_mainCamera.ScreenToWorldPoint(mousePosition);
-            cursor.position = mousePosition;
+            cursor.position = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
         }
 
         // We want to immediately update the highlighter position
-        selectTile();
+        selectTile(m_mainCamera.ScreenToWorldPoint(cursor.position));
     }
 
 
@@ -64,7 +62,8 @@ public class PlayerController : MonoBehaviour {
     // In addition, even Pass Through doesn't generate events on sticks being actuated but only changed, which prevents us from having an event-only approach to cursor movement.
     // TODO: Make every action call a function to make the code cleaner, possibly moving rare inputs like menu to event-based.
     // TODO: Consider a mapping of InputAction to enum to avoid string lookup cost.
-	void Update () {
+    void Update()
+    {
         // We ignore game input while an input field is focused
         if (m_gameController.gameState.hasState(GameState.TagState.InputFocused))
         {
@@ -74,22 +73,25 @@ public class PlayerController : MonoBehaviour {
         InputActionAsset inputActions = m_playerInput.actions;
         if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
         {
-            if ( inputActions["CursorMovement"].triggered || ( m_isGamepad && (m_gamepad.leftStick.IsActuated() || m_gamepad.rightStick.IsActuated()) ) )
+            if (inputActions["CursorMovement"].triggered || (m_isGamepad && (m_gamepad.leftStick.IsActuated() || m_gamepad.rightStick.IsActuated())))
             {
+                Vector3 newCursorPos;
                 if (m_isGamepad)
                 {
                     Vector2 inputVec = m_gamepad.leftStick.ReadValue() * stickSensitivity;
-                    m_cursorPos += new Vector3(inputVec[0], 0.0f, inputVec[1]);
-                    cursor.position = m_mainCamera.WorldToScreenPoint(m_cursorPos);
+                    newCursorPos = cursor.position + (new Vector3(inputVec[0], inputVec[1], 0.0f));
                 }
                 else
                 {
-                    Vector2 mousePosition = m_mouse.position.ReadValue();
-                    m_cursorPos = m_mainCamera.ScreenToWorldPoint(mousePosition);
-                    cursor.position = mousePosition;
+                    newCursorPos = m_mouse.position.ReadValue();
                 }
 
-                selectTile();
+                // Make sure to clamp cursor position to screen edge so the player doesn't lose their cursor
+                newCursorPos.x = Mathf.Clamp(newCursorPos.x, 0, Screen.width - 1.0f);
+                newCursorPos.y = Mathf.Clamp(newCursorPos.y, 0, Screen.height - 1.0f);
+                cursor.position = newCursorPos;
+
+                selectTile(m_mainCamera.ScreenToWorldPoint(newCursorPos));
             }
 
             if (inputActions["DirectionalPlacement"].triggered)
@@ -207,25 +209,30 @@ public class PlayerController : MonoBehaviour {
 
 
     // Updates the current tile and positions the highlighter accordingly
-    private void selectTile()
+    private void selectTile(Vector3 position)
     {
-        m_currentTile = m_gameMap.tileAt(m_gameMap.transform.InverseTransformPoint(m_cursorPos));
+        MapTile newTile = m_gameMap.tileAt(m_gameMap.transform.InverseTransformPoint(position));
 
-        // Move tile highlighter to the mouse position
-        if (m_currentTile == null)
+        if (m_currentTile != newTile)
         {
-            if (highlighter.gameObject.activeSelf)
+            m_currentTile = newTile;
+
+            // Move tile highlighter to the mouse position
+            if (m_currentTile == null)
             {
-                highlighter.gameObject.SetActive(false);
+                if (highlighter.gameObject.activeSelf)
+                {
+                    highlighter.gameObject.SetActive(false);
+                }
             }
-        }
-        else
-        {
-            if (!highlighter.gameObject.activeSelf)
+            else
             {
-                highlighter.gameObject.SetActive(true);
+                if (!highlighter.gameObject.activeSelf)
+                {
+                    highlighter.gameObject.SetActive(true);
+                }
+                highlighter.position = m_currentTile.transform.position + Vector3.up * 2;
             }
-            highlighter.position = m_currentTile.transform.position + Vector3.up * 2;
         }
     }
 
@@ -291,5 +298,4 @@ public class PlayerController : MonoBehaviour {
     private FramerateDisplay m_fpsScript;
     private Camera m_mainCamera;
     private MapTile m_currentTile = null;
-    private Vector3 m_cursorPos;
 }

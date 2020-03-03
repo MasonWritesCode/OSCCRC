@@ -187,7 +187,7 @@ MonoBehaviour:
   highlighter: {fileID: 1638084543}
   pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
-  stickSensitivity: 0.1
+  stickSensitivity: 10
 --- !u!114 &1278169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6434,7 +6434,7 @@ MonoBehaviour:
   highlighter: {fileID: 483816935}
   pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
-  stickSensitivity: 0.1
+  stickSensitivity: 10
 --- !u!114 &1470011353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6644,7 +6644,7 @@ MonoBehaviour:
   highlighter: {fileID: 298173076}
   pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
-  stickSensitivity: 0.1
+  stickSensitivity: 10
 --- !u!114 &1509620761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6900,7 +6900,7 @@ MonoBehaviour:
   highlighter: {fileID: 1406404670}
   pauseDisplay: {fileID: 1519803094}
   fpsDisplay: {fileID: 996980960}
-  stickSensitivity: 0.1
+  stickSensitivity: 10
 --- !u!114 &1579695486
 MonoBehaviour:
   m_ObjectHideFlags: 0
