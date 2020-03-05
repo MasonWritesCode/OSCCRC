@@ -26,7 +26,7 @@ public class Editor : MonoBehaviour {
         m_selectedImprovement = MapTile.TileImprovement.None;
         m_placeholderObject = Instantiate(m_gameResources.objects["Placeholder"], m_gameMap.transform);
         disablePlaceholder();
-        m_direction = Directions.Direction.East;
+        m_direction = Directions.Direction.North;
         m_positionOffset = Vector3.zero;
 
         m_gameControl.gameState.mainStateChange += onStateChange;

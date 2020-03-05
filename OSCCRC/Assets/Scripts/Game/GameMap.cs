@@ -15,9 +15,10 @@ public class GameMap : MonoBehaviour
     public int mapWidth { get { return m_mapWidth; } }
     public float tileSize { get { return m_tileSize; } }
 
-    public Transform ringPrefab;
-    public Transform blinkPrefab;
-    public Transform floorPrefab;
+    public Transform ringPrefab;  // Editor Set
+    public Transform blinkPrefab; // Editor Set
+    // TODO: Isn't this supposed to be in resources?
+    public Transform floorPrefab; // Editor Set
 
 
     void Awake()
@@ -182,7 +183,7 @@ public class GameMap : MonoBehaviour
     public void destroyMover(GridMovement mover)
     {
         //mover.gameObject.SetActive(false);
-        if (m_mainCamera.isAttached && mover.GetComponentInChildren<Camera>())
+        if (m_mainCamera != null && m_mainCamera.isAttached && mover.GetComponentInChildren<Camera>())
         {
             m_mainCamera.setCameraOrthographic();
             m_mainCamera.setCameraView(this);
@@ -197,7 +198,7 @@ public class GameMap : MonoBehaviour
     {
         GridMovement[] movers = GetComponentsInChildren<GridMovement>();
 
-        if (m_mainCamera.isAttached)
+        if (m_mainCamera != null && m_mainCamera.isAttached)
         {
             m_mainCamera.setCameraOrthographic();
             m_mainCamera.setCameraView(this);
@@ -523,7 +524,10 @@ public class GameMap : MonoBehaviour
         bigTileRend.material = m_gameResources.materials["TileTiledColor"];
         bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
 
-        m_mainCamera.setCameraView(this);
+        if (m_mainCamera != null)
+        {
+            m_mainCamera.setCameraView(this);
+        }
     }
 
 
@@ -534,5 +538,5 @@ public class GameMap : MonoBehaviour
     private Transform m_floor = null;
     private Transform m_transform;
     private GameResources m_gameResources;
-    private CameraController m_mainCamera;
+    private CameraController m_mainCamera = null;
 }
