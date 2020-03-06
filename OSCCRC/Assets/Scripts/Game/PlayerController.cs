@@ -2,6 +2,7 @@
 using UnityEngine.InputSystem;
 
 // This class allows for player input and handles player interaction with the game (but currently not the editor).
+// TODO: I think I incorrectly understood device.current before, and that it is actually player specific and we can use it instead of iterating over user devices
 
 public class PlayerController : MonoBehaviour {
 
@@ -24,6 +25,14 @@ public class PlayerController : MonoBehaviour {
         cursor.gameObject.SetActive(true);
 
         m_playerInput.onControlsChanged += ctx => OnControlsChanged();
+        m_playerInput.actions["DirectionalPlacement"].performed   += ctx => onDirectionalPlacement(ctx);
+        m_playerInput.actions["Pause"].performed                  += ctx => onPause();
+        m_playerInput.actions["Reset"].performed                  += ctx => onReset();
+        m_playerInput.actions["Menu"].performed                   += ctx => onMenu();
+        m_playerInput.actions["FramerateDisplayToggle"].performed += ctx => onFramerateDisplayToggle();
+        m_playerInput.actions["SpeedToggle"].performed            += ctx => onSpeedToggle();
+        m_playerInput.actions["MoonwalkToggle"].performed         += ctx => onMoonwalkToggle();
+        m_playerInput.actions["FirstPersonToggle"].performed      += ctx => onFirstPersonToggle();
 
         using (var devicelist = m_playerInput.user.controlSchemeMatch.devices)
         {
@@ -58,10 +67,8 @@ public class PlayerController : MonoBehaviour {
     }
 
 
-    // We prefer to poll for input in Update since events generate garbage, which is a performance concern that matters with frequent events like CursorMovement.
+    // We prefer to poll sometimes for input in Update since events generate garbage, which is a performance concern that matters with frequent events like CursorMovement.
     // In addition, even Pass Through doesn't generate events on sticks being actuated but only changed, which prevents us from having an event-only approach to cursor movement.
-    // TODO: Make every action call a function to make the code cleaner, possibly moving rare inputs like menu to event-based.
-    // TODO: Consider a mapping of InputAction to enum to avoid string lookup cost.
     void Update()
     {
         // We ignore game input while an input field is focused
@@ -73,7 +80,9 @@ public class PlayerController : MonoBehaviour {
         InputActionAsset inputActions = m_playerInput.actions;
         if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
         {
-            if (inputActions["CursorMovement"].triggered || (m_isGamepad && (m_gamepad.leftStick.IsActuated() || m_gamepad.rightStick.IsActuated())))
+            // Mouse Movement is very expensive in the new input system, but polling mouse.delta directly doesn't alleviate the issue
+            //   because the system seems to call expensive notify functions even if the CursorMovement action is removed. So sticking with the action map for now.
+            if (inputActions["CursorMovement"].triggered || ( m_isGamepad && m_gamepad.leftStick.IsActuated() ))
             {
                 Vector3 newCursorPos;
                 if (m_isGamepad)
@@ -93,118 +102,137 @@ public class PlayerController : MonoBehaviour {
 
                 selectTile(m_mainCamera.ScreenToWorldPoint(newCursorPos));
             }
+        }
+    }
 
-            if (inputActions["DirectionalPlacement"].triggered)
+
+    // The player makes a directional tile placement request
+    private void onDirectionalPlacement(InputAction.CallbackContext context)
+    {
+        if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
+        {
+            if (m_currentTile != null)
             {
-                if (m_currentTile != null)
-                {
-                    Vector2 placementDirVec = inputActions["DirectionalPlacement"].ReadValue<Vector2>();
+                Vector2 placementDirVec = context.ReadValue<Vector2>();
 
-                    if (placementDirVec == Vector2.up)
-                    {
-                        m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North, playerID);
-                    }
-                    else if (placementDirVec == Vector2.right)
-                    {
-                        m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East, playerID);
-                    }
-                    else if (placementDirVec == Vector2.down)
-                    {
-                        m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South, playerID);
-                    }
-                    else if (placementDirVec == Vector2.left)
-                    {
-                        m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West, playerID);
-                    }
+                if (placementDirVec == Vector2.up)
+                {
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.North, playerID);
+                }
+                else if (placementDirVec == Vector2.right)
+                {
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.East, playerID);
+                }
+                else if (placementDirVec == Vector2.down)
+                {
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.South, playerID);
+                }
+                else if (placementDirVec == Vector2.left)
+                {
+                    m_gameController.requestPlacement(m_currentTile, MapTile.TileImprovement.Direction, Directions.Direction.West, playerID);
                 }
             }
-
-            // "Pause" input does not suspend the game in the traditional sense of pause, but toggles the puzzle-placement state
-            if (inputActions["Pause"].triggered)
-            {
-                if (m_gameController.mode != GameController.GameMode.Competitive)
-                {
-                    if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused || m_gameController.gameState.mainState == GameState.State.Ended_Failure)
-                    {
-                        m_gameController.gameState.mainState = GameState.State.Started_Paused;
-                    }
-                    else if (m_gameController.gameState.mainState == GameState.State.Started_Paused)
-                    {
-                        m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
-                    }
-                }
-            }
-
-            // Reset to clear all placements. This will simply reload the map and re-initialize the game mode for now.
-            if (inputActions["Reset"].triggered)
-            {
-                m_gameController.resetGame();
-            }
         }
+    }
 
-        if (inputActions["Menu"].triggered)
-        {
-            if (!pauseDisplay.activeSelf)
-            {
-                pauseDisplay.SetActive(true);
-                m_gameController.gameState.addState(GameState.TagState.Suspended);
-            }
-            else
-            {
-                pauseDisplay.SetActive(false);
-                // Currently the Menu input is the only one that can suspend the game.
-                // If this changes, we will need to make sure that we account for all toggles to suspend.
-                m_gameController.gameState.removeState(GameState.TagState.Suspended);
-            }
-        }
 
-        // Toggle framerate display between Basic, Advanced, and Off
-        if (inputActions["FramerateDisplayToggle"].triggered)
-        {
-            if (!m_fpsScript.enabled)
-            {
-                fpsDisplay.enabled = true;
-                m_fpsScript.enabled = true;
-                m_fpsScript.isAdvanced = false;
-            }
-            else if (!m_fpsScript.isAdvanced)
-            {
-                m_fpsScript.isAdvanced = true;
-            }
-            else
-            {
-                m_fpsScript.enabled = false;
-                fpsDisplay.enabled = false;
-            }
-        }
-
-        // For now, we use a button press to toggle double movement speed
-        if (inputActions["SpeedToggle"].triggered)
+    // "Pause" input does not suspend the game in the traditional sense of pause, but toggles the puzzle-placement state
+    private void onPause()
+    {
+        if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
         {
             if (m_gameController.mode != GameController.GameMode.Competitive)
             {
-                if (GridMovement.speedMultiplier > 1.0f)
+                if (m_gameController.gameState.mainState == GameState.State.Started_Unpaused || m_gameController.gameState.mainState == GameState.State.Ended_Failure)
                 {
-                    GridMovement.speedMultiplier = 1.0f;
+                    m_gameController.gameState.mainState = GameState.State.Started_Paused;
                 }
-                else
+                else if (m_gameController.gameState.mainState == GameState.State.Started_Paused)
                 {
-                    GridMovement.speedMultiplier = 2.0f;
+                    m_gameController.gameState.mainState = GameState.State.Started_Unpaused;
                 }
             }
         }
+    }
 
-        // Moonwalking easter egg thing
-        if (inputActions["MoonwalkToggle"].triggered)
-        {
-            GridMovement.moonwalkEnabled = !GridMovement.moonwalkEnabled;
-        }
 
-        // First person easter egg thing
-        if (inputActions["FirstPersonToggle"].triggered)
+    // Reset to clear all placements. This will simply reload the map and re-initialize the game mode for now.
+    private void onReset()
+    {
+        if (!m_gameController.gameState.hasState(GameState.TagState.Suspended))
         {
-            toggleFPSMode();
+            m_gameController.resetGame();
         }
+    }
+
+
+    // Opens the Pause Menu
+    private void onMenu()
+    {
+        if (!pauseDisplay.activeSelf)
+        {
+            pauseDisplay.SetActive(true);
+            m_gameController.gameState.addState(GameState.TagState.Suspended);
+        }
+        else
+        {
+            pauseDisplay.SetActive(false);
+            // Currently the Menu input is the only one that can suspend the game.
+            // If this changes, we will need to make sure that we account for all toggles to suspend.
+            m_gameController.gameState.removeState(GameState.TagState.Suspended);
+        }
+    }
+
+
+    // Toggle framerate display between Basic, Advanced, and Off
+    private void onFramerateDisplayToggle()
+    {
+        if (!m_fpsScript.enabled)
+        {
+            fpsDisplay.enabled = true;
+            m_fpsScript.enabled = true;
+            m_fpsScript.isAdvanced = false;
+        }
+        else if (!m_fpsScript.isAdvanced)
+        {
+            m_fpsScript.isAdvanced = true;
+        }
+        else
+        {
+            m_fpsScript.enabled = false;
+            fpsDisplay.enabled = false;
+        }
+    }
+
+
+    // For now, we use a button press to toggle double movement speed
+    private void onSpeedToggle()
+    {
+        if (m_gameController.mode != GameController.GameMode.Competitive)
+        {
+            if (GridMovement.speedMultiplier > 1.0f)
+            {
+                GridMovement.speedMultiplier = 1.0f;
+            }
+            else
+            {
+                GridMovement.speedMultiplier = 2.0f;
+            }
+        }
+    }
+
+
+    // Moonwalking easter egg thing
+    private void onMoonwalkToggle()
+    {
+        GridMovement.moonwalkEnabled = !GridMovement.moonwalkEnabled;
+    }
+
+
+    // First person easter egg thing
+    private void onFirstPersonToggle()
+    {
+        toggleFPSMode();
     }
 
 

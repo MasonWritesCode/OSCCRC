@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 // This class controls various parts of gameplay and manages the state of the game.
+// TODO: Get rid of the ugly mode property. Anything that needs to query the game mode should rather call a GameController function
+//       which will call a function on the mode object (or if the mode object shouldn't do it then GameController should be an abstract class).
 
 public class GameController : MonoBehaviour {
 

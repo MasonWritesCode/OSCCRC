@@ -21,7 +21,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""CursorMovement"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""66a633e2-2b57-4bd1-aff0-5d4b833fa612"",
+                    ""id"": ""2bd8f7ef-b79f-470d-b0e9-1709d5184521"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -29,7 +29,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""Select"",
                     ""type"": ""Button"",
-                    ""id"": ""2bd8f7ef-b79f-470d-b0e9-1709d5184521"",
+                    ""id"": ""439f2da8-54df-4c83-be61-877bacb22db8"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
@@ -37,7 +37,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""DirectionalPlacement"",
                     ""type"": ""Button"",
-                    ""id"": ""439f2da8-54df-4c83-be61-877bacb22db8"",
+                    ""id"": ""f5d9d535-7369-4485-93e2-9a4bac852a81"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -45,7 +45,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""Pause"",
                     ""type"": ""Button"",
-                    ""id"": ""f5d9d535-7369-4485-93e2-9a4bac852a81"",
+                    ""id"": ""91a40072-e898-481c-8e89-ee2c1d18a82f"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
@@ -53,7 +53,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""Reset"",
                     ""type"": ""Button"",
-                    ""id"": ""91a40072-e898-481c-8e89-ee2c1d18a82f"",
+                    ""id"": ""7802d923-d4e9-4aa2-9bb5-7d5c5d9dbd75"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
@@ -61,7 +61,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""Menu"",
                     ""type"": ""Button"",
-                    ""id"": ""7802d923-d4e9-4aa2-9bb5-7d5c5d9dbd75"",
+                    ""id"": ""b905ebf5-d20e-480b-b568-4ae424947a42"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
@@ -69,7 +69,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""FramerateDisplayToggle"",
                     ""type"": ""Button"",
-                    ""id"": ""b905ebf5-d20e-480b-b568-4ae424947a42"",
+                    ""id"": ""f8279fd6-02e3-4dcf-9795-df61828067a4"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
@@ -77,7 +77,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""SpeedToggle"",
                     ""type"": ""Button"",
-                    ""id"": ""f8279fd6-02e3-4dcf-9795-df61828067a4"",
+                    ""id"": ""3f2448a8-d32a-4b54-b6ec-acf62f2c5d77"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
@@ -85,7 +85,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""MoonwalkToggle"",
                     ""type"": ""Button"",
-                    ""id"": ""3f2448a8-d32a-4b54-b6ec-acf62f2c5d77"",
+                    ""id"": ""0a888bc1-0a5c-4b32-bda9-659730af0f61"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
@@ -93,46 +93,13 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": ""FirstPersonToggle"",
                     ""type"": ""Button"",
-                    ""id"": ""0a888bc1-0a5c-4b32-bda9-659730af0f61"",
+                    ""id"": ""3e6be630-733f-47a6-a86c-99b7a35cbce8"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press""
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""c48f0150-d842-43ca-a4fa-37ec481dd115"",
-                    ""path"": ""<Gamepad>/leftStick"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Controller"",
-                    ""action"": ""CursorMovement"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""e3ec4e1e-0257-4736-a101-be92ed2c98ef"",
-                    ""path"": ""<Gamepad>/rightStick"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Controller"",
-                    ""action"": ""CursorMovement"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ff1a32e9-30bb-4578-85c7-558a49176f4b"",
-                    ""path"": ""<Mouse>/delta"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Mouse+Keyboard"",
-                    ""action"": ""CursorMovement"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
                 {
                     ""name"": ""ARROWS"",
                     ""id"": ""bc1b560f-8d4c-44c6-9bae-dadbf3d74fdf"",
@@ -493,6 +460,28 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""processors"": """",
                     ""groups"": ""Controller"",
                     ""action"": ""Select"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""38e3d2b9-50de-4d1d-9589-79cfc1a6d9bf"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse+Keyboard"",
+                    ""action"": ""CursorMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3ecbf25b-65d9-4374-89d0-4fd03b931585"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""CursorMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
