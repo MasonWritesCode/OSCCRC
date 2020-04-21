@@ -15,7 +15,7 @@ public static class TimeManager
             desiredTimeScale = Time.timeScale;
         }
 
-        Time.timeScale = 0;
+        Time.timeScale = 0.0f;
 
         PauseInstance newInstance = new PauseInstance(restorationTimeScale);
         instances.Add(newInstance);
@@ -23,11 +23,15 @@ public static class TimeManager
         return newInstance;
     }
 
-    // Removes a pause instance, setting the desired timescale of the instance if it was the last one.
+    // Removes an active pause instance, setting the desired timescale of the instance if it was the last one.
     public static void removeTimePause(PauseInstance instance)
     {
-        Debug.Assert(instance != null);
-        Debug.Assert(instances.Contains(instance));
+        if (instance == null || !instances.Contains(instance))
+        {
+            Debug.LogAssertion("Invalid instace passed to TimeManager.removeTimePause");
+            return;
+        }
+
         instances.Remove(instance);
 
         if (!(instance.restorationTimeScale < 0.0f))

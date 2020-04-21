@@ -229,6 +229,7 @@ public class GameController : MonoBehaviour {
             if (m_pauseInstance != null)
             {
                 TimeManager.removeTimePause(m_pauseInstance);
+                m_pauseInstance = null;
             }
         }
     }
