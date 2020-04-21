@@ -10,8 +10,15 @@ public class MapTile : MonoBehaviour
     public enum TileImprovement { None, Hole, Goal, Spawner, Direction, Mouse, Cat }
 
     // This needs to be public so that the editor can see the texture used for an improvement
-    public static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>();
-    public static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>();
+    public static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>() {
+        { TileImprovement.None,    "Tile"    },
+        { TileImprovement.Hole,    "Hole"    },
+        { TileImprovement.Goal,    "Goal"    },
+        { TileImprovement.Spawner, "Spawner" }
+    };
+    public static Dictionary<TileImprovement, string> improvementObjects = new Dictionary<TileImprovement, string>() {
+        { TileImprovement.Direction, "DirectionArrow" }
+    };
 
     public TileImprovement improvement { get { return m_improvement; } set { setTileImprovement(value); } }
     public TileImprovement movingObject { get { return m_movingObject; } set { m_movingObject = value; } }
@@ -19,18 +26,6 @@ public class MapTile : MonoBehaviour
     public Directions.Direction movingObjDirection { get { return m_movingDir; } set { m_movingDir = value; } }
     public int owner { get { return m_owner; } set { if (m_owner != value) { m_owner = value; setTileImprovement(m_improvement); } } }
     public Walls walls;
-
-
-    // This static constructor is used to generate a map used to interface with resource packs
-    static MapTile()
-    {
-        improvementTextures.Add(TileImprovement.None, "Tile");
-        improvementTextures.Add(TileImprovement.Hole, "Hole");
-        improvementTextures.Add(TileImprovement.Goal, "Goal");
-        improvementTextures.Add(TileImprovement.Spawner, "Spawner");
-
-        improvementObjects.Add(TileImprovement.Direction, "DirectionArrow");
-    }
 
 
     // Initializes this tile using data from "parentMap"
