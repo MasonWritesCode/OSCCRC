@@ -32,7 +32,7 @@ public class Menu_MapEntry : MonoBehaviour, IPointerClickHandler {
             AudioSource audioData = GameObject.Find("ClickSound").GetComponent<AudioSource>();
             audioData.Play(0);
 
-            parentPanel.load(entryID);
+            parentPanel.loadStage(entryID);
         }
     }
 }

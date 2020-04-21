@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.IO;
 
 public class Menu_Panel : MonoBehaviour {
@@ -17,20 +16,19 @@ public class Menu_Panel : MonoBehaviour {
 
     void Awake()
     {
-        m_folderNames.Add(Folder.Competitive, "Competitive/");
-        m_folderNames.Add(Folder.Retro, "Retro/");
-        m_folderNames.Add(Folder.New, "New/");
-        m_folderNames.Add(Folder.Custom, "Custom/");
-
         m_tempStageInfo = gameObject.AddComponent<GameStage>();
 
         // We might have wanted to set folder before the gameobject became active
-        // So now that we are active we can open the folder that was set
-        setFolder(m_folder);
+        // So now that we are active we can open a page for the folder if it was set
+        if (folder != Folder.Unset)
+        {
+            page = 0;
+        }
     }
 
 
-    public void load(int place)
+    // Loads the stage referenced by the entry ID
+    public void loadStage(int place)
     {
         FileInfo selectedFile = m_fileList[place + m_startIndex];
         GlobalData.currentStagePath = m_folderNames[m_folder] + selectedFile.Name;
@@ -42,7 +40,15 @@ public class Menu_Panel : MonoBehaviour {
     private void getFiles(Folder folder)
     {
         DirectoryInfo di = new DirectoryInfo(Application.streamingAssetsPath + "/Maps/" + m_folderNames[folder]);
-        m_fileList = di.GetFiles("*.stage");
+
+        if (di.Exists)
+        {
+            m_fileList = di.GetFiles("*.stage");
+        }
+        else
+        {
+            m_fileList = new FileInfo[0];
+        }
     }
 
 
@@ -86,11 +92,19 @@ public class Menu_Panel : MonoBehaviour {
     // Loads files from a folder
     private void setFolder(Folder folder)
     {
+        if (folder == Folder.Unset)
+        {
+            return;
+        }
+
+        // For now setFolder will act as a request to update the file list even if already set to this folder
+        // This also resets the page to page 0
+        getFiles(folder);
         m_folder = folder;
+
         // We use m_temStageInfo to verify the gameobject became active since folder might be set before then
         if (m_tempStageInfo != null)
         {
-            getFiles(folder);
             page = 0;
         }
     }
@@ -135,7 +149,13 @@ public class Menu_Panel : MonoBehaviour {
     private int m_pageNum = 0;
     private int m_startIndex = 0;
     private Folder m_folder = Folder.Unset;
-    private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(4);
     private FileInfo[] m_fileList;
     private GameStage m_tempStageInfo = null;
+
+    private Dictionary<Folder, string> m_folderNames = new Dictionary<Folder, string>(4) {
+        { Folder.Competitive, "Competitive/" },
+        { Folder.Retro,       "Retro/"       },
+        { Folder.New,         "New/"         },
+        { Folder.Custom,      "Custom/"      }
+    };
 }
