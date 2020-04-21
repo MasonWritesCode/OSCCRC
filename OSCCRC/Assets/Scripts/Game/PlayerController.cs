@@ -34,24 +34,7 @@ public class PlayerController : MonoBehaviour {
         m_playerInput.actions["MoonwalkToggle"].performed         += ctx => onMoonwalkToggle();
         m_playerInput.actions["FirstPersonToggle"].performed      += ctx => onFirstPersonToggle();
 
-        using (var devicelist = m_playerInput.user.controlSchemeMatch.devices)
-        {
-            m_mouse = null;
-            m_gamepad = null;
-
-            for (int i = 0; i < devicelist.Count; ++i)
-            {
-                if (devicelist[i] is Gamepad)
-                {
-                    m_gamepad = devicelist[i] as Gamepad;
-                }
-                if (devicelist[i] is UnityEngine.InputSystem.Mouse)
-                {
-                    m_mouse = devicelist[i] as UnityEngine.InputSystem.Mouse;
-                }
-            }
-        }
-        m_isGamepad = m_playerInput.currentControlScheme != "Mouse+Keyboard";
+        OnControlsChanged();
 
         if (m_isGamepad)
         {
