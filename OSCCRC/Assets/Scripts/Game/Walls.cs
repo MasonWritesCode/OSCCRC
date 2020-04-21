@@ -63,11 +63,12 @@ public class Walls
         }
 
         // We set the companion wall to the same state if it exists
-        MapTile companionTile = m_map.tileAt(m_map.wrapCoord(m_origin + (Directions.toVector(wallID) * m_map.tileSize)));
-        if (m_map.isEdgeTile(companionTile) && m_map.isEdgeTile(m_map.tileAt(m_origin)))
+        Vector3 companionTilePos = m_origin + (Directions.toVector(wallID) * m_map.tileSize);
+        MapTile companionTile = m_map.tileAt(companionTilePos);
+        if (companionTile == null)
         {
-            // Walls on edges share state with wrapped around tile, but they don't share the same wall object
-            companionTile.walls.changeWall(Directions.getOppositeDir(wallID), isCreating);
+            // Walls on opposite edges share state with wrapped around tile, but they don't share the same wall object
+            m_map.tileAt(m_map.wrapCoord(companionTilePos)).walls.changeWall(Directions.getOppositeDir(wallID), isCreating);
         }
         else
         {
