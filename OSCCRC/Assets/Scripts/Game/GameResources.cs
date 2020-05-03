@@ -26,8 +26,6 @@ public class GameResources : MonoBehaviour {
         string currentDir;
 
         currentDir = "/Materials/";
-        materials.Add("Tile", resourceFromDir(currentDir + "Tile") as Material);
-        materials.Add("TileAlt", resourceFromDir(currentDir + "TileAlt") as Material);
         materials.Add("TileTiledColor", resourceFromDir(currentDir + "TileTiledColor") as Material);
         materials.Add("Hole", resourceFromDir(currentDir + "Hole") as Material);
         materials.Add("Goal", resourceFromDir(currentDir + "Goal") as Material);
@@ -35,7 +33,6 @@ public class GameResources : MonoBehaviour {
         materials.Add("Goal2", resourceFromDir(currentDir + "Goal2") as Material);
         materials.Add("Goal3", resourceFromDir(currentDir + "Goal3") as Material);
         materials.Add("Spawner", resourceFromDir(currentDir + "Spawner") as Material);
-        materials.Add("Placeholder", resourceFromDir(currentDir + "ObjectPlace") as Material);
 
         currentDir = "/Prefabs/";
         objects.Add("Tile", (resourceFromDir(currentDir + "TilePrefab") as GameObject).transform);
@@ -48,7 +45,6 @@ public class GameResources : MonoBehaviour {
         objects.Add("BigMouse", (resourceFromDir(currentDir + "BigMouse") as GameObject).transform);
         objects.Add("SpecialMouse", (resourceFromDir(currentDir + "SpecialMouse") as GameObject).transform);
         objects.Add("Cat", (resourceFromDir(currentDir + "Cat") as GameObject).transform);
-        objects.Add("Placeholder", (resourceFromDir(currentDir + "Placeholder") as GameObject).transform);
     }
 
 

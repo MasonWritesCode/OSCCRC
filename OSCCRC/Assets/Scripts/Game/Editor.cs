@@ -7,6 +7,9 @@ using UnityEngine.InputSystem;
 
 public class Editor : MonoBehaviour {
 
+    public Transform placeholderPrefab; // Editor set
+    public Material placeholderMaterial; // Editor set
+
     void OnDisable() {
         disablePlaceholder();
     }
@@ -24,7 +27,7 @@ public class Editor : MonoBehaviour {
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
-        m_placeholderObject = Instantiate(m_gameResources.objects["Placeholder"], m_gameMap.transform);
+        m_placeholderObject = Instantiate(placeholderPrefab, m_gameMap.transform);
         disablePlaceholder();
         m_direction = Directions.Direction.North;
         m_positionOffset = Vector3.zero;
@@ -406,7 +409,7 @@ public class Editor : MonoBehaviour {
 
         // Select the mesh for the selected object
         Mesh newMesh = m_gameResources.objects["Tile"].GetComponent<MeshFilter>().sharedMesh;
-        Texture newTex = m_gameResources.materials["Placeholder"].mainTexture;
+        Texture newTex = placeholderMaterial.mainTexture;
         if (m_placeholderType == ObjectType.Wall)
         {
             newMesh = m_gameResources.objects["Wall"].GetComponent<MeshFilter>().sharedMesh;

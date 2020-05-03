@@ -11,7 +11,6 @@ public class MapTile : MonoBehaviour
 
     // This needs to be public so that the editor can see the texture used for an improvement
     public static Dictionary<TileImprovement, string> improvementTextures = new Dictionary<TileImprovement, string>() {
-        { TileImprovement.None,    "Tile"    },
         { TileImprovement.Hole,    "Hole"    },
         { TileImprovement.Goal,    "Goal"    },
         { TileImprovement.Spawner, "Spawner" }
@@ -114,7 +113,7 @@ public class MapTile : MonoBehaviour
         }
 
         // Set associated tile texture
-        if (improvement == TileImprovement.None || materialName == null)
+        if (materialName == null)
         {
             // We disable the renderer here instead of setting to Blank tile material, see GameMap for more info
 

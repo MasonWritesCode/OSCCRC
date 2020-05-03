@@ -821,8 +821,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RepeatDelay: 0.5
-  m_RepeatRate: 0.1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
   m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
     type: 3}
   m_PointAction: {fileID: 1054132383583890850, guid: ca9f5fa95ffab41fb9a615ab714db018,
@@ -845,8 +845,8 @@ MonoBehaviour:
     type: 3}
   m_TrackedDeviceOrientationAction: {fileID: 1025543830046995696, guid: ca9f5fa95ffab41fb9a615ab714db018,
     type: 3}
-  m_TrackedDeviceSelectAction: {fileID: 2559092417903258184, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
 --- !u!114 &100097281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3639,6 +3639,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89b398df7b4037e4389bdbb692d94e3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  placeholderPrefab: {fileID: 4206341274469886, guid: ff6d3ec6580f4324ab97abd81bd9ecfa,
+    type: 3}
+  placeholderMaterial: {fileID: 2100000, guid: 18f6cde3b238541488eaaf2e3738aaed, type: 2}
 --- !u!114 &903401649
 MonoBehaviour:
   m_ObjectHideFlags: 0
