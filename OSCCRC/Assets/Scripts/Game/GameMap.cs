@@ -91,8 +91,10 @@ public class GameMap : MonoBehaviour
     {
         Transform wallPrefab = m_gameResources.objects["Wall"];
         Transform newWall = Instantiate(wallPrefab, m_transform);
-        newWall.localPosition = position;
+        newWall.localPosition = new Vector3(position.x, newWall.localPosition.y, position.z);
 
+        // Instead of this, we should have the model's center point be outside of the model
+        // So that the positioning is handled entirely with the rotate call
         if (direction == Directions.Direction.North)
         {
             newWall.localPosition += Vector3.forward * (m_tileSize / 2);
