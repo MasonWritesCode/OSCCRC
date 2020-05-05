@@ -280,7 +280,7 @@ PlayerSettings:
   m_BuildTargetGraphicsJobMode: []
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: WindowsStandaloneSupport
-    m_APIs: 1500000002000000
+    m_APIs: 02000000
     m_Automatic: 1
   m_BuildTargetVRSettings: []
   openGLRequireES31: 0
