@@ -7,8 +7,9 @@ using UnityEngine.InputSystem;
 
 public class Editor : MonoBehaviour {
 
-    public Transform placeholderPrefab; // Editor set
-    public Material placeholderMaterial; // Editor set
+    public Transform directionIndicatorPrefab; // Editor set
+    public Transform placeholderPrefab;        // Editor set
+    public Material placeholderMaterial;       // Editor set
 
     void OnDisable() {
         disablePlaceholder();
@@ -27,6 +28,7 @@ public class Editor : MonoBehaviour {
 
         m_placeholderType = ObjectType.None;
         m_selectedImprovement = MapTile.TileImprovement.None;
+        m_directionIndicator = Instantiate(directionIndicatorPrefab, m_gameMap.transform);
         m_placeholderObject = Instantiate(placeholderPrefab, m_gameMap.transform);
         disablePlaceholder();
         m_direction = Directions.Direction.North;
@@ -227,11 +229,13 @@ public class Editor : MonoBehaviour {
                 {
                     Vector3 mousePos = m_mainCamera.ScreenToWorldPoint(m_mouse.position.ReadValue());
                     // We should use game map height as the height, but we weren't doing it before and I wont bother for now
-                    m_placeholderObject.position = new Vector3(mousePos.x, 0.0f, mousePos.z) + m_positionOffset;
+                    m_directionIndicator.position = new Vector3(mousePos.x, 0.0f, mousePos.z);
+                    m_placeholderObject.position = m_directionIndicator.position + m_positionOffset;
                 }
                 else
                 {
-                    m_placeholderObject.localPosition = selectedTile.transform.localPosition + m_positionOffset;
+                    m_directionIndicator.localPosition = selectedTile.transform.localPosition;
+                    m_placeholderObject.localPosition = m_directionIndicator.localPosition + m_positionOffset;
                 }
             }
 
@@ -381,6 +385,10 @@ public class Editor : MonoBehaviour {
     {
         if (m_placeholderObject)
         {
+            // Direction indicator is essentially part of the placeholder so shares the same state
+            // But is a separate object because the placeholder needs unique rotation and position to mimick our objects
+            // This can be fixed when our objects are actual models and not doing specific rotation and position nonsense
+            m_directionIndicator.gameObject.SetActive(false);
             m_placeholderObject.gameObject.SetActive(false);
         }
     }
@@ -391,6 +399,10 @@ public class Editor : MonoBehaviour {
     {
         if (m_placeholderObject)
         {
+            // Direction indicator is essentially part of the placeholder so shares the same state
+            // But is a separate object because the placeholder needs unique rotation and position to mimick our objects
+            // This can be fixed when our objects are actual models and not doing specific rotation and position nonsense
+            m_directionIndicator.gameObject.SetActive(true);
             m_placeholderObject.gameObject.SetActive(true);
         }
     }
@@ -480,6 +492,7 @@ public class Editor : MonoBehaviour {
             }
         }
 
+        Directions.rotate(m_directionIndicator, m_direction);
         Directions.rotate(m_placeholderObject, m_direction);
 
         // Assign the new mesh
@@ -506,6 +519,7 @@ public class Editor : MonoBehaviour {
     private enum ObjectType { None, Wall, Improvement }
 
     private Transform m_placeholderObject;
+    private Transform m_directionIndicator;
     private MapTile.TileImprovement m_selectedImprovement;
     private ObjectType m_placeholderType;
     private Directions.Direction m_direction;
