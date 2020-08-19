@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4801157146197612}
   - component: {fileID: 33962021313579250}
   - component: {fileID: 23984902851062824}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DirectionArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 // This class controls various parts of gameplay and manages the state of the game.
+// TODO: Get rid of the ugly mode property. Anything that needs to query the game mode should rather call a GameController function
+//       which will call a function on the mode object (or if the mode object shouldn't do it then GameController should be an abstract class).
 
 public class GameController : MonoBehaviour {
 
-    public enum GameMode { None, Editor, Puzzle, Multiplayer };
+    public enum GameMode { None, Editor, Puzzle, Competitive };
     public GameMode mode { get { return m_mode; } }
     public GameState gameState { get { return m_gameState; } }
-    public Canvas completeDisplay;
+    public Transform puzzleUI;      // Editor Set
+    public Transform editorUI;      // Editor Set
+    public Transform competitiveUI; // Editor Set
 
 
     // Checks if a player is allowed to place the desired improvement, and does so if they can
-    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North)
+    public void requestPlacement(MapTile tile, MapTile.TileImprovement improvement = MapTile.TileImprovement.Direction, Directions.Direction dir = Directions.Direction.North, int player = 0)
     {
         if (m_gameState.hasState(GameState.TagState.Suspended))
         {
@@ -26,7 +31,7 @@ public class GameController : MonoBehaviour {
         {
             if (tile.improvement == MapTile.TileImprovement.None || tile.improvement == MapTile.TileImprovement.Direction)
             {
-                m_game.placeDirection(tile, dir);
+                m_game.placeDirection(tile, dir, player);
             }
         }
     }
@@ -48,13 +53,17 @@ public class GameController : MonoBehaviour {
             m_game.endGame();
         }
 
-        if (newMode == GameMode.Puzzle)
+        switch (newMode)
         {
-            m_game = new PuzzleGame(m_gameState);
-        }
-        else if (newMode == GameMode.Editor)
-        {
-            m_game = new EditorGame(m_gameState);
+            case GameMode.Puzzle:
+                m_game = new PuzzleGame(m_gameState, puzzleUI);
+                break;
+            case GameMode.Editor:
+                m_game = new EditorGame(m_gameState, editorUI);
+                break;
+            case GameMode.Competitive:
+                m_game = new CompetitiveGame(m_gameState, competitiveUI);
+                break;
         }
 
         Editor editor = GetComponent<Editor>();
@@ -67,6 +76,28 @@ public class GameController : MonoBehaviour {
             else if (newMode != GameMode.Editor && editor.enabled)
             {
                 editor.enabled = false;
+            }
+        }
+
+        // Set up our players
+        GameObject players = GameObject.FindWithTag("Player");
+        if (players)
+        {
+            // We enable the other players for 4 player modes
+            for (int i = 0; i < players.transform.childCount - 1; ++i)
+            {
+                GameObject playerObject = players.transform.GetChild(i).gameObject;
+
+                // For now, set as many human players as we have input devices
+                bool isHuman = GlobalData.isHumanPlayer[i];
+                playerObject.GetComponent<PlayerController>().enabled =  isHuman;
+                playerObject.GetComponent<PlayerInput>().enabled      =  isHuman;
+                playerObject.GetComponent<AIController>().enabled     = !isHuman;
+
+                if (i > 0)
+                {
+                    playerObject.SetActive(newMode == GameMode.Competitive);
+                }
             }
         }
 
@@ -98,14 +129,14 @@ public class GameController : MonoBehaviour {
             Application.targetFrameRate = -1;
         }
 
+        Cursor.visible = false;
+
         m_eventSystem = EventSystem.current;
         m_wasInputFocused = false;
 
         m_gameState = new GameState();
         m_gameState.stateAdded += onTagStateAdd;
         m_gameState.stateRemoved += onTagStateRemove;
-
-        m_gameState.mainStateChange += onLevelComplete;
 
         GameStage stage = GetComponent<GameStage>();
         string currentStage = GlobalData.currentStagePath;
@@ -130,7 +161,6 @@ public class GameController : MonoBehaviour {
         {
             InputField field = m_eventSystem.currentSelectedGameObject.GetComponent<InputField>();
             isInputFocused = field != null && field.isFocused;
-            
         }
 
         if (isInputFocused != m_wasInputFocused) // focus changed, so change input focus state
@@ -157,7 +187,7 @@ public class GameController : MonoBehaviour {
             return;
         }
         // One scenario we could consider adding is to disable physics when there are no cats to collide with.
-        if (m_gameState.mainState != GameState.State.Started_Unpaused || m_gameState.hasState(GameState.TagState.Suspended))
+        if (m_gameState.mainState == GameState.State.Started_Paused || m_gameState.hasState(GameState.TagState.Suspended))
         {
             return;
         }
@@ -168,7 +198,12 @@ public class GameController : MonoBehaviour {
     // We have to make sure we restore the time scale when the scene changes
     void OnDestroy()
     {
-        Time.timeScale = m_timeScaleHolder;
+        Cursor.visible = true;
+
+        if (m_pauseInstance != null)
+        {
+            TimeManager.removeTimePause(m_pauseInstance);
+        }
     }
 
     // Set timescale to 0 for suspending the game
@@ -177,8 +212,9 @@ public class GameController : MonoBehaviour {
     {
         if (state == GameState.TagState.Suspended)
         {
-            m_timeScaleHolder = Time.timeScale;
-            Time.timeScale = 0.0f;
+            Cursor.visible = true;
+
+            m_pauseInstance = TimeManager.addTimePause();
         }
     }
 
@@ -188,29 +224,22 @@ public class GameController : MonoBehaviour {
     {
         if (state == GameState.TagState.Suspended)
         {
-            Time.timeScale = m_timeScaleHolder;
-        }
-    }
+            Cursor.visible = false;
 
-    // Does actions when a user completes a stage
-    private void onLevelComplete(GameState.State stateOld, GameState.State stateNew)
-    {
-        if (stateNew == GameState.State.Ended_Unpaused)
-        {
-            // This should be moved into PuzzleGame in some way or another at some point
-            //   when we figure out how we want to store the display reference to the mode without it being a monobehavior
-            if (m_mode == GameMode.Puzzle)
+            if (m_pauseInstance != null)
             {
-                completeDisplay.enabled = true;
+                TimeManager.removeTimePause(m_pauseInstance);
+                m_pauseInstance = null;
             }
         }
     }
 
 
-    private GameMode m_mode = GameMode.None;
-    private GameState m_gameState;
-    private IGameMode m_game;
-    private float m_timeScaleHolder = 1.0f;
     private EventSystem m_eventSystem;
+    private GameState m_gameState;
+    private PauseInstance m_pauseInstance = null;
+
+    private GameMode m_mode = GameMode.None;
+    private IGameMode m_game;
     private bool m_wasInputFocused;
 }

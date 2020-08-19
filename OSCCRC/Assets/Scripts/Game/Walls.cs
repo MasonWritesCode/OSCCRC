@@ -62,55 +62,18 @@ public class Walls
             return;
         }
 
-        // Determine where the other wall is if it exists
-        float otherTileX = m_origin.x, otherTileZ = m_origin.z;
-        if (wallID == Directions.Direction.North)
+        // We set the companion wall to the same state if it exists
+        Vector3 companionTilePos = m_origin + (Directions.toVector(wallID) * m_map.tileSize);
+        MapTile companionTile = m_map.tileAt(companionTilePos);
+        if (companionTile == null)
         {
-            otherTileZ += m_map.tileSize;
-            if (otherTileZ > (m_maxHeightIndex * m_map.tileSize))
-            {
-                otherTileZ = 0;
-            }
-        }
-        else if (wallID == Directions.Direction.East)
-        {
-            otherTileX += m_map.tileSize;
-            if (otherTileX > (m_maxWidthIndex * m_map.tileSize))
-            {
-                otherTileX = 0;
-            }
-        }
-        else if (wallID == Directions.Direction.South)
-        {
-            otherTileZ -= m_map.tileSize;
-            if (otherTileZ < 0)
-            {
-                otherTileZ = m_maxHeightIndex * m_map.tileSize;
-            }
-        }
-        else if (wallID == Directions.Direction.West)
-        {
-            otherTileX -= m_map.tileSize;
-            if (otherTileX < 0)
-            {
-                otherTileX = m_maxWidthIndex * m_map.tileSize;
-            }
-        }
-
-        // The companion wall always has the same existence state
-        if (Mathf.Abs(m_origin.z - otherTileZ) == (m_maxHeightIndex * m_map.tileSize) || Mathf.Abs(m_origin.x - otherTileX) == (m_maxWidthIndex * m_map.tileSize))
-        {
-            // Walls on edges share state with wrapped around tile, but they don't share the same wall object
-            m_map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.changeWall(Directions.getOppositeDir(wallID), isCreating);
+            // Walls on opposite edges share state with wrapped around tile, but they don't share the same wall object
+            m_map.tileAt(m_map.wrapCoord(companionTilePos)).walls.changeWall(Directions.getOppositeDir(wallID), isCreating);
         }
         else
         {
-            Transform wallSet = null;
-            if (isCreating)
-            {
-                wallSet = m_walls[wallID];
-            }
-            m_map.tileAt(new Vector3(otherTileX, 0, otherTileZ)).walls.m_walls[Directions.getOppositeDir(wallID)] = wallSet;
+            // Walls that are not on edges share the same wall object
+            companionTile.walls.m_walls[Directions.getOppositeDir(wallID)] = m_walls[wallID];
         }
     }
 

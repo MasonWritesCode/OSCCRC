@@ -6,18 +6,20 @@ using UnityEngine.EventSystems;
 public class Pause_No : MonoBehaviour, IPointerClickHandler
 {
     public AudioSource audioData;
-    public Canvas pauseDisplay; // Editor Set
+    public GameObject pauseDisplay; // Editor Set
 
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            audioData = GameObject.Find("ClickSound").GetComponent<AudioSource>();
-            audioData.Play(0);
+            if (audioData != null)
+            {
+                audioData.Play(0);
+            }
 
             GameController m_gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
 
-            pauseDisplay.enabled = false;
+            pauseDisplay.SetActive(false);
             m_gameController.gameState.removeState(GameState.TagState.Suspended);
         }
     }

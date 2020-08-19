@@ -6,6 +6,8 @@ using System.IO;
 
 public class Menu_UpdateMaps : MonoBehaviour, IPointerClickHandler
 {
+    public GameObject gameDataObj; // Editor Set
+
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
@@ -14,14 +16,19 @@ public class Menu_UpdateMaps : MonoBehaviour, IPointerClickHandler
             // We could modify GameMap to support a "virtual" game map that doesn't do instantiations and would be
             //  vastly more efficient for this purpose, but I'm not going to bother doing that just for this rarely used function.
             // For now, we just create a GameObject that will be used for those instantiations
+
+            // We need to pass in prefabs to the component, so the components are just loaded with the scene now.
+            // Actually, I think the only thing we need to pass in was set to be passed in by mistake, so review this later.
+            /*
             if (GameDataObj == null)
             {
                 GameDataObj = new GameObject();
-                GameDataObj.AddComponent<GameMap>();
                 GameDataObj.AddComponent<GameStage>();
                 GameDataObj.AddComponent<GameResources>();
+                GameDataObj.AddComponent<GameMap>();
                 GameDataObj.tag = "Map";
             }
+            */
 
             updateAll();
         }
@@ -31,9 +38,9 @@ public class Menu_UpdateMaps : MonoBehaviour, IPointerClickHandler
     {
         Debug.Log("Beginning Update to latest map format (may take some time)...");
 
-        GameDataObj.SetActive(true);
-        GameMap mapData = GameDataObj.GetComponent<GameMap>();
-        GameStage stageData = GameDataObj.GetComponent<GameStage>();
+        gameDataObj.SetActive(true);
+        GameMap mapData = gameDataObj.GetComponent<GameMap>();
+        GameStage stageData = gameDataObj.GetComponent<GameStage>();
 
         DirectoryInfo mapsDir = new DirectoryInfo(Application.streamingAssetsPath + "/Maps/");
         DirectoryInfo[] mapCollections = mapsDir.GetDirectories();
@@ -57,10 +64,8 @@ public class Menu_UpdateMaps : MonoBehaviour, IPointerClickHandler
             }
         }
 
-        GameDataObj.SetActive(false);
+        gameDataObj.SetActive(false);
 
         Debug.Log("Map format update complete.");
     }
-
-    private GameObject GameDataObj = null;
 }

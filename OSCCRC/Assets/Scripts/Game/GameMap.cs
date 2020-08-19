@@ -15,8 +15,10 @@ public class GameMap : MonoBehaviour
     public int mapWidth { get { return m_mapWidth; } }
     public float tileSize { get { return m_tileSize; } }
 
-    public Transform ringPrefab;
-    public Transform floorPrefab;
+    public Transform ringPrefab;  // Editor Set
+    public Transform blinkPrefab; // Editor Set
+    // TODO: Isn't this supposed to be in resources?
+    public Transform floorPrefab; // Editor Set
 
 
     void Awake()
@@ -89,8 +91,10 @@ public class GameMap : MonoBehaviour
     {
         Transform wallPrefab = m_gameResources.objects["Wall"];
         Transform newWall = Instantiate(wallPrefab, m_transform);
-        newWall.localPosition = position;
+        newWall.localPosition = new Vector3(position.x, newWall.localPosition.y, position.z);
 
+        // Instead of this, we should have the model's center point be outside of the model
+        // So that the positioning is handled entirely with the rotate call
         if (direction == Directions.Direction.North)
         {
             newWall.localPosition += Vector3.forward * (m_tileSize / 2);
@@ -107,7 +111,7 @@ public class GameMap : MonoBehaviour
         {
             newWall.localPosition += Vector3.left * (m_tileSize / 2);
         }
-        Directions.rotate(newWall, direction, m_transform);
+        Directions.rotate(newWall, direction);
 
         return newWall;
     }
@@ -120,7 +124,35 @@ public class GameMap : MonoBehaviour
         Transform mousePrefab = m_gameResources.objects["Mouse"];
         Transform newMouse = Instantiate(mousePrefab, m_transform);
         newMouse.localPosition = position;
-        Directions.rotate(newMouse, direction, m_transform);
+        Directions.rotate(newMouse, direction);
+        newMouse.GetComponent<GridMovement>().direction = direction;
+
+        return newMouse;
+    }
+
+
+    // Creates a big mouse object and returns its transform. The position is map-relative.
+    // The returned object should only be destroyed with the destroyMouse function instead of Unity's destroy
+    public Transform placeBigMouse(Vector3 position, Directions.Direction direction)
+    {
+        Transform mousePrefab = m_gameResources.objects["BigMouse"];
+        Transform newMouse = Instantiate(mousePrefab, m_transform);
+        newMouse.localPosition = position;
+        Directions.rotate(newMouse, direction);
+        newMouse.GetComponent<GridMovement>().direction = direction;
+
+        return newMouse;
+    }
+
+
+    // Creates a special mouse object and returns its transform. The position is map-relative.
+    // The returned object should only be destroyed with the destroyMouse function instead of Unity's destroy
+    public Transform placeSpecialMouse(Vector3 position, Directions.Direction direction)
+    {
+        Transform mousePrefab = m_gameResources.objects["SpecialMouse"];
+        Transform newMouse = Instantiate(mousePrefab, m_transform);
+        newMouse.localPosition = position;
+        Directions.rotate(newMouse, direction);
         newMouse.GetComponent<GridMovement>().direction = direction;
 
         return newMouse;
@@ -134,7 +166,7 @@ public class GameMap : MonoBehaviour
         Transform catPrefab = m_gameResources.objects["Cat"];
         Transform newCat = Instantiate(catPrefab, m_transform);
         newCat.localPosition = position;
-        Directions.rotate(newCat, direction, m_transform);
+        Directions.rotate(newCat, direction);
         newCat.GetComponent<GridMovement>().direction = direction;
 
         return newCat;
@@ -148,41 +180,61 @@ public class GameMap : MonoBehaviour
     }
 
 
-    // Removes a mouse game object with transform "mouse"
-    // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
-    public void destroyMouse(Transform mouse)
+    // Removes a Gridmovement GameObject with transform "mover"
+    // GameController's destroyMover should be used instead for game logic processing, this just deletes the object
+    public void destroyMover(GridMovement mover)
     {
-        //mouse.gameObject.SetActive(false);
-        if (m_mainCamera.isAttached && mouse.GetComponentInChildren<Camera>())
+        //mover.gameObject.SetActive(false);
+        if (m_mainCamera != null && m_mainCamera.isAttached && mover.GetComponentInChildren<Camera>())
         {
             m_mainCamera.setCameraOrthographic();
             m_mainCamera.setCameraView(this);
         }
-        Destroy(mouse.gameObject);
+
+        Destroy(mover.gameObject);
     }
 
 
-    // Removes a cat game object with transform "cat"
-    // GameController's destroyMover should be used instead to account for the effect on game logic, this just deletes the object
-    public void destroyCat(Transform cat)
+    // Removes all cats and mice on the GameMap, without game logic processing
+    public void destroyAllMovers()
     {
-        //cat.gameObject.SetActive(false);
-        if (m_mainCamera.isAttached && cat.GetComponentInChildren<Camera>())
+        GridMovement[] movers = GetComponentsInChildren<GridMovement>();
+
+        if (m_mainCamera != null && m_mainCamera.isAttached)
         {
             m_mainCamera.setCameraOrthographic();
             m_mainCamera.setCameraView(this);
         }
-        Destroy(cat.gameObject);
+
+        for (int i = movers.Length - 1; i >= 0; --i)
+        {
+            Destroy(movers[i].gameObject);
+        }
     }
 
 
     // Draws a ring around the specified location on the map for the specified length of time to draw the user's attention.
-    // Location is a map-relative position.
+    // Only one ring will be shown at a time for now, which is the most recent. Location is a map-relative position.
     public void pingLocation(Vector3 location, float timeInSeconds)
     {
+        Transform prevRing = m_transform.Find("Ring(Clone)");
+        if (prevRing != null)
+        {
+            Destroy(prevRing.gameObject);
+        }
+
         Transform pingRing = Instantiate(ringPrefab, m_transform);
         pingRing.localPosition = new Vector3(location.x, 5.0f, location.z);
         Destroy(pingRing.gameObject, timeInSeconds);
+    }
+
+
+    // Makes a tile appear to blink. For now, is not removed when loading a new map
+    public void blinkTile(MapTile tile, float durationInSeconds)
+    {
+        Transform blinker = Instantiate(blinkPrefab, tile.transform);
+        blinker.localPosition = Vector3.forward * -0.0002f;
+        Destroy(blinker.gameObject, durationInSeconds);
     }
 
 
@@ -196,18 +248,14 @@ public class GameMap : MonoBehaviour
         // Removing walls will be handled at the same point in code where they are placed
 
         // We aren't currently keeping track of mice or cats, so destroy all children with a GridMovement attached
-        GridMovement[] deadMeat = GetComponentsInChildren<GridMovement>();
-        for (int i = 0; i < deadMeat.Length; ++i)
+        destroyAllMovers();
+
+        // Remove ping ring
+        // If there is a nice way to find them all we might consider supporting multiple rings, but to be simple require one and use find for now
+        Transform ring = m_transform.Find("Ring(Clone)");
+        if (ring != null)
         {
-            deadMeat[i].gameObject.SetActive(false);
-            if (deadMeat[i] is Mouse)
-            {
-                destroyMouse(deadMeat[i].transform);
-            }
-            else if (deadMeat[i] is Cat)
-            {
-                destroyCat(deadMeat[i].transform);
-            }
+            Destroy(ring.gameObject);
         }
 
         // Create a new map if necessary
@@ -220,10 +268,10 @@ public class GameMap : MonoBehaviour
         }
         else
         {
-            // We need to manually make sure we update the bigTile texture in case the resource pack changed
-            if (m_bigTile != null)
+            // We need to manually make sure we update the floor texture in case the resource pack changed
+            if (m_floor != null)
             {
-                m_bigTile.GetComponent<MeshRenderer>().material = m_gameResources.materials["TileTiledColor"];
+                m_floor.GetComponent<MeshRenderer>().material = m_gameResources.materials["TileTiledColor"];
             }
         }
 
@@ -234,6 +282,11 @@ public class GameMap : MonoBehaviour
                 MapTile tile = m_mapTiles[j, i];
 
                 int tileFlags = int.Parse(fin.ReadLine());
+
+                if ((tileFlags >> 3 & 1) == 1)
+                {
+                    tile.owner = int.Parse(fin.ReadLine());
+                }
 
                 if ((tileFlags >> 0 & 1) == 1)
                 {
@@ -313,10 +366,14 @@ public class GameMap : MonoBehaviour
                 //                   \ \ / /  | | | TileImprovement
                 //                      |     | | MovingObject
                 //                      |     | HasWalls
-                //                      |     Reserved-For-Future-Use    
+                //                      |     Owner is not default  
                 //                      WallsFlags(w,s,e,n)
                 int tileFlags = 0;
 
+                if (tile.owner != 0)
+                {
+                    tileFlags |= 1 << 3;
+                }
                 if (tile.improvement != MapTile.TileImprovement.None)
                 {
                     tileFlags |= 1 << 0;
@@ -349,6 +406,10 @@ public class GameMap : MonoBehaviour
                 fout.WriteLine(tileFlags);
 
                 // Write remaining data if necessary
+                if ((tileFlags >> 3 & 1) == 1)
+                {
+                    fout.WriteLine(tile.owner);
+                }
                 if ((tileFlags >> 0 & 1) == 1)
                 {
                     fout.WriteLine((int)tile.improvement);
@@ -451,21 +512,24 @@ public class GameMap : MonoBehaviour
 
         // Here we set a single stretched tile that represents all blank tiles
         // Since usually most tiles are blank, this saves draw calls by only enabling a tile's renderer when it is not blank
-        if (m_bigTile == null)
+        if (m_floor == null)
         {
-            m_bigTile = Instantiate(floorPrefab, m_transform);
+            m_floor = Instantiate(floorPrefab, m_transform);
         }
 
         // We need to set the scale to mapsize
         // Position needs to be set to ((mapsize - 1) / 2) (divided by two because scale stretches in both directions)
         // Material tiling has to be set to (mapsize / 2)
-        m_bigTile.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
-        m_bigTile.localPosition = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
-        MeshRenderer bigTileRend = m_bigTile.GetComponent<MeshRenderer>();
+        m_floor.localScale = new Vector3(m_mapWidth, m_mapHeight, 1.0f);
+        m_floor.localPosition = new Vector3((m_mapWidth - 1.0f) / 2.0f, 0.0f, (m_mapHeight - 1.0f) / 2.0f);
+        MeshRenderer bigTileRend = m_floor.GetComponent<MeshRenderer>();
         bigTileRend.material = m_gameResources.materials["TileTiledColor"];
         bigTileRend.material.mainTextureScale = new Vector2(m_mapWidth / 2.0f, m_mapHeight / 2.0f);
 
-        m_mainCamera.setCameraView(this);
+        if (m_mainCamera != null)
+        {
+            m_mainCamera.setCameraView(this);
+        }
     }
 
 
@@ -473,8 +537,8 @@ public class GameMap : MonoBehaviour
     private int m_mapWidth = 0;
     private float m_tileSize = 1;
     private MapTile[,] m_mapTiles = null;
-    private Transform m_bigTile = null;
+    private Transform m_floor = null;
     private Transform m_transform;
     private GameResources m_gameResources;
-    private CameraController m_mainCamera;
+    private CameraController m_mainCamera = null;
 }

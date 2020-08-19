@@ -5,18 +5,21 @@ using UnityEngine;
 
 // This is an interface between the game controller and the Puzzle game mode.
 // This mode requires being passed information about the game state.
+// This mode requires being passed its related UI transform.
 
 public class EditorGame : IGameMode
 {
-    public EditorGame(GameState gameStateRef)
+    public EditorGame(GameState gameStateRef, Transform modeUI)
     {
         m_gameState = gameStateRef;
+        m_display = modeUI;
     }
 
     // Begins a puzzle game
     public void startGame()
     {
         m_gameMap = GameObject.FindWithTag("Map").GetComponent<GameMap>();
+        m_audioParent = GameObject.FindWithTag("Audio").GetComponent<Transform>();
 
         // We need to count the number of mice so that we know if a puzzle has been solved
         countMice();
@@ -28,8 +31,7 @@ public class EditorGame : IGameMode
         m_gameState.mainState = GameState.State.Started_Paused;
         m_gameState.mainStateChange += onStateChange;
 
-        m_saveMenu = GameObject.Find("EditorMenu (UI)");
-        m_saveMenu.GetComponent<Canvas>().enabled = true;
+        m_display.gameObject.SetActive(true);
 
         return;
     }
@@ -51,6 +53,11 @@ public class EditorGame : IGameMode
     public void endGame()
     {
         m_gameState.mainStateChange -= onStateChange;
+
+        if (m_timer != null)
+        {
+            m_timer.Dispose();
+        }
     }
 
 
@@ -59,11 +66,11 @@ public class EditorGame : IGameMode
     {
         if (victory)
         {
-            m_gameState.mainState = GameState.State.Ended_Unpaused;
+            m_gameState.mainState = GameState.State.Ended_Victory;
         }
         else
         {
-            m_gameState.mainState = GameState.State.Ended_Paused;
+            m_gameState.mainState = GameState.State.Ended_Failure;
         }
         // We reset for the player after a period of time when they win or lose by "pressing pause"
         setStateDelayed(GameState.State.Started_Paused, m_autoResetDelay);
@@ -71,7 +78,7 @@ public class EditorGame : IGameMode
 
 
     // Places a tile if it is in the stage's list of available placements
-    public void placeDirection(MapTile tile, Directions.Direction dir)
+    public void placeDirection(MapTile tile, Directions.Direction dir, int player)
     {
         // We only place tiles in edit mode (handled by Editor.cs), not during play
         return;
@@ -88,14 +95,7 @@ public class EditorGame : IGameMode
 
         if (m_paused || !m_playing)
         {
-            if (deadMeat is Cat)
-            {
-                m_gameMap.destroyCat(deadMeat.transform);
-            }
-            else if (deadMeat is Mouse)
-            {
-                m_gameMap.destroyMouse(deadMeat.transform);
-            }
+            m_gameMap.destroyMover(deadMeat);
             return;
         }
 
@@ -103,10 +103,9 @@ public class EditorGame : IGameMode
         {
             if (deadMeat.tile.improvement == MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData = GameObject.Find("CatGoalSound").GetComponent<AudioSource>();
+                AudioSource audioData = m_audioParent.Find("CatGoalSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
-                Debug.Log("Cat hit goal, you lose.");
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
@@ -115,28 +114,26 @@ public class EditorGame : IGameMode
         {
             if (deadMeat.tile.improvement != MapTile.TileImprovement.Goal)
             {
-                AudioSource audioData = GameObject.Find("MouseDiedSound").GetComponent<AudioSource>();
+                AudioSource audioData = m_audioParent.Find("MouseDiedSound").GetComponent<AudioSource>();
                 audioData.Play(0);
 
-                Debug.Log("A mouse was destroyed. Game Over.");
                 m_gameMap.pingLocation(deadMeat.transform.localPosition, m_autoResetDelay);
                 endGame(false);
             }
             else
             {
                 --m_currentMice;
-                m_gameMap.destroyMouse(deadMeat.transform);
+                m_gameMap.destroyMover(deadMeat);
                 if (m_currentMice <= 0)
                 {
-                    AudioSource audioData = GameObject.Find("SuccessSound").GetComponent<AudioSource>();
+                    AudioSource audioData = m_audioParent.Find("SuccessSound").GetComponent<AudioSource>();
                     audioData.Play(0);
 
-                    Debug.Log("The last mouse hit a goal, you won.");
                     endGame(true);
                 }
                 else
                 {
-                    AudioSource audioData = GameObject.Find("MouseGoalSound").GetComponent<AudioSource>();
+                    AudioSource audioData = m_audioParent.Find("MouseGoalSound").GetComponent<AudioSource>();
                     audioData.Play(0);
                 }
             }
@@ -144,8 +141,14 @@ public class EditorGame : IGameMode
     }
 
 
+
     private void onStateChange(GameState.State oldState, GameState.State newState)
     {
+        if (m_timer != null)
+        {
+            m_timer.stopTimer();
+        }
+
         if (newState == GameState.State.Started_Paused)
         {
             m_paused = true;
@@ -158,13 +161,14 @@ public class EditorGame : IGameMode
             m_paused = false;
             m_playing = true;
             saveAutosave(ref m_pauseSaveData);
+            countMice();
         }
-        else if (newState == GameState.State.Ended_Paused)
+        else if (newState == GameState.State.Ended_Failure)
         {
             m_paused = true;
             m_playing = false;
         }
-        else if (newState == GameState.State.Ended_Unpaused)
+        else if (newState == GameState.State.Ended_Victory)
         {
             m_paused = false;
             m_playing = false;
@@ -235,21 +239,26 @@ public class EditorGame : IGameMode
         m_timer = new Timer();
         m_timer.timerCompleted += () =>
         {
-            m_gameState.mainState = state;
+            if (m_gameState.mainState != state)
+            {
+                m_gameState.mainState = state;
+            }
             m_timer = null;
         };
         m_timer.startTimer(delayInSeconds);
     }
 
 
-    private int m_numMice = 0;
-    private int m_currentMice = 0;
-    private GameObject m_saveMenu;
-    private bool m_paused;
-    private bool m_playing;
-    private float m_autoResetDelay = 1.5f;
-    private Timer m_timer = null;
-    private byte[] m_pauseSaveData;
+    private Transform m_display;
+    private Transform m_audioParent;
     private GameMap m_gameMap;
     private GameState m_gameState;
+    private Timer m_timer = null;
+
+    private byte[] m_pauseSaveData;
+    private int m_numMice = 0;
+    private int m_currentMice = 0;
+    private float m_autoResetDelay = 1.5f;
+    private bool m_paused;
+    private bool m_playing;
 }

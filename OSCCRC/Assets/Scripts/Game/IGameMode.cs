@@ -22,9 +22,9 @@ public interface IGameMode {
     void endGame();
 
 
-    // Places a directional tile
+    // Places a directional tile for the specified player
     // Puzzle mode allows a limited set of tiles, wheras multiplayer keeps the most recent three
-    void placeDirection(MapTile tile, Directions.Direction dir);
+    void placeDirection(MapTile tile, Directions.Direction dir, int player);
 
 
     // Handles the elimination of a GridMovement object

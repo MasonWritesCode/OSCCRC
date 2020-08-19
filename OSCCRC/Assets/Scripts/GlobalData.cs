@@ -3,19 +3,19 @@
 
 public static class GlobalData {
 
-    // MainManu exports:
+    // MainMenu exports:
 
     public static GameController.GameMode mode;
     public static string currentStagePath;
+    public static bool[] isHumanPlayer = { true, false, false, false };
 
 
     // Development Related Values:
 
-    // Disables vsync so that performance can properly be measured
+    // Disables vsync in the game scene so that performance can properly be measured
     public static readonly bool d_uncapFrames = false;
 
-    // Begins loading of Game scene once main menu is shown where the slowdown is less noticible.
-    // This is currently disabled by default, because beginning an async load can cause input drops which I consider much worse.
-    // This will disable the profiler apparently, so make sure this is false if you want to profile the main menu.
-    public static readonly bool d_loadSceneAsync = false;
+    // Begins loading of Game scene asynchronously while still in the main menu.
+    public static readonly bool d_loadSceneAsync = true;
+
 }

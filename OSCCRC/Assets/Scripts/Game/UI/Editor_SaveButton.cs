@@ -6,18 +6,21 @@ using UnityEngine.UI;
 
 public class Editor_SaveButton : MonoBehaviour, IPointerClickHandler
 {
+    public InputField pathInput;
+    public InputField stageNameInput;
+
     void Start()
     {
-        m_editor = GameObject.FindWithTag("GameController").GetComponent<Editor>();
         m_gameStage = GameObject.FindWithTag("GameController").GetComponent<GameStage>();
+        m_editor = GameObject.FindWithTag("GameController").GetComponent<Editor>();
     }
 
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         if (pointerEventData.button == PointerEventData.InputButton.Left)
         {
-            string savePath = transform.parent.GetComponentInChildren<Text>().text;
-            string stageName = transform.parent.Find("Stage").GetComponentInChildren<Text>().text;
+            string savePath = pathInput.text;
+            string stageName = stageNameInput.text;
 
             Debug.Log(savePath);
             Debug.Log(stageName);

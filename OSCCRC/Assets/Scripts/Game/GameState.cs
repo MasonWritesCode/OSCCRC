@@ -12,12 +12,12 @@ public class GameState
      * State Unstarted        : The game level is getting ready to start, but not yet ready for user input
      * State Started_Paused   : The game level is started, but no movement occurs because we are waiting for user to finish their input
      * State Started_Unpaused : The game level is started and simulation is occuring
-     * State Ended_Paused     : The game level is finished, but proceeding with new activities is on hold
-     * State Ended_Unpaused   : The game level is finished
+     * State Ended_Failure    : The game level is finished, but proceeding with new activities is on hold because the player failed
+     * State Ended_Victory    : The game level is finished and someone is victorious
      * TagState Suspended     : The game is paused/suspended and activity should be halted until it is no longer suspended
      * TagState InputFocused  : A UI input field is set to recieve user input, and so game controls should avoid reacting to input
      */
-    public enum State { None, Unstarted, Started_Paused, Started_Unpaused, Ended_Paused, Ended_Unpaused }
+    public enum State { None, Unstarted, Started_Paused, Started_Unpaused, Ended_Failure, Ended_Victory }
     public enum TagState { Suspended, InputFocused }
 
     public delegate void stateChangeEvent(State oldState, State newState);

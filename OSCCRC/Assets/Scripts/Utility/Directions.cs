@@ -9,6 +9,7 @@ public static class Directions {
 
     public enum Direction { North = 1, East = 2, South = 4, West = 8 };
 
+
     // Rotates a transform into the specified cardinal direction, local to relativeTo or its parent if not specified
     public static void rotate(Transform transform, Direction dir, Transform relativeTo = null)
     {
@@ -17,36 +18,46 @@ public static class Directions {
             return;
         }
 
-        // We rotate the vector so that eulerAngles.y is the rotation about a fixed global axis, then we assign our value and then undo our previous rotation
-        // We use eulerAngles so that we can assign a degree value without having to worry about the current rotation in that direction and avoid touching rotation about other axes
-        if (relativeTo == null && transform.parent)
-        {
-            relativeTo = transform.parent;
-        }
-        Vector3 relVec = Vector3.forward;
-        if (relativeTo != null)
-        {
-            relVec = relativeTo.forward;
-        }
-        Quaternion rot = Quaternion.FromToRotation(relVec, Vector3.forward);
-        Vector3 newAngles = (rot * transform.rotation).eulerAngles;
+        float angle;
         switch (dir)
         {
             case Direction.East:
-                newAngles.y = 90.0f;
+                angle = 90.0f;
                 break;
             case Direction.South:
-                newAngles.y = 180.0f;
+                angle = 180.0f;
                 break;
             case Direction.West:
-                newAngles.y = 270.0f;
+                angle = 270.0f;
                 break;
             default:
-                newAngles.y = 0.0f;
+                angle = 0.0f;
                 break;
         }
-        transform.rotation = Quaternion.Inverse(rot) * Quaternion.Euler(newAngles);
+
+        // We rotate the vector so that eulerAngles.y is the rotation about a fixed global axis, then we assign our value and then undo our previous rotation
+        // We use eulerAngles so that we can assign a degree value without having to worry about the current rotation in that direction and avoid touching rotation about other axes
+        if (relativeTo == null)
+        {
+            // We can just do localRotation in this case instead for performance
+
+            Vector3 newAngles = transform.localEulerAngles;
+            newAngles.y = angle;
+
+            transform.localRotation = Quaternion.Euler(newAngles);
+        }
+        else
+        {
+            Vector3 relVec = relativeTo.forward;
+            Quaternion rot = Quaternion.FromToRotation(relVec, Vector3.forward);
+
+            Vector3 newAngles = (rot * transform.rotation).eulerAngles;
+            newAngles.y = angle;
+
+            transform.rotation = Quaternion.Inverse(rot) * Quaternion.Euler(newAngles);
+        }
     }
+
 
     // Gets the cardinal direction opposite of the one specified by "dir"
     public static Direction getOppositeDir(Direction dir)
@@ -62,6 +73,7 @@ public static class Directions {
         return (Direction)(newNum);
     }
 
+
     // Returns the closest cardinal direction moving clockwise from "dir"
     public static Direction nextClockwiseDir(Direction dir)
     {
@@ -71,6 +83,7 @@ public static class Directions {
 
         return (Direction)(newNum);
     }
+
 
     // Returns the closest cardinal direction moving counter-clockwise from "dir"
     public static Direction nextCounterClockwiseDir(Direction dir)
@@ -86,8 +99,9 @@ public static class Directions {
         return (Direction)(newNum);
     }
 
+
     // Returns the vector representing this direction
-    public static Vector3 toDirectionVector(Direction dir)
+    public static Vector3 toVector(Direction dir)
     {
         switch (dir)
         {
@@ -104,6 +118,7 @@ public static class Directions {
         }
 
     }
+
 
     // An IEqualityComparer that avoids boxing to improve performance with a direction as a key
     public struct DirectionComparer : System.Collections.Generic.IEqualityComparer<Direction>
